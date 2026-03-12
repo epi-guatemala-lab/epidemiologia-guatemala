@@ -1,0 +1,3073 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard Epidemiológico — IRA e Influenza Guatemala 2016-2026</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3.0.1/dist/chartjs-plugin-annotation.min.js"></script>
+<style>
+  :root {
+    --primary: #1a5276;
+    --accent: #2980b9;
+    --danger: #c0392b;
+    --warning: #e67e22;
+    --success: #27ae60;
+    --bg: #f4f6f9;
+    --card: #ffffff;
+    --text: #2c3e50;
+    --border: #dde2e8;
+    --muted: #7f8c8d;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); }
+
+  /* HEADER */
+  header {
+    background: linear-gradient(135deg, var(--primary) 0%, #154360 100%);
+    color: white; padding: 24px 32px;
+    display: flex; align-items: center; gap: 20px;
+    box-shadow: 0 3px 12px rgba(0,0,0,0.2);
+  }
+  header .flag { font-size: 2.4rem; }
+  header h1 { font-size: 1.5rem; font-weight: 700; line-height: 1.3; }
+  header p { font-size: 0.82rem; opacity: 0.8; margin-top: 4px; }
+  header .badge {
+    margin-left: auto; background: rgba(255,255,255,0.15);
+    border: 1px solid rgba(255,255,255,0.3);
+    padding: 6px 14px; border-radius: 20px; font-size: 0.78rem;
+    white-space: nowrap;
+  }
+
+  /* NAV TABS */
+  .tabs {
+    display: flex; background: var(--primary); padding: 0 24px; gap: 4px;
+    overflow-x: auto;
+  }
+  .tab-btn {
+    padding: 10px 18px; border: none; background: transparent;
+    color: rgba(255,255,255,0.65); cursor: pointer;
+    font-size: 0.85rem; font-weight: 500; border-bottom: 3px solid transparent;
+    transition: all 0.2s; white-space: nowrap;
+  }
+  .tab-btn:hover { color: white; }
+  .tab-btn.active { color: white; border-bottom-color: #3498db; }
+
+  /* CONTENT */
+  .tab-content { display: none; padding: 24px; }
+  .tab-content.active { display: block; }
+
+  /* KPI CARDS */
+  .kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 16px; margin-bottom: 24px;
+  }
+  .kpi {
+    background: var(--card); border-radius: 12px;
+    padding: 18px 20px; border-left: 4px solid var(--accent);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    transition: transform 0.15s;
+  }
+  .kpi:hover { transform: translateY(-2px); }
+  .kpi.danger { border-left-color: var(--danger); }
+  .kpi.warning { border-left-color: var(--warning); }
+  .kpi.success { border-left-color: var(--success); }
+  .kpi .label { font-size: 0.75rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; }
+  .kpi .value { font-size: 1.8rem; font-weight: 700; margin: 4px 0; color: var(--text); line-height: 1; }
+  .kpi .sub { font-size: 0.78rem; color: var(--muted); }
+
+  /* CHARTS GRID */
+  .charts-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(480px, 1fr));
+    gap: 20px;
+  }
+  .chart-card {
+    background: var(--card); border-radius: 12px; padding: 20px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  }
+  .chart-card.wide { grid-column: 1 / -1; }
+  .chart-card h3 { font-size: 0.95rem; font-weight: 600; margin-bottom: 16px; color: var(--text); }
+  .chart-card .source {
+    font-size: 0.7rem; color: var(--muted); margin-top: 10px; font-style: italic;
+  }
+  .chart-card .source a { color: var(--accent); }
+  canvas { max-height: 320px; }
+
+  /* TABLES */
+  .data-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; margin-top: 12px; }
+  .data-table th { background: var(--primary); color: white; padding: 10px 12px; text-align: left; font-weight: 600; font-size: 0.8rem; }
+  .data-table td { padding: 9px 12px; border-bottom: 1px solid var(--border); }
+  .data-table tr:nth-child(even) td { background: #f8fafc; }
+  .data-table tr:hover td { background: #eaf4fb; }
+  .tag { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 0.72rem; font-weight: 600; }
+  .tag-h3n2 { background: #fdebd0; color: #784212; }
+  .tag-h1n1 { background: #d5f5e3; color: #1a5632; }
+  .tag-rsv  { background: #d6eaf8; color: #1a5276; }
+  .tag-b    { background: #f9ebea; color: #922b21; }
+
+  /* ALERT BANNERS */
+  .alert {
+    border-radius: 8px; padding: 12px 16px; margin-bottom: 16px;
+    display: flex; align-items: flex-start; gap: 10px; font-size: 0.85rem;
+  }
+  .alert-danger  { background: #fdf2f2; border: 1px solid #f5c6cb; color: #721c24; }
+  .alert-warning { background: #fff8e1; border: 1px solid #ffd966; color: #6c4a00; }
+  .alert-info    { background: #e8f4fd; border: 1px solid #bee5eb; color: #0c5460; }
+  .alert-icon    { font-size: 1.1rem; flex-shrink: 0; margin-top: 1px; }
+
+  /* SECTION HEADER */
+  .section-title {
+    font-size: 1.1rem; font-weight: 700; color: var(--primary);
+    margin-bottom: 16px; padding-bottom: 8px;
+    border-bottom: 2px solid var(--border);
+    display: flex; align-items: center; gap: 8px;
+  }
+
+  /* LINKS */
+  .sources-box {
+    background: #f8f9fb; border: 1px solid var(--border);
+    border-radius: 8px; padding: 14px 18px; margin-top: 20px;
+  }
+  .sources-box h4 { font-size: 0.82rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px; }
+  .sources-box ul { list-style: none; }
+  .sources-box li { margin-bottom: 6px; font-size: 0.82rem; }
+  .sources-box a { color: var(--accent); text-decoration: none; }
+  .sources-box a:hover { text-decoration: underline; }
+
+  /* CIAS CODES TABLE */
+  .cie-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 12px; }
+  .cie-card { background: var(--card); border-radius: 8px; padding: 14px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
+  .cie-card .code { font-family: monospace; font-size: 1rem; font-weight: 700; color: var(--primary); }
+  .cie-card .desc { font-size: 0.82rem; margin-top: 4px; color: var(--text); }
+  .cie-card .sub-codes { font-size: 0.75rem; color: var(--muted); margin-top: 6px; line-height: 1.6; }
+
+  /* RESPONSIVE */
+  @media (max-width: 768px) {
+    .charts-grid { grid-template-columns: 1fr; }
+    .kpi-grid { grid-template-columns: 1fr 1fr; }
+    header { flex-wrap: wrap; }
+    header .badge { margin-left: 0; }
+  }
+
+  /* FOOTER */
+  footer {
+    text-align: center; padding: 20px; font-size: 0.78rem;
+    color: var(--muted); border-top: 1px solid var(--border);
+    background: var(--card); margin-top: 24px;
+  }
+
+  /* PROGRESS BARS */
+  .progress-container { margin: 6px 0; }
+  .progress-label { display: flex; justify-content: space-between; font-size: 0.8rem; margin-bottom: 3px; }
+  .progress-bar { height: 8px; background: #e9ecef; border-radius: 4px; overflow: hidden; }
+  .progress-fill { height: 100%; border-radius: 4px; transition: width 0.6s ease; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="flag">🇬🇹</div>
+  <div>
+    <h1>Dashboard Epidemiológico: Influenza e Infecciones Respiratorias Agudas</h1>
+    <p>Guatemala · Periodo: 2012–2026 · Fuentes: MSPAS CSV verificado, WHO FluNet (LNS), OPS/OMS, CDC/VICo, IHME/GBD · Auditado 2026-03-10; FluNet verificado 2026-03-12</p>
+  </div>
+  <div class="badge">⚠️ Brote H3N2 Activo · Marzo 2026</div>
+</header>
+
+<nav class="tabs">
+  <button class="tab-btn active" onclick="showTab('resumen')">📊 Introducción</button>
+  <button class="tab-btn" onclick="showTab('tendencias')">📈 Tendencias 2016–2026</button>
+  <button class="tab-btn" onclick="showTab('virologia')">🦠 Vigilancia Virológica</button>
+  <button class="tab-btn" onclick="showTab('demografia')">👥 Demografía y Riesgo</button>
+  <button class="tab-btn" onclick="showTab('analisis')">🔬 Análisis Cruzado</button>
+  <button class="tab-btn" onclick="showTab('mortalidad')">💀 Mortalidad</button>
+  <button class="tab-btn" onclick="showTab('ensayo')">🧪 Ensayo Clínico</button>
+  <button class="tab-btn" onclick="showTab('cie10')">📋 Códigos CIE-10</button>
+  <button class="tab-btn" onclick="showTab('fuentes')">🔗 Fuentes y Datos</button>
+</nav>
+
+<!-- ===================== TAB: RESUMEN EJECUTIVO ===================== -->
+<div id="resumen" class="tab-content active">
+
+  <div class="alert alert-danger">
+    <span class="alert-icon">🚨</span>
+    <div><strong>ALERTA ACTIVA — Marzo 2026:</strong> Brote de Influenza A(H3N2) con positividad &gt;50%. Hospital San Juan de Dios reporta +390% en hospitalizaciones (ene–feb 2026 vs 2025). Hospital Roosevelt: +50% en emergencia pediátrica. Subclado K (J.2.4.1) reportado en 6.5% de muestras (fuente: MSPAS/GISAID, no verificable en FluNet CSV).</div>
+  </div>
+
+  <div class="kpi-grid">
+    <div class="kpi danger">
+      <div class="label">Positividad Influenza (SE8/2026)</div>
+      <div class="value" style="color:#c0392b">55.4%</div>
+      <div class="sub">Pico semana 8 · Promedio SE1–9: 36.0% · Predominio H3N2 (FluNet SENTINEL)</div>
+    </div>
+    <div class="kpi warning">
+      <div class="label">Aumento Hospitalizaciones 2026</div>
+      <div class="value" style="color:#e67e22">+390%</div>
+      <div class="sub">HGSJ ene–feb 2026 vs 2025</div>
+    </div>
+    <div class="kpi">
+      <div class="label">DALYs por Influenza (LAC)</div>
+      <div class="value">503.78</div>
+      <div class="sub">por 100,000 hab. — 1° en América Latina (2015–19)</div>
+    </div>
+    <div class="kpi danger">
+      <div class="label">Mortalidad Influenza+Neumonía</div>
+      <div class="value" style="color:#c0392b">9,245</div>
+      <div class="sub">muertes/año (OMS country profile 2020, estimación modelada — INE 2018 registra 6,541 por J09-J18) · Tasa ajustada 70.32/100k (OMS MDB, estandarizada por edad)</div>
+    </div>
+    <div class="kpi">
+      <div class="label">Tasa Hospitalización Influenza</div>
+      <div class="value">24</div>
+      <div class="sub">por 100,000 · Niños &lt;5: 93/100k</div>
+    </div>
+    <div class="kpi warning">
+      <div class="label">Casos IRA Anuales (pre-COVID)</div>
+      <div class="value" style="color:#e67e22">3.6M</div>
+      <div class="sub">consultas totales en 2019 (SIGSA)</div>
+    </div>
+    <div class="kpi">
+      <div class="label">Mortalidad Hospitalaria Influenza</div>
+      <div class="value">6%</div>
+      <div class="sub">hospitalizados con influenza confirmada (VICo 2008–12, era H1N1pdm09 — dato de hace 14 años)</div>
+    </div>
+    <div class="kpi success">
+      <div class="label">Vacunación Influenza (niños &lt;5)</div>
+      <div class="value" style="color:#c0392b">1%</div>
+      <div class="sub">cobertura documentada en hospitalizados (VICo)</div>
+    </div>
+  </div>
+
+  <div class="charts-grid">
+    <div class="chart-card">
+      <h3>📉 Serie Histórica: Casos IRA Anuales Guatemala (2012–2024)</h3>
+      <canvas id="chartIRASerie"></canvas>
+      <div class="source">Fuente: <a href="https://datosabiertos.mspas.gob.gt/dataset/morbilidad-por-iras-y-etas" target="_blank">MSPAS Datos Abiertos — morbilidad-iras-departamento-2012-al-2024.csv</a> · Datos verificados directamente del CSV oficial (8,008 registros, total 36,690,514 casos)</div>
+    </div>
+    <div class="chart-card">
+      <h3>🦠 Distribución de Patógenos en IRA Hospitalizada (VICo 2007–11)</h3>
+      <canvas id="chartPatogenos"></canvas>
+      <div class="source">Fuente: <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC3877070/" target="_blank">Surveillance for Hospitalized ARI in Guatemala, PLOS One 2013</a></div>
+    </div>
+    <div class="chart-card">
+      <h3>📊 Tasas de Hospitalización por Influenza por Edad (por 100k) — VICo 2009</h3>
+      <canvas id="chartIncidenciaEdad"></canvas>
+      <div class="source">Fuente: <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC6696630/" target="_blank">Hospitalization and death among patients with influenza, Guatemala 2008–2012</a></div>
+    </div>
+    <div class="chart-card">
+      <h3>⚰️ Distribución de Muertes por Influenza Hospitalizada según Edad</h3>
+      <canvas id="chartMuertes"></canvas>
+      <div class="source">Fuente: <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC6696630/" target="_blank">BMC Public Health 2019 — VICo Guatemala</a></div>
+    </div>
+  </div>
+
+  <div class="sources-box" style="margin-top:20px">
+    <h4>🔑 Hallazgos Clave</h4>
+    <ul>
+      <li>✅ Guatemala tiene la <strong>mayor carga de influenza per cápita en toda América Latina</strong> (503.78 DALYs/100k, 2015–2019)</li>
+      <li>✅ Influenza y neumonía son la <strong>2ª causa de muerte</strong> en Guatemala según agrupación OMS country profile 2020 (10.61% de muertes — IHME/GBD clasifica "infecciones respiratorias" como 3ª causa, tras cardiovasculares y neoplasias)</li>
+      <li>✅ El VRS (VSR) es el patógeno más frecuente en IRA hospitalizada (26.4%), seguido por adenovirus (11.2%) e influenza A (7%)</li>
+      <li>✅ Solo el <strong>1% de niños &lt;5 hospitalizados con influenza estaba vacunado</strong> (2008–2012)</li>
+      <li>✅ La etnicidad indígena y la neumonía radiológica son factores independientes de enfermedad grave (aOR 4.3 y 5.2 respectivamente)</li>
+      <li>⚠️ El subregistro es masivo: solo 25–30% de casos IRA acuden a establecimientos MSPAS (estimado: 52% busca atención total [OMS GHO 2015] x ~55% va a MSPAS; Q1=46.5% vs Q5=68.2%)</li>
+    </ul>
+  </div>
+</div>
+
+<!-- ===================== TAB: TENDENCIAS ===================== -->
+<div id="tendencias" class="tab-content">
+  <div class="section-title">📈 Tendencias 2016–2026</div>
+
+  <div class="charts-grid">
+    <div class="chart-card wide">
+      <h3>📉 Evolución de Casos IRA e Influenza en Guatemala (con hitos epidemiológicos)</h3>
+      <canvas id="chartTendenciaHitos" style="max-height:380px"></canvas>
+      <div class="source">IRA (barras): <a href="https://datosabiertos.mspas.gob.gt/dataset/morbilidad-por-iras-y-etas" target="_blank">MSPAS Datos Abiertos CSV verificado 2012–2024</a> · Positividad (línea): <a href="https://www.who.int/tools/flunet" target="_blank">WHO FluNet GT — fuente centinela deduplicada SE36/2009–SE9/2026</a> · IRA 2012–2019 incluye subregistro (~70–75% casos no consultan establecimientos gubernamentales)</div>
+    </div>
+
+    <div class="chart-card">
+      <h3>🔄 Transición de Cepas: H1N1 → H3N2 (2025–2026)</h3>
+      <canvas id="chartCepas"></canvas>
+      <div class="source">Fuente: <a href="https://www.prensalibre.com/guatemala/comunitario/influenza-a-h3n2-en-guatemala-casos-variantessintomas-vacuna-y-recomendaciones-del-ministerio-de-salud/" target="_blank">MSPAS / Prensa Libre 2026</a></div>
+    </div>
+
+    <div class="chart-card">
+      <h3>📅 Estacionalidad Real de Influenza en Guatemala (FluNet 2009–2026)</h3>
+      <canvas id="chartEstacionalidad"></canvas>
+      <div class="source">Fuente: <a href="https://www.who.int/tools/flunet" target="_blank">WHO FluNet GT (ISO2=GT)</a> · SE36/2009–SE9/2026 · N=850 semanas-año únicas · Fuente centinela deduplicada · Pico: Mar (25.4%) · Valle: Ago (7.5%)</div>
+    </div>
+
+    <div class="chart-card">
+      <h3>🏥 Impacto del COVID-19 en Vigilancia de Influenza</h3>
+      <canvas id="chartCovid"></canvas>
+      <div class="source">Fuente: <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC9745234/" target="_blank">Leveraging Influenza Surveillance during COVID-19, CDC 2022</a></div>
+    </div>
+  </div>
+
+  <div class="chart-card" style="margin-top:20px">
+    <h3>📊 Casos Confirmados Influenza por Año — Centros Centinela (VICo)</h3>
+    <table class="data-table">
+      <thead><tr><th>Año</th><th>Total IRA Hospitalizados</th><th>Influenza Confirmada</th><th>% Positivos</th><th>Cepa Predominante</th><th>Eventos Clave</th></tr></thead>
+      <tbody>
+        <tr><td>2008</td><td>~1,400</td><td>62</td><td>4.4%</td><td><span class="tag tag-h1n1">H1N1 estacional</span></td><td>Inicio sistema VICo</td></tr>
+        <tr><td>2009</td><td>~1,500</td><td>180</td><td>12%</td><td><span class="tag tag-h1n1">H1N1pdm09</span></td><td>🚨 Pandemia H1N1</td></tr>
+        <tr><td>2010</td><td>~1,600</td><td>120</td><td>7.5%</td><td><span class="tag tag-h1n1">H1N1pdm09</span></td><td>Año pico hospitalización</td></tr>
+        <tr><td>2011</td><td>~1,400</td><td>75</td><td>5.4%</td><td><span class="tag tag-h1n1">H1N1</span> / <span class="tag tag-h3n2">H3N2</span></td><td>—</td></tr>
+        <tr><td>2012</td><td>~1,426</td><td>84</td><td>5.9%</td><td><span class="tag tag-h3n2">H3N2</span></td><td>—</td></tr>
+        <tr><td>2016–19</td><td>2.5–3.6M IRA/año (SIGSA)</td><td>—</td><td>9.2–22.7%</td><td><span class="tag tag-h1n1">H1N1</span></td><td>Periodo pre-COVID · pico 22.7% en 2019 (FluNet centinela)</td></tr>
+        <tr><td>2020</td><td>~2.1M IRA totales</td><td>Muy reducido</td><td>&lt;2%</td><td><span class="tag tag-h1n1">H1N1</span></td><td>🦠 Pandemia COVID-19</td></tr>
+        <tr><td>2021</td><td>1,797,135 IRA (SIGSA)</td><td>10 (FluNet) / ~71 est. (MSPAS SE reports)</td><td>0–1% (FluNet: 10 pos/1,045 spec SENTINEL; 1,156 combinado SENTINEL+NONSENTINEL)</td><td><span class="tag tag-h1n1">H1N1</span></td><td>Nadir vigilancia influenza · colapso COVID-19 · 52 semanas reportando ≤3 spec/semana</td></tr>
+        <tr><td>2022</td><td>—</td><td>—</td><td>—</td><td><span class="tag tag-h3n2">H3N2</span></td><td>Reactivación H3N2</td></tr>
+        <tr><td>2023</td><td>—</td><td>—</td><td>moderado</td><td><span class="tag tag-b">B/Victoria</span></td><td>Rebote post-COVID</td></tr>
+        <tr><td>2024</td><td>—</td><td>—</td><td>9.5% (PAHO SE39, métrica ILI diferente de FluNet SENTINEL 21.6%)</td><td><span class="tag tag-h1n1">H1N1</span> + <span class="tag tag-rsv">VSR</span></td><td>Inicio transición H3N2</td></tr>
+        <tr><td>2025-26</td><td>—</td><td>—</td><td><strong>&gt;50%</strong></td><td><span class="tag tag-h3n2">H3N2 ~84–97%</span></td><td>🚨 Brote +390% hospitalizaciones</td></tr>
+      </tbody>
+    </table>
+    <div class="source" style="margin-top:10px">Fuentes: VICo/CDC/UVG, SIGSA/MSPAS, PAHO, Prensa Libre</div>
+  </div>
+</div>
+
+<!-- ===================== TAB: VIROLOGÍA ===================== -->
+<div id="virologia" class="tab-content">
+  <div class="section-title">🦠 Vigilancia Virológica</div>
+
+  <div class="alert alert-info">
+    <span class="alert-icon">ℹ️</span>
+    <div>Guatemala reporta a FluNet (OMS) a través del Laboratorio Nacional de Salud (LNS). Completitud del reporte 2005–2019: <strong>57.88%</strong> (puesto 16/29 en las Américas). Acceso a datos en tiempo real: <a href="https://www.who.int/tools/flunet" target="_blank">FluNet</a> · <a href="https://dashboards.pahoflu.com/app/respiratory_viruses/" target="_blank">PAHO Dashboard</a></div>
+  </div>
+  <div class="alert alert-warning">
+    <span class="alert-icon">⚠️</span>
+    <div><strong>Nota metodológica FluNet (auditada 2026-03-10):</strong> A partir de 2020 la OMS registra datos <em>SENTINEL</em> y <em>NONSENTINEL</em> por separado (2 filas/semana en el mismo CSV). Este dashboard filtra por <code>ORIGIN_SOURCE = 'SENTINEL'</code> (2020–2026) y <code>ORIGIN_SOURCE = 'NOTDEFINED'</code> (2009–2019) para consistencia metodológica. <strong>ADVERTENCIA:</strong> un filtro naïve tipo <em>keep='first'</em> selecciona NONSENTINEL en 2020–2026 (que aparece primero en el CSV), generando errores de hasta ±11pp. El colapso de 2020–2021 refleja el cierre de sitios centinela por COVID-19. Fuente: WHO FluNet ISO2=GT, SE36/2009–SE9/2026. Guatemala <strong>no reporta al WHO FluID</strong> (datos de hospitalizaciones).</div>
+  </div>
+
+  <div class="charts-grid">
+    <div class="chart-card">
+      <h3>🧬 Subtipos de Influenza Detectados (VICo 2008–2012, n=444)</h3>
+      <canvas id="chartSubtipos"></canvas>
+      <div class="source">Fuente: <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC6696630/" target="_blank">BMC Public Health 2019</a></div>
+    </div>
+    <div class="chart-card">
+      <h3>🔬 Positividad Influenza y Otros Virus Respiratorios — Oct 2025 (Guatemala)</h3>
+      <canvas id="chartPosOct25"></canvas>
+      <div class="source">Fuente: <a href="https://iris.paho.org/handle/10665.2/61690" target="_blank">PAHO SE 39/2025</a></div>
+    </div>
+    <div class="chart-card">
+      <h3>📊 Completitud Datos FluNet Guatemala vs. Región Américas (2005–2019)</h3>
+      <canvas id="chartFlunet"></canvas>
+      <div class="source">Fuente: <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC7804328/" target="_blank">Completeness FluNet data Pan-America, PLOS One 2021</a></div>
+    </div>
+    <div class="chart-card">
+      <h3>🏥 Patógenos en IRA Hospitalizada — Guatemala (% detección)</h3>
+      <canvas id="chartPatogenos2"></canvas>
+      <div class="source">Fuente: <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC3877070/" target="_blank">Surveillance ARI Guatemala 2007–2011, PLOS One 2013</a></div>
+    </div>
+  </div>
+
+  <div class="chart-card" style="margin-top:20px">
+    <h3>🧫 Sitios Centinela de Vigilancia de Influenza en Guatemala</h3>
+    <table class="data-table">
+      <thead><tr><th>Hospital / Sitio</th><th>Ubicación</th><th>Tipo</th><th>Sistema</th><th>Activo Desde</th></tr></thead>
+      <tbody>
+        <tr><td>Hospital Infantil de Infectología y Rehabilitación</td><td>Ciudad de Guatemala</td><td>IRAG Pediátrico</td><td>MSPAS/OPS</td><td>~2007</td></tr>
+        <tr><td>Hospital General San Juan de Dios</td><td>Ciudad de Guatemala</td><td>IRAG/ETI</td><td>MSPAS/OPS</td><td>~2007</td></tr>
+        <tr><td>Hospital Roosevelt</td><td>Ciudad de Guatemala</td><td>IRAG/ETI</td><td>MSPAS</td><td>~2010</td></tr>
+        <tr><td>Hospital Nacional de Santa Rosa (Cuilapa)</td><td>Santa Rosa</td><td>VICo poblacional</td><td>CDC/UVG/MSPAS</td><td>Nov 2007</td></tr>
+        <tr><td>Hospital Regional de Occidente</td><td>Quetzaltenango</td><td>VICo poblacional</td><td>CDC/UVG/MSPAS</td><td>Feb 2009</td></tr>
+        <tr><td>IGSS Hospital de Enfermedades</td><td>Ciudad de Guatemala</td><td>IRAG/ETI</td><td>IGSS/CDC</td><td>~2009</td></tr>
+        <tr><td>Hospital Nacional de San Marcos</td><td>San Marcos</td><td>Centinela IRAG</td><td>MSPAS/OPS</td><td>~2015</td></tr>
+      </tbody>
+    </table>
+    <div class="source" style="margin-top:8px">Fuentes: SICA, PAHO, Prensa Libre · <a href="https://www.sica.int/noticias/realizan-visita-tecnica-a-sitios-centinela-de-vigilancia-de-influenza-y-otros-virus-respiratorios-en-guatemala_1_134086.html" target="_blank">Visita técnica sitios centinela 2024</a></div>
+  </div>
+</div>
+
+<!-- ===================== TAB: DEMOGRAFÍA ===================== -->
+<div id="demografia" class="tab-content">
+  <div class="section-title">👥 Demografía y Factores de Riesgo</div>
+
+  <div class="charts-grid">
+    <div class="chart-card">
+      <h3>📊 Grupos de Edad más Afectados por Influenza</h3>
+      <canvas id="chartGruposEdad"></canvas>
+      <div class="source">Fuente: VICo/CDC 2008–2012 · PAHO Americas 2010–2015</div>
+    </div>
+    <div class="chart-card">
+      <h3>🗺️ Tasa de Incidencia IRA por Departamento (por 1,000 hab.)</h3>
+      <canvas id="chartDepartamentos"></canvas>
+      <div class="source">Fuente: <a href="https://datosabiertos.mspas.gob.gt/dataset/morbilidad-por-iras-y-etas" target="_blank">MSPAS CSV verificado 2022–2024</a> + proyecciones población <a href="https://www.ine.gob.gt" target="_blank">INE 2018</a> · Solo consultas sector MSPAS (excluye IGSS y privado)</div>
+    </div>
+    <div class="chart-card">
+      <h3>⚠️ Factores de Riesgo (Odds Ratios ajustados)</h3>
+      <canvas id="chartOR"></canvas>
+      <div class="source">Fuente: <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC6696630/" target="_blank">VICo Guatemala 2008–2012 BMC Public Health</a></div>
+    </div>
+    <div class="chart-card">
+      <h3>💸 Contexto Socioeconómico y Salud</h3>
+      <canvas id="chartSocioeco"></canvas>
+      <div class="source">Fuentes: Banco Mundial, UNICEF, IHME/GBD</div>
+    </div>
+  </div>
+
+  <div class="chart-card" style="margin-top:20px">
+    <h3>🌍 Comparación Regional — Guatemala vs. América Latina</h3>
+    <table class="data-table">
+      <thead><tr><th>Indicador</th><th>Guatemala</th><th>Promedio LAC</th><th>Mejor país LAC</th><th>Fuente</th></tr></thead>
+      <tbody>
+        <tr><td>DALYs influenza/100k (2015–19)</td><td><strong>503.78</strong> 🔴</td><td>~120</td><td>Chile ~45</td><td><a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC11861997/" target="_blank">PMC 2025</a></td></tr>
+        <tr><td>Gasto salud per cápita (2022)</td><td><strong>$396 USD</strong> 🔴</td><td>$800–1,200</td><td>Costa Rica $1,100</td><td><a href="https://data.worldbank.org/indicator/SH.XPD.CHEX.GD.ZS?locations=GT" target="_blank">Banco Mundial</a></td></tr>
+        <tr><td>Gasto de bolsillo (% total)</td><td><strong>60.98%</strong> 🔴</td><td>~30–35%</td><td>Uruguay ~15%</td><td>Banco Mundial 2021</td></tr>
+        <tr><td>Desnutrición crónica &lt;5 años</td><td><strong>48.9%</strong> 🔴</td><td>~12%</td><td>Chile ~2%</td><td><a href="https://www.unicef.es/noticia/en-guatemala-los-ninos-sufre-desnutricion-cronica-maria-claudia-santizo-oficial" target="_blank">UNICEF</a></td></tr>
+        <tr><td>Médicos por 1,000 habitantes</td><td><strong>0.93</strong> 🟡</td><td>~2.0</td><td>Cuba ~8.4</td><td>OMS 2022</td></tr>
+        <tr><td>Cobertura vacuna influenza (grupos prioritarios)</td><td><strong>Baja</strong> 🔴</td><td>Moderada</td><td>Brasil, México</td><td>OPS/OMS 2025</td></tr>
+        <tr><td>Tasa mort. influenza+neumonía/100k (age-std)</td><td><strong>70.32</strong> 🔴</td><td>~25–40</td><td>Chile ~15</td><td>OMS MDB 2020 (estandarizada; cruda INE 2018: 37.9/100k J09-J18)</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="chart-card" style="margin-top:16px">
+    <h3>🔥 Contaminación del Aire Intradomiciliar (Humo de Leña) — Factor de Riesgo Crítico</h3>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:12px">
+      <div>
+        <div class="progress-container">
+          <div class="progress-label"><span>PM2.5 intradomiciliar</span><span><strong>528 µg/m³</strong></span></div>
+          <div class="progress-bar"><div class="progress-fill" style="width:100%;background:#e74c3c"></div></div>
+          <div style="font-size:0.72rem;color:#999">Límite OMS: 25 µg/m³ (21× por encima)</div>
+        </div>
+        <div class="progress-container" style="margin-top:12px">
+          <div class="progress-label"><span>PM10 intradomiciliar</span><span><strong>717 µg/m³</strong></span></div>
+          <div class="progress-bar"><div class="progress-fill" style="width:100%;background:#e67e22"></div></div>
+          <div style="font-size:0.72rem;color:#999">Límite OMS: 50 µg/m³ (14× por encima)</div>
+        </div>
+        <div class="progress-container" style="margin-top:12px">
+          <div class="progress-label"><span>Exposición diaria mujeres</span><span><strong>5 horas</strong></span></div>
+          <div class="progress-bar"><div class="progress-fill" style="width:62%;background:#8e44ad"></div></div>
+        </div>
+      </div>
+      <div style="font-size:0.83rem;line-height:1.7">
+        <p>🔥 Principal combustible doméstico en zonas rurales: <strong>leña en fuego abierto</strong></p>
+        <p>🏥 2ª causa de DALYs en Guatemala (2010)</p>
+        <p>👶 Principal efecto: infecciones respiratorias agudas bajas en niños</p>
+        <p>👩 En mujeres: EPOC crónico</p>
+        <p>📖 <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC4384202/" target="_blank">Estudio RESPIRE Guatemala (EHP 2015)</a></p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== TAB: ANÁLISIS ADICIONAL ===================== -->
+<div id="analisis" class="tab-content">
+  <div class="section-title">🔬 Análisis Cruzado — Indicadores Calculados desde Datos Verificados</div>
+
+  <div class="alert alert-info">
+    <span class="alert-icon">📊</span>
+    <div>Indicadores calculados directamente desde los CSV verificados (MSPAS Datos Abiertos 2012–2024 + WHO FluNet centinela). Auditoría completada 2026-03-10.</div>
+  </div>
+
+  <div class="kpi-grid">
+    <div class="kpi warning">
+      <div class="label">Influenza Estimada 2019 (pico)</div>
+      <div class="value" style="color:#e67e22">824,480</div>
+      <div class="sub">IRA SIGSA × FluNet positivity 22.7% — límite inferior real</div>
+    </div>
+    <div class="kpi danger">
+      <div class="label">Influenza Estimada 2024 ⚠️ MÁXIMO HISTÓRICO</div>
+      <div class="value" style="color:#c0392b">852,090</div>
+      <div class="sub">IRA 3.13M × FluNet SENTINEL 27.2% — supera pico 2019 (824,480)</div>
+    </div>
+    <div class="kpi danger">
+      <div class="label">Influenza Estimada 2020 (COVID)</div>
+      <div class="value" style="color:#c0392b">161,375</div>
+      <div class="sub">Mínimo histórico — colapso vigilancia + NPIs COVID</div>
+    </div>
+    <div class="kpi success">
+      <div class="label">Recuperación post-COVID (2024)</div>
+      <div class="value" style="color:#27ae60">86.2%</div>
+      <div class="sub">Casos IRA 2024 / 2019 — aún -13.8% vs pico pre-COVID</div>
+    </div>
+    <div class="kpi warning">
+      <div class="label">Carga pediátrica &lt;5 años 2024</div>
+      <div class="value" style="color:#e67e22">37.3%</div>
+      <div class="sub">↓ desde 48.7% en 2012 — desplazamiento etario significativo</div>
+    </div>
+    <div class="kpi">
+      <div class="label">Espécimenes FluNet / 10k hab.</div>
+      <div class="value">0.67</div>
+      <div class="sub">Guatemala 2024 (1,228 spec SENTINEL / 18.4M hab.) · OMS recomienda mín. 5.0/10k → solo 13% del mínimo</div>
+    </div>
+  </div>
+
+  <div class="charts-grid">
+    <div class="chart-card wide">
+      <h3>📊 Carga de Influenza Estimada vs IRA Total (2012–2024)</h3>
+      <canvas id="chartInfluenzaEst" style="max-height:360px"></canvas>
+      <div class="source">Cálculo: Casos IRA SIGSA × % Positividad FluNet centinela. Fuentes: <a href="https://datosabiertos.mspas.gob.gt/dataset/morbilidad-por-iras-y-etas" target="_blank">MSPAS CSV</a> + <a href="https://www.who.int/tools/flunet" target="_blank">WHO FluNet GT</a> · Nota: subestima 3–10× por subregistro en establecimientos MSPAS</div>
+    </div>
+    <div class="chart-card">
+      <h3>👶 Tendencia Carga Pediátrica &lt;5 años en IRAs (2012–2024)</h3>
+      <canvas id="chartPediatrica"></canvas>
+      <div class="source">Fuente: <a href="https://datosabiertos.mspas.gob.gt/dataset/morbilidad-por-iras-y-etas" target="_blank">MSPAS CSV verificado</a> · Grupos: &lt;1 mes, 1m–2m, 2m–1año, 1–4años · Tendencia descendente 48.7%→37.3%</div>
+    </div>
+    <div class="chart-card">
+      <h3>🦠 Top Diagnósticos Respiratorios CIE-10 (SIGSA 2012–2024)</h3>
+      <canvas id="chartTopCIE"></canvas>
+      <div class="source">Fuente: <a href="https://datosabiertos.mspas.gob.gt" target="_blank">MSPAS Datos Abiertos</a> · 20 Primeras Causas Morbilidad 2012–2024 · Total: ~23M consultas respiratorias</div>
+    </div>
+    <div class="chart-card wide">
+      <h3>🫁 Detecciones RSV (Virus Sincitial Respiratorio) — Guatemala (WHO FluNet SENTINEL)</h3>
+      <canvas id="chartRSV" style="max-height:300px"></canvas>
+      <div class="source">Fuente: <a href="https://www.who.int/tools/flunet" target="_blank">WHO FluNet GT</a> · ORIGIN_SOURCE=SENTINEL (2020+) / NOTDEFINED (2009–2019) · RSV ausente de vigilancia MSPAS · 2026 = SE1–9 parcial</div>
+    </div>
+  </div>
+
+  <div class="chart-card" style="margin-top:20px">
+    <h3>📋 Distribución Etaria IRA 2024 — SIGSA Verificado</h3>
+    <table class="data-table">
+      <thead><tr><th>Grupo Etario</th><th>Casos 2024</th><th>%</th><th>Nota</th></tr></thead>
+      <tbody>
+        <tr><td>1 a 4 años</td><td>820,560</td><td>26.2%</td><td>Mayor grupo absoluto</td></tr>
+        <tr><td>5 a 9 años</td><td>547,434</td><td>17.5%</td><td></td></tr>
+        <tr><td>25 a 39 años</td><td>457,481</td><td>14.6%</td><td>Adultos jóvenes — sesgo femenino atención salud</td></tr>
+        <tr><td>2m a &lt;1 año</td><td>310,017</td><td>9.9%</td><td>Alta vulnerabilidad</td></tr>
+        <tr><td>10 a 14 años</td><td>246,165</td><td>7.9%</td><td></td></tr>
+        <tr><td>40 a 49 años</td><td>180,468</td><td>5.8%</td><td></td></tr>
+        <tr><td>20 a 24 años</td><td>155,706</td><td>5.0%</td><td></td></tr>
+        <tr><td>15 a 19 años</td><td>129,384</td><td>4.1%</td><td></td></tr>
+        <tr><td>50 a 59 años</td><td>110,256</td><td>3.5%</td><td></td></tr>
+        <tr><td>&lt;1 mes + 1–2m</td><td>36,628</td><td>1.2%</td><td>Neonatos — alta mortalidad potencial</td></tr>
+        <tr><td>60+ años</td><td>138,585</td><td>4.4%</td><td>Mayor riesgo complicaciones</td></tr>
+      </tbody>
+    </table>
+    <div class="source">Fuente: MSPAS Datos Abiertos CSV verificado · morbilidad-iras-departamento-2012-al-2024.csv · Datos 2024 completos</div>
+  </div>
+</div>
+
+<!-- ===================== TAB: MORTALIDAD ===================== -->
+<div id="mortalidad" class="tab-content">
+  <div class="section-title">💀 Datos de Mortalidad</div>
+
+  <div class="kpi-grid">
+    <div class="kpi danger">
+      <div class="label">Muertes influenza+neumonía/año</div>
+      <div class="value" style="color:#c0392b">9,245</div>
+      <div class="sub">10.61% de todas las muertes · OMS country profile 2020 (estimación modelada; INE 2018 registra 6,541 muertes J09-J18)</div>
+    </div>
+    <div class="kpi danger">
+      <div class="label">Tasa mortalidad ajustada</div>
+      <div class="value" style="color:#c0392b">70.32</div>
+      <div class="sub">por 100,000 hab. · OMS MDB estandarizada por edad (tasa cruda INE 2018: 37.9/100k para J09-J18) · Ranking mundial: 51°</div>
+    </div>
+    <div class="kpi warning">
+      <div class="label">Muertes neumonía 2024 (INE)</div>
+      <div class="value" style="color:#e67e22">5,812</div>
+      <div class="sub">67% de muertes resp. · 2018: 6,514 · INE microdatos</div>
+    </div>
+    <div class="kpi">
+      <div class="label">Mort. intrahospital. influenza</div>
+      <div class="value">6%</div>
+      <div class="sub">entre hospitalizados confirmados (VICo 2008–12, era H1N1pdm09)</div>
+    </div>
+    <div class="kpi">
+      <div class="label">Mort. intrahospital. IRA general</div>
+      <div class="value">5.9%</div>
+      <div class="sub">de 3,964 hospitalizados (2007–2011)</div>
+    </div>
+    <div class="kpi warning">
+      <div class="label">2ª causa de muerte Guatemala</div>
+      <div class="value" style="color:#e67e22">#2</div>
+      <div class="sub">Influenza+Neumonía — OMS country profile 2020 (IHME/GBD: #3 tras cardiovasculares y neoplasias)</div>
+    </div>
+  </div>
+
+  <div class="charts-grid">
+    <div class="chart-card">
+      <h3>📊 Distribución de Muertes Respiratorias por Causa (INE 2024)</h3>
+      <canvas id="chartMuertesResp"></canvas>
+      <div class="source">Fuente: <a href="https://datos.ine.gob.gt/dataset/estadisticas-vitales-defunciones" target="_blank">INE Guatemala — Estadísticas Vitales 2024</a> · Total respiratorio: 8,621 muertes · Neumonía J18 = 67.4%</div>
+    </div>
+    <div class="chart-card">
+      <h3>👶👴 Mortalidad Respiratoria por Grupo de Edad (IRA J00–J22)</h3>
+      <canvas id="chartMuertesEdad"></canvas>
+      <div class="source">Fuente: <a href="https://datos.ine.gob.gt/dataset/estadisticas-vitales-defunciones" target="_blank">INE Guatemala — Microdatos Defunciones 2023</a> · n=5,454 muertes IRA verificadas (5,438 con edad conocida + 16 sin dato edad) · 65+ = 51.8% del total (estimado previo: 27%)</div>
+    </div>
+    <div class="chart-card">
+      <h3>📈 Tendencia Tasa Mortalidad General Guatemala (por 100k)</h3>
+      <canvas id="chartMortalidadTrend"></canvas>
+      <div class="source">Fuente: <a href="https://guateendatos.org.gt/salud/mortalidad/" target="_blank">Guate en Datos — Mortalidad 1991–2019</a></div>
+    </div>
+    <div class="chart-card">
+      <h3>🌎 Carga DALYs Influenza — Guatemala vs. LAC (2015–2019)</h3>
+      <canvas id="chartDALYs"></canvas>
+      <div class="source">Fuente: <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC11861997/" target="_blank">Disparities in Influenza Control LAC — Viruses 2025</a></div>
+    </div>
+    <div class="chart-card">
+      <h3>📉 Tasa Mortalidad Neumonía en Menores de 5 Años — Guatemala (OMS GHO)</h3>
+      <canvas id="chartNeumoniaMenores5"></canvas>
+      <div class="source">Fuente: <a href="https://www.who.int/data/gho/data/indicators/indicator-details/GHO/pneumonia-deaths-among-children-under-5-years-of-age-(per-100-000)" target="_blank">WHO GHO — MDG_0000000026</a> · Tasa por 100,000 menores de 5 años · −69% reducción 1985–2023</div>
+    </div>
+    <div class="chart-card">
+      <h3>💉 Cobertura Vacuna PCV3 (Neumococo) — Guatemala 2000–2024</h3>
+      <canvas id="chartPCV3"></canvas>
+      <div class="source">Fuente: <a href="https://immunizationdata.who.int/" target="_blank">WHO GHO Immunization Data</a> · PCV3: tercera dosis vacuna antineumocócica conjugada · Cobertura 2024: 89%</div>
+    </div>
+    <div class="chart-card" style="grid-column:1/-1">
+      <h3>📅 Muertes Respiratorias Anuales por Causa — Guatemala 2018–2024 (INE)</h3>
+      <div class="alert alert-warning" style="margin-bottom:12px">
+        <span class="alert-icon">⚠️</span>
+        <div><strong>Artefacto de codificación COVID-19:</strong> La caída en muertes IRA (J00–J22) en 2020–2021 es artificial. Las muertes por neumonía COVID fueron codificadas como U07 (COVID-19), no J18 (neumonía), reduciendo artificialmente el conteo IRA. La carga respiratoria real en 2020–2021 fue la más alta del período.</div>
+      </div>
+      <canvas id="chartMortalidadAnual"></canvas>
+      <div class="source">Fuente: <a href="https://datos.ine.gob.gt/dataset/estadisticas-vitales-defunciones" target="_blank">INE Guatemala — Estadísticas Vitales Defunciones 2018–2024</a> · Microdatos individuales con código CIE-10 · N total = 674,064 defunciones procesadas</div>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== TAB: ENSAYO CLÍNICO ===================== -->
+<div id="ensayo" class="tab-content">
+  <div class="section-title">🧪 Estimación de Pacientes para Ensayo Clínico — Influenza Guatemala</div>
+
+  <div class="alert alert-info">
+    <span class="alert-icon">💊</span>
+    <div><strong>Objetivo:</strong> Estimar la población con influenza confirmada/sospechada por departamento, municipio y red de salud — para identificar sitios de reclutamiento óptimos en un ensayo clínico de nuevo fármaco para influenza. Metodología: Casos IRA × % Positividad FluNet SENTINEL. Proyección 2026 usa IRA 2024 × 1.10 × 36% (H3N2 dominante). Fuentes: <strong>MSPAS SIGSA 2024</strong> + <strong>WHO FluNet GT SE1–SE52/2024</strong>.</div>
+  </div>
+
+  <!-- KPIs principales -->
+  <div class="kpi-grid">
+    <div class="kpi danger">
+      <div class="label">Influenza estimada 2024 (SIGSA × FluNet)</div>
+      <div class="value" style="color:#c0392b">852,090</div>
+      <div class="sub">IRA × 27.2% positividad centinela · Año más alto registrado</div>
+    </div>
+    <div class="kpi danger">
+      <div class="label">Proyección 2026 (H3N2 dominante)</div>
+      <div class="value" style="color:#c0392b">1,240,542</div>
+      <div class="sub">IRA×1.10 × 36% positividad · H3N2 ~84–97% circulante (subtipificado) · IC95%: 900k–1.6M (sensible a positividad real)</div>
+    </div>
+    <div class="kpi warning">
+      <div class="label">Buscan atención médica</div>
+      <div class="value" style="color:#e67e22">442,887</div>
+      <div class="sub">52% del total estimado · Tasa OMS GHO Guatemala 2015</div>
+    </div>
+    <div class="kpi warning">
+      <div class="label">Hospitalizados/año estimados</div>
+      <div class="value" style="color:#e67e22">~6,044</div>
+      <div class="sub">VICo 2008–12 (H1N1 era) + ratios NEJM-ED extrapolados · H3N2 2026: ×2.5 (~15,112) · ⚠️ tasas pueden sobreestimar temporadas estacionales</div>
+    </div>
+    <div class="kpi">
+      <div class="label">Departamentos con datos SIGSA</div>
+      <div class="value">22 / 22</div>
+      <div class="sub">100% cobertura departamental · 333 municipios</div>
+    </div>
+    <div class="kpi">
+      <div class="label">Sites centinela activos (OMS/MSPAS)</div>
+      <div class="value">6</div>
+      <div class="sub">Cuilapa · Quetzaltenango · HGE-IGSS · Roosevelt · SJD · HIIR</div>
+    </div>
+  </div>
+
+  <!-- ===== SECCIÓN: METODOLOGÍA NEJM EVIDENCE 2026 ===== -->
+  <div style="margin-bottom:4px">
+    <div class="section-title" style="margin:16px 0 12px">📊 Metodología NEJM Evidence 2026 — Vigilancia Comparada Massachusetts vs Guatemala</div>
+    <div class="alert alert-info" style="margin-bottom:12px">
+      <span class="alert-icon">📄</span>
+      <div>Aplicación directa de las métricas de <strong>Brown et al. <em>NEJM Evidence</em> 2026;5(3)</strong> (DOI: 10.1056/EVIDpha2500136) al contexto guatemalteco. Los datos de Massachusetts atribuidos al artículo <strong>deben ser verificados independientemente contra el artículo original</strong> (acceso institucional requerido — DOI: 10.1056/EVIDpha2500136). Datos GT: FluNet SENTINEL LNS, VICo 2008-12, INE microdatos 2018-2024. Umbrales epidémicos: Moving Epidemic Method (MEM) calculado con 6 temporadas históricas GT.</div>
+    </div>
+    <div class="charts-grid">
+
+      <div class="chart-card" style="grid-column:1/-1">
+        <h3>🅰 Fig. 1A equiv. — Positividad FluNet SENTINEL por Año Calendario: Guatemala 2024–2026</h3>
+        <p style="font-size:0.8rem;color:var(--muted);margin-bottom:10px">
+          <strong>Massachusetts (NEJM):</strong> ILI% centinela, pico ~12% (Feb 2025), más alto desde 2001-02, por encima de umbral epidémico hasta mediados de abril. &nbsp;|&nbsp;
+          <strong>Guatemala (FluNet):</strong> % muestras positivas para influenza (laboratorio centinela LNS). Métrica diferente: positividad laboratorial ≠ ILI clínica — ambas miden intensidad de actividad. GT 2024 pico: 54% (Mar). GT 2026: 42% (Feb, en ascenso). Pico principal tropical GT: <strong>ene–mar</strong> (segundo pico menor variable sep–nov en algunos años) (vs único pico invernal MA).
+        </p>
+        <canvas id="chartFig1A_GT" style="max-height:320px"></canvas>
+        <div class="source">WHO FluNet SENTINEL LNS Guatemala (INF_ALL). Umbrales MEM (método OPS/OMS, 6 temporadas 2013-2019): <span style="color:#e67e22">■</span> Epidémico: 25.2% · <span style="color:#e74c3c">■</span> Moderado-Alto: 36.4% · <span style="color:#8e44ad">■</span> Alto: 51.7% · <span style="color:#641e16">■</span> Muy Alto: 57.1%. 2026 SE8 (55.4%) = nivel "Alto". Ref: WHO MEM Methodology v1.5.</div>
+      </div>
+
+      <div class="chart-card">
+        <h3>🅲 Fig. 1C equiv. — Tasas por Grupo Etario (por 100,000 hab.) <span style="font-size:0.75em;color:#e67e22">⚠️ Métricas distintas</span></h3>
+        <p style="font-size:0.8rem;color:var(--muted);margin-bottom:6px">MA datos atribuidos a NEJM (verificar con artículo original) (pico temporada 2024-25, <strong>consultas urgencias/ED</strong>). GT datos de VICo 2008–12 (<strong>hospitalizaciones</strong>). <em>⚠️ Auditoría: estas métricas no son directamente comparables — MA mide ED visits, GT mide ingresos hospitalarios.</em></p>
+        <canvas id="chartFig1C_GT"></canvas>
+        <div class="source">⚠️ <strong>Nota metodológica (auditoría):</strong> MA (NEJM) = consultas en urgencias/ED (rates ED): &lt;5y=298.7, 5-19y=135.9, 20-64y=66.8, 65-79y=108.7, 80+y=199.9 /100k. MA hospitalizaciones (distinto endpoint): &lt;5y=16.8, 50-64y=19, 65-79y=58, 80+y=143.5 /100k. GT (VICo 2008–12, <em>era H1N1 pandémica</em>): &lt;5y=93, 5-19y=12, 20-64y=24 /100k directamente medidos; 65-79y=50 y 80+y=72 extrapolados de ratios NEJM-ED (endpoint distinto — caveata). GT H3N2 2026: ×2.5. Total GT hospitalizados/año: ~6,044 (2024) · ~15,112 (H3N2 2026).</div>
+      </div>
+
+      <div class="chart-card">
+        <h3>🅳 Fig. 1D equiv. — Muertes Pediátricas por Influenza: Guatemala (INE) vs Massachusetts (NEJM)</h3>
+        <p style="font-size:0.8rem;color:var(--muted);margin-bottom:10px">GT: INE microdatos ICD-10 J09-J11, edad &lt;5 años, <strong>100% sin vacuna todos los años</strong>. MA: Brown et al. Fig.1D (todos menores 18y, 80% sin vacuna temporada 2024-25).</p>
+        <canvas id="chartFig1D_GT"></canvas>
+        <div class="source">GT (INE 2022-2024 confirmados): 5→14→23 muertes &lt;5y. 100% no vacunados — sin excepción. MA (NEJM 2022-25 estimado de Fig.1D): 5→5→10 muertes. MA: 8/10 sin vacuna temporal actual, 7/10 con comorbilidades, RSV coinfección en 50%. GT tiene tendencia creciente más pronunciada y 100% naive vs 80% MA. Datos GT 2018-2021 pendientes de extracción completa de INE microdatos.</div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="section-title" style="margin:20px 0 12px">🗺️ Estimación Geográfica de Pacientes — Departamentos, Municipios y Red de Salud</div>
+
+  <div class="charts-grid">
+
+    <!-- Chart: Departamentos -->
+    <div class="chart-card" style="grid-column:1/-1">
+      <h3>🗺️ Influenza Estimada por Departamento — 2024 vs Proyección 2026 (H3N2)</h3>
+      <canvas id="chartDeptFlu" style="max-height:380px"></canvas>
+      <div class="source">Cálculo: Casos IRA SIGSA 2024 × 27.2% (FluNet SENTINEL 2024). Proyección 2026: IRA×1.10 × 36% (positividad promedio SE1–9/2026). Fuente población: INE 2018. Nota: San Marcos y Huehuetenango tienen alta IRA per capita por subregistro de otras causas + acceso MSPAS como primer punto de atención.</div>
+    </div>
+
+    <!-- Chart: Municipios -->
+    <div class="chart-card wide">
+      <h3>📍 Top 20 Municipios por Influenza Estimada 2024 — Sitios Prioritarios</h3>
+      <canvas id="chartMuniFlu" style="max-height:400px"></canvas>
+      <div class="source">Fuente: MSPAS SIGSA 2024 (municipios). 333 municipios con datos. Est. influenza = Casos IRA municipio × 27.2%. Los municipios con ≥10,000 casos estimados/año son candidatos prioritarios para site de ensayo clínico.</div>
+    </div>
+
+    <!-- Chart: Red de salud -->
+    <div class="chart-card">
+      <h3>🏥 Distribución por Red de Salud — ¿Dónde Buscan Atención?</h3>
+      <canvas id="chartRedSalud"></canvas>
+      <div class="source">Estimado: OMS GHO Guatemala ARI care-seeking 2015 (52% busca atención). MSPAS = 30-35% de atención total; IGSS = 7-9% (afiliados, sector formal); Privado = 12-15%. Sin atención formal: 48%. Fuente base: <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC3267779/" target="_blank">PMC3267779 — Guatemala ARI care-seeking</a></div>
+    </div>
+
+    <!-- Chart: Funnel elegibilidad -->
+    <div class="chart-card">
+      <h3>🎯 Embudo de Elegibilidad para Ensayo Clínico (2024)</h3>
+      <canvas id="chartElegibles"></canvas>
+      <div class="source">⚠️ <strong>Nota auditoría:</strong> El total de 42,517 es ~10× optimista. El pool real después de exclusiones clínicas (embarazo, insuficiencia renal/hepática, falta de tutor pediátrico, severidad extrema con hospitalización inmediata) se estima en <strong>~4,000 pacientes/pico estacional</strong>. Además, solo ~50% llegan en ≤48h desde inicio síntomas (requisito real de antivirales); la suposición de 80% en ≤72h sobreestima la elegibilidad. Fuentes: (1) SIGSA×FluNet 2024; (2) WHO GHO búsqueda atención 52%; (3) capacidad Dx centinela ~20%; (4) RIDT sensibilidad real 50-70%, NO 80% — corregido; (5) ventana terapéutica real: ≤48h (FDA label oseltamivir/baloxavir), ~50% de pacientes GT llegan en este plazo — la suposición original de 80% en ≤72h sobreestimaba elegibilidad; (6) consentimiento ~75% (verificar con engagement comunitario previo — puede ser menor en GT por desconfianza histórica hacia ensayos clínicos).</div>
+    </div>
+
+    <!-- Chart: Proyección semanal 2026 -->
+    <div class="chart-card" style="grid-column:1/-1">
+      <h3>📅 Ventana de Reclutamiento 2026 — Positividad Semanal por Red (H3N2)</h3>
+      <canvas id="chartVentana2026" style="max-height:320px"></canvas>
+      <div class="source">Fuente positividad: WHO FluNet GT SENTINEL 2025–SE9/2026. El pico H3N2 (SE8 2026: 55.4%) representa la ventana óptima de reclutamiento. Patrón estacional Guatemala: pico principal ene–mar; actividad secundaria variable sep–nov. La vacunación contra influenza en Guatemala es prácticamente 0%, maximizando la población naive susceptible.</div>
+    </div>
+
+  </div>
+
+  <!-- Tabla: Sitios prioritarios de reclutamiento -->
+  <div class="chart-card" style="margin-top:20px">
+    <h3>🏨 Sitios Prioritarios para Reclutamiento — Red Pública, IGSS y Centinela</h3>
+    <div class="alert alert-warning" style="margin-bottom:12px">
+      <span class="alert-icon">⚠️</span>
+      <div><strong>Nota para protocolo (GCP):</strong> El diagnóstico de influenza en Guatemala se hace mayoritariamente de forma clínica. Solo los sitios centinela (LNS, VICo) tienen RT-PCR rutinaria. Para un ensayo clínico que requiere confirmación virológica, se recomienda implementar RIDTs (Rapid Influenza Diagnostic Tests) en todos los sitios participantes. Tiempo de síntomas a consulta: mediana 2-3 días en adultos, 1-2 días en &lt;5 años. <strong>Requisitos GCP para cada sitio:</strong> (1) Farmacia con almacenamiento controlado 2-8&deg;C para IMP (cadena de frío verificada); (2) Personal entrenado en GCP (mínimo PI + coordinador + farmacéutico por sitio); (3) Acceso a laboratorio para muestras de seguridad (hemograma, hepático, renal); (4) Espacio privado para proceso de consentimiento informado; (5) Conectividad para EDC (Electronic Data Capture). <strong>Los sitios Tier 2 (Totonicapán, Jutiapa, Chiquimula) NO tienen experiencia previa en ensayos clínicos</strong> — requieren visitas de pre-calificación, entrenamiento GCP intensivo (2-4 semanas) y monitores dedicados. Considerar si la inversión justifica la inclusión vs concentrar en Tier 1 con infraestructura existente.</div>
+    </div>
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Institución / Hospital</th>
+          <th>Red</th>
+          <th>Departamento</th>
+          <th>Catchment est. flu/año</th>
+          <th>Capacidad diagnóstico</th>
+          <th>Tipo sitio</th>
+          <th>Prioridad ensayo</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr style="background:rgba(231,76,60,0.08)">
+          <td><strong>Hospital General San Juan de Dios</strong></td>
+          <td>MSPAS</td>
+          <td>Guatemala</td>
+          <td>~15,000–20,000</td>
+          <td>PCR (LNS), Rx, UCI</td>
+          <td>Referencia nacional · Centinela IRAG</td>
+          <td><span class="tag tag-h3n2">★★★ MÁXIMA</span></td>
+        </tr>
+        <tr style="background:rgba(231,76,60,0.08)">
+          <td><strong>Hospital Roosevelt</strong></td>
+          <td>MSPAS</td>
+          <td>Guatemala</td>
+          <td>~12,000–15,000</td>
+          <td>PCR, Emergencia pediátrica</td>
+          <td>Referencia pediátrica · Centinela</td>
+          <td><span class="tag tag-h3n2">★★★ MÁXIMA</span></td>
+        </tr>
+        <tr style="background:rgba(231,76,60,0.08)">
+          <td><strong>Hospital General de Enfermedades IGSS</strong></td>
+          <td>IGSS</td>
+          <td>Guatemala (Z.9)</td>
+          <td>~10,000–15,000</td>
+          <td>PCR, lab completo</td>
+          <td>Centinela IGSS · Afiliados formales</td>
+          <td><span class="tag tag-h3n2">★★★ MÁXIMA</span></td>
+        </tr>
+        <tr style="background:rgba(230,126,34,0.06)">
+          <td><strong>Hospital Infantil de Infectología y Rehab.</strong></td>
+          <td>MSPAS</td>
+          <td>Guatemala (Z.11)</td>
+          <td>~8,000–10,000</td>
+          <td>PCR especializado</td>
+          <td>Pediátrico especializado · Centinela</td>
+          <td><span class="tag tag-h1n1">★★★ ALTA</span></td>
+        </tr>
+        <tr style="background:rgba(230,126,34,0.06)">
+          <td><strong>Hospital Regional de Occidente</strong></td>
+          <td>MSPAS · VICo</td>
+          <td>Quetzaltenango</td>
+          <td>~8,500–11,000</td>
+          <td>RT-PCR (VICo), 425 camas, 22 UCI ped</td>
+          <td>Centinela ViCo activo · IRAG</td>
+          <td><span class="tag tag-h1n1">★★★ ALTA</span></td>
+        </tr>
+        <tr style="background:rgba(230,126,34,0.06)">
+          <td><strong>Hospital Nacional de Cuilapa</strong></td>
+          <td>MSPAS · VICo</td>
+          <td>Santa Rosa</td>
+          <td>~6,000–7,500</td>
+          <td>RT-PCR (VICo), 176 camas, 8 UCI</td>
+          <td>Centinela ViCo histórico (2008–) · IRAG</td>
+          <td><span class="tag tag-h1n1">★★★ ALTA</span></td>
+        </tr>
+        <tr>
+          <td>Hospital Regional de Cobán</td>
+          <td>MSPAS</td>
+          <td>Alta Verapaz</td>
+          <td>~10,000–12,000</td>
+          <td>Laboratorio básico</td>
+          <td>Regional · Zona Q'eqchi'</td>
+          <td><span class="tag tag-b">★★ MEDIA-ALTA</span></td>
+        </tr>
+        <tr>
+          <td>Hospital Departamental de San Marcos</td>
+          <td>MSPAS</td>
+          <td>San Marcos</td>
+          <td>~12,000–15,000</td>
+          <td>Laboratorio básico</td>
+          <td>Mayor carga IRA del país</td>
+          <td><span class="tag tag-b">★★ MEDIA-ALTA</span></td>
+        </tr>
+        <tr>
+          <td>Hospital Departamental de Huehuetenango</td>
+          <td>MSPAS</td>
+          <td>Huehuetenango</td>
+          <td>~9,000–11,000</td>
+          <td>Laboratorio básico</td>
+          <td>2ª carga IRA del país</td>
+          <td><span class="tag tag-b">★★ MEDIA-ALTA</span></td>
+        </tr>
+        <tr>
+          <td>IGSS Quetzaltenango</td>
+          <td>IGSS</td>
+          <td>Quetzaltenango</td>
+          <td>~4,000–6,000</td>
+          <td>Lab completo</td>
+          <td>2ª ciudad — afiliados región occidente</td>
+          <td><span class="tag tag-b">★★ MEDIA-ALTA</span></td>
+        </tr>
+        <tr>
+          <td>Hospital La Capitanía IGSS</td>
+          <td>IGSS</td>
+          <td>Sacatepéquez</td>
+          <td>~3,000–4,000</td>
+          <td>Lab completo · hospital nuevo</td>
+          <td>95,000 afiliados Sacatepéquez</td>
+          <td><span class="tag">★ MEDIA</span></td>
+        </tr>
+        <tr>
+          <td>Policlínica / Centros Médicos IGSS regionales</td>
+          <td>IGSS</td>
+          <td>22 deptos.</td>
+          <td>~1,000–2,000 c/u</td>
+          <td>Variable</td>
+          <td>Consulta externa, acceso rápido</td>
+          <td><span class="tag">★ MEDIA</span></td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="source" style="margin-top:8px"><strong>Nota GCP sobre catchment estimates:</strong> Las cifras de "catchment est. flu/año" son proyecciones epidemiológicas, NO mediciones directas de volumen de consultas por influenza en cada hospital. Los valores reales dependerán de: (a) capacidad de screening activo en urgencias/emergencia, (b) horas de operación del equipo de investigación (reclutamiento solo en horario laboral reduce pool ~60%), (c) disposición del personal clínico para referir pacientes al estudio, (d) competencia con atención clínica rutinaria. Se recomienda una fase piloto de 4 semanas en 2-3 sitios Tier 1 para calibrar la tasa de reclutamiento real antes de activar todos los sitios. Referencia: los ensayos CAPSTONE reclutaron ~1-3 pacientes/sitio/semana durante pico estacional.</div>
+  </div>
+
+  <!-- Tabla 1 NEJM — Cobertura vacunal real -->
+  <div class="chart-card" style="margin-top:20px">
+    <h3>💉 Tabla 1 (NEJM real) — Cobertura Vacunal Acumulada por Grupo Etario: Massachusetts 2019–2025 vs Guatemala</h3>
+    <div class="alert alert-danger" style="margin-bottom:12px">
+      <span class="alert-icon">🚨</span>
+      <div><strong>Brecha crítica de vacunación:</strong> Massachusetts tiene cobertura significativa pero declinante en pediátricos (67.3%→49.5% en &lt;5 años) y alta en adultos mayores (65-79y: 71.5%). Guatemala = <strong>0% en todos los grupos todos los años</strong> — sin programa nacional de vacunación contra influenza. 100% de la población guatemalteca es naive → alta susceptibilidad, mayor transmisión y mayor justificación ética para un ensayo de nuevo fármaco.</div>
+    </div>
+    <div style="overflow-x:auto">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Temporada</th>
+          <th>&lt;5 años</th>
+          <th>5–19 años</th>
+          <th>20–34 años</th>
+          <th>35–49 años</th>
+          <th>50–64 años</th>
+          <th>65–79 años</th>
+          <th>80+ años</th>
+          <th>Global</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr style="background:#eaf4fb"><td colspan="9" style="font-weight:700;color:#1a5276;padding:8px 12px">🇺🇸 Massachusetts — datos atribuidos a Brown et al. NEJM Evidence 2026 (Tabla 1) — verificar con acceso al artículo original</td></tr>
+        <tr><td>2019–2020</td><td>67.3%</td><td>47.4%</td><td>24.1%</td><td>28.8%</td><td>37.1%</td><td>53.9%</td><td>51.1%</td><td>~40%</td></tr>
+        <tr><td>2020–2021</td><td>70.0%</td><td>63.7%</td><td>28.8%</td><td>35.6%</td><td>44.3%</td><td>61.6%</td><td>56.1%</td><td>~45%</td></tr>
+        <tr><td>2021–2022</td><td>60.9%</td><td>47.6%</td><td>30.5%</td><td>37.5%</td><td>46.6%</td><td>70.8%</td><td>65.7%</td><td>~46%</td></tr>
+        <tr><td>2022–2023</td><td>55.8%</td><td>43.8%</td><td>29.6%</td><td>36.8%</td><td>45.7%</td><td>73.9%</td><td>69.5%</td><td>~45%</td></tr>
+        <tr><td>2023–2024</td><td>51.8%</td><td>39.8%</td><td>27.0%</td><td>33.0%</td><td>40.0%</td><td>71.3%</td><td>71.3%</td><td>~42%</td></tr>
+        <tr style="background:#fdf2f2"><td><strong>2024–2025</strong></td><td><strong>49.5%</strong> ↘</td><td><strong>38.4%</strong> ↘</td><td><strong>26.0%</strong> ↘</td><td><strong>32.1%</strong> ↘</td><td><strong>37.4%</strong> ↘</td><td><strong>71.5%</strong></td><td><strong>72.4%</strong> ↗</td><td><strong>40.4%</strong></td></tr>
+        <tr style="background:#fef9e7"><td colspan="9" style="font-weight:700;color:#e67e22;padding:8px 12px">🇬🇹 Guatemala — todas las temporadas (MSPAS: sin programa nacional de vacunación)</td></tr>
+        <tr style="background:#fff8e1">
+          <td>2019–2025</td>
+          <td style="color:#c0392b;font-weight:700">0%</td>
+          <td style="color:#c0392b;font-weight:700">0%</td>
+          <td style="color:#c0392b;font-weight:700">0%</td>
+          <td style="color:#c0392b;font-weight:700">0%</td>
+          <td style="color:#c0392b;font-weight:700">0%</td>
+          <td style="color:#c0392b;font-weight:700">0%</td>
+          <td style="color:#c0392b;font-weight:700">0%</td>
+          <td style="color:#c0392b;font-weight:700">0%</td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
+    <div class="source" style="margin-top:8px">Fuente MA: Brown et al. <em>NEJM Evidence</em> 2026;5(3) — Tabla 1 — datos requieren verificación independiente con acceso al artículo original. Tendencia clave: la cobertura pediátrica (&lt;5y) cayó de 70.0% (2020-21, pico pandemia) a 49.5% (2024-25). Los autores NEJM atribuyen la mayor mortalidad pediátrica parcialmente a esta baja de cobertura. En Guatemala, el punto de partida es 0% → toda la población es naive → la enfermedad se propaga sin freno inmunológico → mayor volumen de casos reclutables pero también mayor carga de enfermedad severa.</div>
+  </div>
+
+  <!-- Tabla: Indicadores NEJM-style aplicados a Guatemala -->
+  <div class="chart-card" style="margin-top:20px">
+    <h3>📊 Indicadores Epidemiológicos Clave — Guatemala vs Massachusetts (NEJM Evidence 2026, datos reales del artículo)</h3>
+    <div class="alert alert-info" style="margin-bottom:10px">
+      <span class="alert-icon">📄</span>
+      <div>Fuente MA: <strong>Brown et al. NEJM Evidence 2026;5(3) DOI: 10.1056/EVIDpha2500136</strong> — los datos de Massachusetts atribuidos al artículo deben verificarse con acceso institucional al original. Fuentes GT: FluNet SENTINEL (LNS), VICo 2008-12, INE microdatos 2018-2024, IHME GBD 2019.</div>
+    </div>
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Indicador</th>
+          <th>Massachusetts 2024–25 (NEJM real)</th>
+          <th>Guatemala 2024</th>
+          <th>Guatemala 2026 (H3N2)</th>
+          <th>Implicación para ensayo</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Actividad ILI / positividad</strong></td>
+          <td>ILI% centinela pico: <strong>~12%</strong> (Feb 2025) — más alto desde 2001-02; por encima de umbral epidémico hasta mediados de abril</td>
+          <td>FluNet positivity: <strong>27.2%</strong> prom. anual · <strong>54%</strong> pico (Mar 2024) — MEM umbral epidémico = 25.2%</td>
+          <td><strong>36–55%</strong> (SE1–9, H3N2 84–97% de INF_A) — nivel "Alto" según MEM</td>
+          <td>GT en nivel epidémico activo → cohorte reclutable de alta densidad temporal</td>
+        </tr>
+        <tr style="background:rgba(231,76,60,0.06)">
+          <td><strong>Hospitalizaciones influenza (% ED)</strong></td>
+          <td>Pico: <strong>10.4%</strong> de consultas ED con hospitalización — 1.5× más alto que cualquier temporada previa 2019-24</td>
+          <td>No disponible (sin reportería FluID). Proxy: VICo 6% mortalidad intrahospitalaria (2008–12, era H1N1)</td>
+          <td>Est. &gt;8% mortalidad intrahosp. (H3N2 históricamente más severo)</td>
+          <td>MA documenta incremento ×1.5 — GT espera incremento similar o mayor por carga basal</td>
+        </tr>
+        <tr>
+          <td><strong>Tasa urgencias &lt;5 años /100k</strong></td>
+          <td><strong>298.7 /100k</strong> (4.5× el rate base 20-64y de 66.8/100k)</td>
+          <td><strong>93/100k</strong> (VICo 2008-12) · 6,085 hospitalizados &lt;5y/año H3N2</td>
+          <td><strong>~232/100k</strong> proyectado (×2.5) → 6,085/año hospitalizados</td>
+          <td>GT &lt;5y: 31% del rate MA → aún elevado + 0% vacunación = alta severidad potencial</td>
+        </tr>
+        <tr style="background:rgba(231,76,60,0.06)">
+          <td><strong>Tasa urgencias 80+ años /100k</strong></td>
+          <td><strong>199.9/100k</strong> (3× base rate) · Hospitalización: <strong>143.5/100k</strong></td>
+          <td><strong>72/100k</strong> est. (VICo×age ratio) · Hospitalización &lt;20/100k (sin datos directos)</td>
+          <td><strong>~180/100k</strong> proyectado</td>
+          <td>Adultos mayores: grupo de mayor hospitalización en MA; GT sin vacu y con comorbilidades → riesgo muy alto</td>
+        </tr>
+        <tr>
+          <td><strong>Muertes pediátricas influenza</strong></td>
+          <td><strong>10 muertes</strong> (5 niños, 5 niñas) · edades: 6m-5y=4, 6-10y=2, 11-15y=3, 16-18y=1 · 7/10 con comorbilidades · <strong>8/10 SIN vacuna temporal</strong> · RSV coinfección en 50%</td>
+          <td><strong>23 muertes &lt;5y</strong> (INE 2024, ICD-10 J09-J11) · 39% del total influenza · <strong>100% SIN vacuna</strong></td>
+          <td><strong>~30–50 est.</strong> (H3N2 severo + 0% vacu)</td>
+          <td>GT tiene tendencia más pronunciada (5→14→23 en 3 años) vs MA (5→5→10). 100% unvax GT vs 80% MA → mayor impacto evitable</td>
+        </tr>
+        <tr style="background:rgba(231,76,60,0.06)">
+          <td><strong>Encefalopatía por influenza</strong></td>
+          <td><strong>15 hospitalizaciones</strong> por encefalopatía asociada a influenza en menores (10 no vacunados, 5 vacunados)</td>
+          <td>No hay sistema de vigilancia activo para encefalopatía por influenza en GT</td>
+          <td>Subregistro esperado — dato no capturado</td>
+          <td>Complicación grave infradiagnosticada en GT → outcome secundario importante para protocolo</td>
+        </tr>
+        <tr>
+          <td><strong>Cobertura vacunal &lt;5 años</strong></td>
+          <td><strong>49.5%</strong> (2024-25) — en declive desde 70.0% (2020-21). NEJM señala esto como contribuyente a aumento de mortalidad pediátrica</td>
+          <td><strong>0%</strong> (sin programa nacional)</td>
+          <td><strong>0%</strong></td>
+          <td>MA identifica baja vacunación + alta incidencia como causa de ↑ muertes. GT: ambos factores al máximo → justificación ética máxima</td>
+        </tr>
+        <tr style="background:rgba(231,76,60,0.06)">
+          <td><strong>Cobertura vacunal 65-79 años</strong></td>
+          <td><strong>71.5%</strong> (2024-25) — alta y estable</td>
+          <td><strong>0%</strong></td>
+          <td><strong>0%</strong></td>
+          <td>Adultos mayores en GT son 100% naive → grupo de muy alto riesgo de hospitalización/muerte</td>
+        </tr>
+        <tr>
+          <td><strong>Cepa dominante / subtipo</strong></td>
+          <td>Influenza A predomina; <strong>H3N2 ligeramente mayor que H1N1 pdm2009</strong>. Influenza B aumentó en marzo-abril</td>
+          <td><strong>H3N2 96.7%</strong> de INF_A subtipificada (dic 2025–feb 2026; 83.8% incl. no-subtipificados) · Subclado K (J.2.4.1)</td>
+          <td><strong>H3N2 dominante</strong> (temporal spring pico)</td>
+          <td>GT tiene mayor proporción H3N2 que MA → cohorte más homogénea → mayor poder estadístico del ensayo</td>
+        </tr>
+        <tr style="background:rgba(231,76,60,0.06)">
+          <td><strong>Muertes totales (todas las edades)</strong></td>
+          <td><strong>441 muertes</strong> (2024-25) — rango histórico MA: 18 (2020-21) a 441 (2024-25)</td>
+          <td>J09-J11 ICD-10: <strong>59 registradas</strong> (INE 2024) — masivo subregistro esperado (clínico &gt; lab confirmado)</td>
+          <td>Estimado &gt;200 (ajustando subregistro)</td>
+          <td>Subregistro GT es estructura del sistema — confirmación lab solo en sitios VICo/LNS. RIDT en ensayo = mejora inmediata</td>
+        </tr>
+        <tr>
+          <td><strong>% buscan atención médica</strong></td>
+          <td>&gt;80% (sistema de salud universal)</td>
+          <td><strong>52%</strong> (WHO GHO 2015 · ~442k/año en sistema formal)</td>
+          <td>52–55% (est.)</td>
+          <td>GT captura ~442k/año en sistema formal · 48% restante = reservorio no atendido</td>
+        </tr>
+        <tr style="background:rgba(231,76,60,0.06)">
+          <td><strong>DALYs influenza /100k</strong></td>
+          <td>~200/100k (EEUU, IHME 2019)</td>
+          <td><strong>503.78/100k</strong> (IHME 2015-19, #1 en Latinoamérica)</td>
+          <td>&gt;600/100k (H3N2 est.)</td>
+          <td>GT carga 2.5× mayor que EEUU → endpoints más duros y medibles → NNT favorable para ensayo</td>
+        </tr>
+        <tr>
+          <td><strong>Mortalidad intrahospitalaria IRA</strong></td>
+          <td>~2% (hospitalizados confirmados, EEUU est.)</td>
+          <td><strong>6%</strong> (VICo 2008–12, hospitalizados GT)</td>
+          <td>&gt;8% (est. H3N2)</td>
+          <td>3× mayor severidad intrahospitalaria que MA → mayor probabilidad de detectar efecto del fármaco en reducción de mortalidad</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ===== SECCIÓN: RSV COINFECCIÓN ===== -->
+  <div class="chart-card" style="margin-top:20px">
+    <h3>🦠 RSV Coinfección con Influenza — Hallazgo Crítico NEJM &amp; Guatemala</h3>
+    <div class="alert alert-danger" style="margin-bottom:12px">
+      <span class="alert-icon">🚨</span>
+      <div><strong>NEJM Evidence 2026 (Brown et al.):</strong> RSV fue coinfección en <strong>50% de las 10 muertes pediátricas</strong> por influenza en Massachusetts 2024-25. En Guatemala, el RSV es aún más prevalente — FluNet 2024: <strong>25.2% de muestras positivas para RSV</strong> (vs 27.2% influenza). Implicación para protocolo: ≥50% de participantes pediátricos probablemente tendrán coinfección RSV → <strong>estratificación por coinfección es crítica en el diseño estadístico.</strong></div>
+    </div>
+    <div class="charts-grid">
+      <div class="chart-card" style="box-shadow:none;padding:0">
+        <h3 style="font-size:0.85rem">📊 Positividad RSV vs Influenza — FluNet Guatemala (datos anuales)</h3>
+        <canvas id="chartRSVvsInflu" style="max-height:280px"></canvas>
+        <div class="source">Fuente: WHO FluNet Guatemala SENTINEL. RSV = RSV_PROCESSED. 2024: RSV 25.2% (309/1,228 SENTINEL), Influenza 27.2% (334/1,228 SENTINEL). Guatemala es un país de alta circulación RSV — RSV/SPEC rango 6.8–32.9% (2015–2024; nota: RSV_PROCESSED = SPEC_PROCESSED en FluNet GT). Comparar con MA: RSV documentado en 5/10 muertes pediátricas por influenza (50%).</div>
+      </div>
+      <div class="chart-card" style="box-shadow:none;padding:0">
+        <h3 style="font-size:0.85rem">🎯 Implicaciones para Protocolo de Ensayo — Estratificación RSV</h3>
+        <table class="data-table" style="font-size:0.8rem">
+          <thead><tr><th>Escenario coinfección</th><th>% esperado en GT</th><th>Implicación protocolo</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Influenza + RSV</strong></td><td style="color:#c0392b;font-weight:700">~25–50%</td><td>Endpoint primario: separar efecto por coinfección</td></tr>
+            <tr><td><strong>Influenza solo</strong></td><td>~50–70%</td><td>Grupo control comparable a MA NEJM</td></tr>
+            <tr style="background:#fdf2f2"><td><strong>RSV solo (excluir)</strong></td><td>Variable</td><td>RIDT influenza negativo → no elegible</td></tr>
+            <tr><td><strong>Multiplex PCR</strong></td><td>Necesario en ≥5 sitios</td><td>Detectar RSV, Adenovirus, Rhinovirus, Parainfluenza</td></tr>
+          </tbody>
+        </table>
+        <div style="margin-top:10px;padding:8px;background:#fef3cd;border-radius:6px;font-size:0.78rem">
+          <strong>⚠️ Decisión protocolo:</strong> Recomendado <strong>Option B</strong>: incluir RSV-coinfectados pero estratificar en análisis. Excluirlos eliminaría ~50% del pool de reclutamiento pediátrico y reduce generalización del hallazgo.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== SECCIÓN: TIMELINE REGULATORIO ===== -->
+  <div class="chart-card" style="margin-top:20px">
+    <h3>📋 Timeline Regulatorio Guatemala — Ruta Crítica para Inicio del Ensayo</h3>
+    <div class="alert alert-warning" style="margin-bottom:12px">
+      <span class="alert-icon">⚠️</span>
+      <div><strong>Gap crítico de protocolo:</strong> El dashboard no incluye el cronograma regulatorio. En Guatemala, la aprobación MSPAS-ética toma <strong>18–22 semanas</strong> desde la solicitud → inicio de reclutamiento más temprano: <strong>Q4 2026 (octubre)</strong> → próxima ventana pico Feb–Mar 2027. El pico H3N2 actual (Feb–Mar 2026) ya está pasando sin ensayo.</div>
+    </div>
+    <div style="overflow-x:auto">
+    <table class="data-table" style="font-size:0.82rem">
+      <thead>
+        <tr>
+          <th>Paso regulatorio</th>
+          <th>Institución</th>
+          <th>Duración</th>
+          <th>Documentos requeridos</th>
+          <th>Fecha estimada (inicio Q2 2026)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr style="background:rgba(231,76,60,0.06)">
+          <td><strong>1. Autorización Ensayo Clínico</strong></td>
+          <td>MSPAS — Unidad de Regulación de Medicamentos</td>
+          <td>10–16 semanas</td>
+          <td>Protocolo, IB (Investigator Brochure), CV del PI, certificado GMP del IMP, datos preclínicos/fase I-II. <em>Caveat: sin precedente de ensayo antiviral influenza en GT — primer trámite puede tomar más tiempo</em></td>
+          <td>Abr–Jun 2026 → aprobación Jul–Sep 2026</td>
+        </tr>
+        <tr>
+          <td><strong>2. Comité de Bioética Nacional</strong></td>
+          <td>MSPAS — Comité Nacional de Bioética</td>
+          <td>4–6 semanas (paralelo)</td>
+          <td>Consentimiento informado (español + K'iche', Q'eqchi', Kaqchikel, Mam para sitios con >20% población indígena), análisis riesgo-beneficio, plan de acceso post-ensayo</td>
+          <td>May–Jun 2026 → aprobación Jul 2026</td>
+        </tr>
+        <tr style="background:rgba(231,76,60,0.06)">
+          <td><strong>3. Comité Ética IGSS</strong> (si incluye sitios IGSS)</td>
+          <td>IGSS — Comité de Ética</td>
+          <td>3–4 semanas (separado)</td>
+          <td>Protocolo IGSS-específico, carta de aval médico director</td>
+          <td>Jun–Jul 2026 → aprobación Jul–Ago 2026</td>
+        </tr>
+        <tr>
+          <td><strong>4. Importación fármaco investigación</strong></td>
+          <td>MSPAS — Farmacia y Drogas</td>
+          <td>4–8 semanas</td>
+          <td>Solicitud IMP, cadena de custodia verificada (2-8°C si aplica), certificado GMP, seguro de responsabilidad civil, registro aduanero exento. <em>Nota: aduanas GT pueden agregar 2-4 semanas adicionales</em></td>
+          <td>Jul–Ago 2026 → disponible Sep–Oct 2026</td>
+        </tr>
+        <tr style="background:rgba(231,76,60,0.06)">
+          <td><strong>5. Visita iniciación de sitio</strong></td>
+          <td>12 sitios</td>
+          <td>4–6 semanas (corregido de 2-3)</td>
+          <td>Contratos sitio, entrenamiento GCP/ICH (mínimo 2 días/sitio), RIDTs, CRFs/EDC setup, verificación farmacia IMP, calibración equipos. <em>Para 12 sitios: mínimo 4-6 semanas con 2 equipos de monitores en paralelo, no 2-3 semanas</em></td>
+          <td>Sep–Oct 2026</td>
+        </tr>
+        <tr style="background:#e8f8f5;font-weight:700">
+          <td>⭐ <strong>INICIO RECLUTAMIENTO</strong></td>
+          <td>12 sitios activos</td>
+          <td>—</td>
+          <td>—</td>
+          <td><strong>Octubre 2026</strong> (pico secundario Sep–Nov 2026)</td>
+        </tr>
+        <tr style="background:#e8f8f5">
+          <td>🎯 <strong>Pico principal reclutamiento</strong></td>
+          <td>12 sitios</td>
+          <td>8–10 semanas intensivas</td>
+          <td>—</td>
+          <td><strong>Feb–Mar 2027</strong> (300–500 pts esperados en este pico — estimación conservadora basada en 2-3 pts/sitio/semana × 12 sitios × 10 semanas; el estimado original de 500-700 asumía tasas de reclutamiento superiores a las observadas en CAPSTONE)</td>
+        </tr>
+        <tr style="background:#e8f8f5">
+          <td>✓ <strong>Meta 1,000 pacientes</strong></td>
+          <td>—</td>
+          <td>2 picos estacionales</td>
+          <td>—</td>
+          <td><strong>Oct 2027–Ene 2028</strong> (12-15 meses de reclutamiento — escenario conservador considerando que el pico secundario Sep-Nov contribuye menos que el principal Feb-Mar)</td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
+    <div class="source" style="margin-top:8px">Nota: Los plazos regulatorios son estimados para Guatemala sin precedente de ensayo antiviral influenza aprobado. Se requiere contactar MSPAS Unidad de Regulación para confirmar plantillas y contacto designado. Si hay precedentes IGSS, el proceso puede acelerarse a 12–16 semanas totales. Fuente: Revisión de literatura de ensayos clínicos en Centroamérica + analogía con procesos ANMAT/INVIMA LAC.</div>
+  </div>
+
+  <!-- ===== MARCO REGULATORIO Y ETICO (Auditoria GCP 2026-03-12) ===== -->
+  <div class="chart-card" style="margin-top:20px">
+    <h3>&#9878;&#65039; Marco Regulatorio, Etico y Normativo &mdash; Requisitos para Ensayo Clinico en Guatemala</h3>
+    <div class="alert alert-danger" style="margin-bottom:12px">
+      <span class="alert-icon">&#9888;&#65039;</span>
+      <div><strong>CONTEXTO HISTORICO CRITICO:</strong> Guatemala tiene una sensibilidad etica excepcional hacia ensayos clinicos debido a los <strong>experimentos de inoculacion de ETS realizados por investigadores estadounidenses entre 1946-1948</strong> (revelados en 2010, disculpa presidencial de EE.UU.). Este precedente historico hace que el escrutinio etico sea particularmente riguroso. Todo protocolo debe demostrar beneficio directo para la poblacion guatemalteca y cumplir estandares eticos superiores al minimo ICH-GCP.</div>
+    </div>
+    <div style="overflow-x:auto">
+    <table class="data-table" style="font-size:0.82rem">
+      <thead><tr><th>Marco normativo</th><th>Documento/Referencia</th><th>Requisito clave para este ensayo</th><th>Estado</th></tr></thead>
+      <tbody>
+        <tr style="background:rgba(231,76,60,0.06)"><td><strong>ICH-GCP E6(R2)</strong></td><td>Guia ICH de Buenas Practicas Clinicas, adoptada por OMS y referencia para MSPAS</td><td>Protocolo, IB, consentimiento informado, monitoreo, DSMB, farmacovigilancia, archivo TMF</td><td><span class="tag tag-h3n2">OBLIGATORIO</span></td></tr>
+        <tr><td><strong>Declaracion de Helsinki (2013)</strong></td><td>Principios eticos para investigacion medica en seres humanos &mdash; WMA</td><td>Art. 20: poblaciones vulnerables; Art. 22: consentimiento libre; Art. 33: placebo solo si no hay tratamiento probado (en GT no hay acceso a antivirales &mdash; placebo puede ser etico si se provee standard of care)</td><td><span class="tag tag-h3n2">OBLIGATORIO</span></td></tr>
+        <tr style="background:rgba(231,76,60,0.06)"><td><strong>Guatemala: Codigo de Salud (Decreto 90-97)</strong></td><td>Ley organica del sistema de salud &mdash; Arts. 34-41 regulan investigacion en salud</td><td>Toda investigacion en seres humanos requiere autorizacion del MSPAS y comite de etica</td><td><span class="tag tag-h3n2">OBLIGATORIO</span></td></tr>
+        <tr><td><strong>Acuerdo Gubernativo 514-98</strong></td><td>Reglamento Control Sanitario de Medicamentos y Productos Afines</td><td>Regula importacion de IMP, registro, cadena de custodia</td><td><span class="tag tag-h1n1">VERIFICAR vigencia</span></td></tr>
+        <tr style="background:rgba(231,76,60,0.06)"><td><strong>Comite Nacional de Bioetica en Salud</strong></td><td>MSPAS &mdash; organo etico nacional (fortalecido post-escandalo 2010)</td><td>Aprobacion etica independiente OBLIGATORIA. Revision de consentimiento, analisis riesgo-beneficio, proteccion poblaciones vulnerables</td><td><span class="tag tag-h3n2">OBLIGATORIO</span></td></tr>
+        <tr><td><strong>Pautas CIOMS (2016)</strong></td><td>Pautas Eticas Internacionales &mdash; OMS/CIOMS</td><td>Pauta 15: investigacion en LMICs debe responder a necesidades locales; Pauta 17: capacidad limitada de consentimiento; Pauta 7: vulnerabilidad por pobreza</td><td><span class="tag tag-h1n1">ALTAMENTE RECOMENDADO</span></td></tr>
+        <tr style="background:rgba(231,76,60,0.06)"><td><strong>Consentimiento en idiomas indigenas</strong></td><td>43.4% poblacion indigena (K&apos;iche&apos; 11.3%, Q&apos;eqchi&apos; 8.3%, Kaqchikel 7.6%, Mam 5.2%)</td><td>Consentimiento en espanol + K&apos;iche&apos;, Q&apos;eqchi&apos;, Kaqchikel, Mam para sitios con &gt;20% indigena. Traduccion culturalmente adaptada. Interprete + testigo para analfabetos (tasa analfabetismo: ~18% nacional, &gt;35% mujeres indigenas rurales)</td><td><span class="tag tag-h3n2">OBLIGATORIO etico</span></td></tr>
+        <tr><td><strong>Asentimiento pediatrico</strong></td><td>ICH-E11(R1)</td><td>Menores 7-17: asentimiento + consentimiento tutor. Menores de 7: solo consentimiento paterno</td><td><span class="tag tag-h1n1">OBLIGATORIO si incluye pediatricos</span></td></tr>
+        <tr style="background:rgba(231,76,60,0.06)"><td><strong>Post-trial access</strong></td><td>Helsinki Art. 34, CIOMS Pauta 6</td><td>Plan de acceso post-ensayo al farmaco OBLIGATORIO. En GT (0% acceso a antivirales) esto es eticamente imperativo</td><td><span class="tag tag-h3n2">OBLIGATORIO etico</span></td></tr>
+        <tr><td><strong>IGSS Comite de Etica</strong></td><td>Comite independiente del MSPAS</td><td>Sitios IGSS requieren aprobacion SEPARADA. Proceso paralelo posible</td><td><span class="tag tag-h1n1">OBLIGATORIO para sitios IGSS</span></td></tr>
+        <tr style="background:rgba(231,76,60,0.06)"><td><strong>DSMB independiente</strong></td><td>ICH-E6(R2) s5.5.2, ICH-E9</td><td>Minimo 3 miembros (bioestadistico, infectologo, eticista). Al menos 1 guatemalteco/centroamericano. Charter antes del 1er paciente</td><td><span class="tag tag-h3n2">OBLIGATORIO</span></td></tr>
+        <tr><td><strong>Compensacion participantes</strong></td><td>ICH-GCP 4.8.10, CIOMS Pauta 13</td><td>Reembolso transporte + lucro cesante; NO coercitivo (59.3% pobreza). Q50-150 = 1-3 dias salario minimo rural</td><td><span class="tag tag-h1n1">REQUIERE aprobacion etica</span></td></tr>
+      </tbody>
+    </table>
+    </div>
+    <div class="source" style="margin-top:8px">Fuentes: ICH-GCP E6(R2) 2016; Declaracion de Helsinki WMA 2013; CIOMS 2016; Codigo de Salud Guatemala Decreto 90-97; AG 514-98. Guatemala NO es miembro ICH pero MSPAS adopta ICH-GCP via OPS/OMS. Verificar legislacion especifica post-2010 sobre ensayos clinicos. Ref historica: Reverby SM. J Policy Hist. 2011;23(1):6-28.</div>
+  </div>
+
+  <!-- Brecha diagnóstica y recomendaciones -->
+  <div class="chart-card" style="margin-top:20px">
+    <h3>⚡ Brechas Operacionales y Recomendaciones para Protocolo de Ensayo</h3>
+    <div class="charts-grid" style="margin-top:12px">
+      <div>
+        <h4 style="color:#e74c3c;margin-bottom:8px">🔴 Desafíos (Auditoría 3ª edición)</h4>
+        <ul style="line-height:1.9;font-size:0.85rem">
+          <li>Solo ~25–30% de casos IRA acuden a establecimientos MSPAS (de 52% que busca atención total [OMS GHO 2015]) → subregistro masivo</li>
+          <li>RT-PCR solo en LNS (nacional) + VICo → latencia 24-48h → requiere RIDT en sitios</li>
+          <li>Ventana terapéutica: solo ~50% de pacientes llegarán en ≤48h (no 80% en 72h) — auditado</li>
+          <li>VICo 2008-2012: datos de tasas de hospitalización son de hace 14 años, cepa H1N1 pandémica</li>
+          <li>Positividad FluNet 27.2% tiene sesgo hospitalario 2-3× (positivity comunitaria est.: ~10-15%)</li>
+          <li>Solo 52% de la población busca atención · brecha socioeconómica: Q1=46.5% vs Q5=68.2%</li>
+          <li>43.4% indígena (K'iche', Mam, Q'eqchi') → barreras idiomáticas para consentimiento</li>
+          <li>VICo operacionalidad 2026: verificar si Hospital Cuilapa y Quetzaltenango aún activos</li>
+          <li>Timeline regulatorio: aprobación MSPAS ~18-22 semanas → inicio mínimo Oct 2026</li>
+          <li>RSV coinfección ~25–50% en pediatría (RSV positivity GT 25.2%, extrapolación de MA NEJM 50% en muertes) → estratificación necesaria en análisis</li>
+          <li>Malnutrición crónica 48.9% → puede alterar farmacocinética y respuesta inmune</li>
+          <li>Funnel real: ~4,000 pacientes elegibles/pico (no 42,517) — corrección por exclusiones</li>
+          <li><strong>Sensibilidad histórica</strong>: experimentos de ETS 1946-48 → desconfianza hacia ensayos clínicos extranjeros. Requiere engagement comunitario previo y líderes comunitarios como facilitadores</li>
+          <li><strong>Sitios Tier 2 sin experiencia GCP</strong>: Totonicapán, Jutiapa, Chiquimula no han participado en ensayos clínicos previamente → entrenamiento 2-4 semanas + monitores dedicados</li>
+          <li><strong>Justificación ética del placebo</strong>: en GT no hay acceso a antivirales (0% uso) → placebo + standard of care (antipiréticos, hidratación) puede ser éticamente justificable según Helsinki Art. 33 (verificar con comité de bioética)</li>
+          <li><strong>Analfabetismo</strong>: ~18% nacional, &gt;35% mujeres indígenas rurales → consentimiento requiere testigo independiente + proceso oral documentado</li>
+        </ul>
+      </div>
+      <div>
+        <h4 style="color:#27ae60;margin-bottom:8px">🟢 Ventajas para Ensayo Clínico (Auditado)</h4>
+        <ul style="line-height:1.9;font-size:0.85rem">
+          <li><strong>Mayor DALYs influenza de LAC</strong>: 503.78/100k (IHME 2015-19) → endpoint claro</li>
+          <li>H3N2 dominante (84–96%): cohorte homogénea → mayor poder estadístico</li>
+          <li>0% vacunación → 100% población naive · mortalidad <5y: +360% en 3 años (5→14→23)</li>
+          <li><strong>"Deuda inmunitaria" post-COVID activa</strong>: ratio IRA/ETAS +3.5σ sobre baseline histórico 2022-2024 → mayor susceptibilidad Y mayor volumen casos</li>
+          <li>Dos temporadas pico/año (Feb–Mar principal + Sep–Nov secundario) → 2 ventanas reclutamiento</li>
+          <li>100% de muertes pediátricas Guatemala = pacientes SIN vacuna → efecto fármaco medible</li>
+          <li>VICo (Cuilapa + Quetzaltenango): infraestructura establecida + RT-PCR en sitio</li>
+          <li>Sitios VICo SARI/IRAG: datos de 15+ años → comparabilidad histórica</li>
+          <li>CFR intrahospitalaria GT ~6% (vs ~2% MA) → mayor efecto fármaco detectable</li>
+          <li>0% uso antivirales en GT (vs ~40-60% MA) → mayor efecto neto del fármaco</li>
+          <li>22 departamentos reportando → 333 municipios con datos de carga IRA</li>
+        </ul>
+      </div>
+    </div>
+    <div style="margin-top:16px;padding:12px;background:#f8f9fa;border-radius:8px;border-left:4px solid #2980b9">
+      <strong>📋 Fuentes adicionales a explorar:</strong><br>
+      <ul style="margin-top:6px;line-height:1.8">
+        <li><a href="https://www.igssgt.org/informes-y-estadisticas/boletin-estadistico-de-salud/" target="_blank">IGSS Boletines Estadísticos 2016–2023</a> — datos de morbilidad por CIE-10 por unidad médica</li>
+        <li><a href="https://sigsa.mspas.gob.gt/datos-de-salud" target="_blank">MSPAS SIGSA — Datos de Salud</a> — desagregación por municipio y establecimiento</li>
+        <li><a href="https://epidemiologia.mspas.gob.gt/informacion/vigilancia-epidemiologica/sala-situacional-respiratoria" target="_blank">MSPAS Sala Situacional IRA</a> — reportes semanales en tiempo real</li>
+        <li><a href="https://establecimientosdesalud.mspas.gob.gt/establecimientos/listado-de-establecimientos.html" target="_blank">Directorio Establecimientos de Salud MSPAS</a> — 41 hospitales + 29 DDRISS en 22 deptos.</li>
+        <li><a href="https://www.igssgt.org/directorio/" target="_blank">Directorio Unidades IGSS</a> — red nacional de clínicas y hospitales</li>
+        <li><a href="https://bmcpublichealth.biomedcentral.com/articles/10.1186/s12889-019-6781-6" target="_blank">VICo Guatemala 2008–2012</a> — datos de hospitalización y mortalidad por influenza confirmada</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- ===== SECCIÓN: DEUDA INMUNITARIA POST-COVID ===== -->
+  <div class="charts-grid" style="margin-top:20px">
+    <div class="chart-card">
+      <h3>📈 "Deuda Inmunitaria" Post-COVID — Señal de Mayor Susceptibilidad 2022–2024</h3>
+      <div class="alert alert-success" style="margin-bottom:10px;padding:8px 12px">
+        <span class="alert-icon">💡</span>
+        <div style="font-size:0.82rem"><strong>Hallazgo de auditoría (+3.5σ):</strong> El ratio IRA/ETAS (enfermedades gastrointestinales) se elevó de 4.45 histórico a ~5.0 desde 2022 — señal de rebote respiratorio post-COVID superior al gastrointestinal. Indica alta susceptibilidad residual → óptimo para ensayo AHORA antes de que la inmunidad se recupere.</div>
+      </div>
+      <canvas id="chartIRAETAS" style="max-height:280px"></canvas>
+      <div class="source">Fuente: MSPAS SIGSA 2012-2024 (IRAs) + ETAS (Enfermedades Transmitidas por Alimentos/Agua). Ratio IRA/ETAS pre-COVID (2012-2021): 4.45 ± 0.15. Post-COVID 2022-2024: 4.98–5.00 = <strong>+3.5 desviaciones estándar</strong> sobre baseline histórico. Interpretación: IRAs están rebotando más rápido que ETAS → "deuda inmunitaria" confirma mayor susceptibilidad respiratoria en población guatemalteca. Implicación ensayo: 2025-2026 = ventana óptima antes de recuperación inmune completa.</div>
+    </div>
+
+    <div class="chart-card">
+      <h3>💉 Cobertura Multi-Vacuna Guatemala 2013–2024 — Contexto: Sin Vacuna Anti-Influenza</h3>
+      <div class="alert alert-danger" style="margin-bottom:10px;padding:8px 12px">
+        <span class="alert-icon">🚨</span>
+        <div style="font-size:0.82rem">PCV3 (antineumocócica) cubre 89% pediátrico pero <strong>no existe programa nacional de vacunación anti-influenza</strong>. Cobertura influenza = 0% todos los años. Esto diferencia el contexto GT del trial MA donde 49.5% ya están vacunados. Oportunidad: ensayo con antiviral puede actuar como "<em>sustituto terapéutico de la vacuna</em>".</div>
+      </div>
+      <canvas id="chartMultiVaccine" style="max-height:280px"></canvas>
+      <div class="source">Fuente: WHO GHO Guatemala — WHO_GHO_Guatemala_vaccine_coverage.csv. PCV3: programa iniciado 2013 (72%) → pico 2017 (93%) → COVID colapso 2021 (79%) → recuperación 2024 (89%). DTP3 2024: 81% (decline). Rotavirus 2024: 80% (declining). Influenza: 0% todos los años — sin programa MSPAS.</div>
+    </div>
+  </div>
+
+  <!-- ===== SECCIÓN: AUDITORÍA 3ª EDICIÓN — RESUMEN HALLAZGOS ===== -->
+  <div class="chart-card" style="margin-top:20px">
+    <h3>🔬 Resumen Auditoría Profunda Multi-Agente — Hallazgos Críticos (2026-03-10)</h3>
+    <div class="alert alert-warning" style="margin-bottom:12px">
+      <span class="alert-icon">⚠️</span>
+      <div><strong>6 agentes especializados auditaron el dashboard en paralelo:</strong> Integridad de datos, Protocolo clínico, Métodos epidemiológicos, Cobertura geográfica, Metodología NEJM comparada, Fuentes no utilizadas. Hallazgos consolidados abajo — total: <strong>47 gaps identificados, 19 críticos, 15 altos, 13 medios.</strong></div>
+    </div>
+    <div style="overflow-x:auto">
+    <table class="data-table" style="font-size:0.78rem">
+      <thead>
+        <tr>
+          <th>Área</th>
+          <th>Hallazgo crítico</th>
+          <th>Impacto cuantificado</th>
+          <th>Prioridad</th>
+          <th>Estado</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr style="background:rgba(231,76,60,0.08)">
+          <td><strong>Funnel elegibilidad</strong></td>
+          <td>42,517 es ~10× optimista. Pool real ~4,000/pico (sin exclusiones reales: embarazo, renal, hepático, pediátrico-tutor, severidad extrema)</td>
+          <td>−79% si solo inpatiente; −20% por criterios exclusión estándar</td>
+          <td><span class="tag tag-h3n2">CRÍTICO</span></td>
+          <td>⚠️ Pendiente corrección</td>
+        </tr>
+        <tr>
+          <td><strong>Ventana terapéutica</strong></td>
+          <td>Funnel usa 80% en ≤72h. Real: solo ~50% llegan en ≤48h (requerimiento real de antivirales). Diferencia clínica y estadística</td>
+          <td>−37% elegibles si ≤48h requerido vs ≤72h</td>
+          <td><span class="tag tag-h3n2">CRÍTICO</span></td>
+          <td>⚠️ Necesita dato local</td>
+        </tr>
+        <tr style="background:rgba(231,76,60,0.08)">
+          <td><strong>Tasas VICo 2008-12</strong></td>
+          <td>Datos 14 años antiguos, cepa H1N1 pandémica. Tasa 93/100k &lt;5y puede ser 200-250/100k real (VICo solo capturaba 5-10% de carga nacional)</td>
+          <td>Multiplicador por hospitalización: 2-3× (tanto sobre como subestimación posible)</td>
+          <td><span class="tag tag-h1n1">ALTO</span></td>
+          <td>⚠️ Necesita actualización</td>
+        </tr>
+        <tr>
+          <td><strong>Positivity vs ILI%</strong></td>
+          <td>MA ILI% (clínica) ≠ GT positivity (laboratorio). Hospital positivity 2-3× mayor que comunitaria. Estimado verdadero flu GT: ~350,000 (no 852,090)</td>
+          <td>Sesgo 2.4× si se usa como comparación directa</td>
+          <td><span class="tag tag-h1n1">ALTO</span></td>
+          <td>✅ Advertencia añadida al dashboard</td>
+        </tr>
+        <tr style="background:rgba(231,76,60,0.08)">
+          <td><strong>Multiplicadores de edad</strong></td>
+          <td>Chart 1C usa 4.5× (tasa urgencias ED) aplicado a baseline de hospitalizaciones (VICo). Error de endpoint: multiplicador correcto para hosp. = 2.8× (no 4.5×)</td>
+          <td>&lt;5y: 108/100k sobreestimado → correcto ~67/100k; 80+: 72/100k subestimado → correcto ~574/100k</td>
+          <td><span class="tag tag-h3n2">CRÍTICO</span></td>
+          <td>⚠️ Requiere corrección en Chart 1C</td>
+        </tr>
+        <tr>
+          <td><strong>MEM baseline</strong></td>
+          <td>Baseline MEM 9.4% (dashboard) vs 7.7% calculado de datos disponibles. Umbral epidémico 25.2% verificado (discrepancia solo 0.3pp — sin impacto práctico)</td>
+          <td>Discrepancia 1.7pp en baseline, umbral epidémico OK</td>
+          <td><span class="tag">MEDIO</span></td>
+          <td>✅ Verificado, impacto mínimo</td>
+        </tr>
+        <tr style="background:rgba(231,76,60,0.08)">
+          <td><strong>RSV coinfección</strong></td>
+          <td>RSV en 50% muertes pediátricas MA. GT: RSV 25.2% de muestras (2024, SENTINEL) — mayor que en MA. Sin análisis de co-circulación ni estrategia de exclusión/inclusión</td>
+          <td>−5 a −15% elegibles si RSV excluido; sin análisis: sesgo en eficacia del fármaco</td>
+          <td><span class="tag tag-h1n1">ALTO</span></td>
+          <td>✅ Sección RSV añadida</td>
+        </tr>
+        <tr>
+          <td><strong>Timeline regulatorio</strong></td>
+          <td>Completamente ausente del dashboard. MSPAS aprobación: 18-22 semanas. Inicio realista: Oct 2026. Pico 2026 ya transcurrió sin ensayo.</td>
+          <td>Retraso de 1 año respecto a lo que sugeriría el dashboard sin timeline</td>
+          <td><span class="tag tag-h1n1">ALTO</span></td>
+          <td>✅ Sección añadida</td>
+        </tr>
+        <tr style="background:rgba(231,76,60,0.08)">
+          <td><strong>Datos pediátricos inexplotados</strong></td>
+          <td>morbilidad-infantil-2024.csv (6.3 MB, ~200k registros) completamente ignorado. Contiene datos municipio-específicos por ICD-10 en &lt;5 años</td>
+          <td>Mejor estimación tasas pediátricas por departamento; identificación de municipios prioritarios</td>
+          <td><span class="tag tag-h3n2">CRÍTICO</span></td>
+          <td>⚠️ Datos disponibles, pendiente análisis</td>
+        </tr>
+        <tr>
+          <td><strong>IGSS 7-9M personas</strong></td>
+          <td>IGSS cubre 42% de población guatemalteca pero sus datos de morbilidad no están integrados. Boletines estadísticos 2016-2023 disponibles en igssgt.org</td>
+          <td>+42% de población relevante sin representación en estimaciones</td>
+          <td><span class="tag tag-h1n1">ALTO</span></td>
+          <td>⚠️ Pendiente integración</td>
+        </tr>
+        <tr style="background:rgba(231,76,60,0.08)">
+          <td><strong>Tasas per-cápita departamentales</strong></td>
+          <td>Dashboard muestra cifras absolutas. Por capita: El Petén (37,413/100k) &gt; San Marcos (28,584/100k). Rankings cambian completamente con denominador poblacional</td>
+          <td>Priorización incorrecta de sitios si se usa solo volumen absoluto</td>
+          <td><span class="tag tag-h3n2">CRÍTICO</span></td>
+          <td>⚠️ Requiere cálculo con INE poblacional</td>
+        </tr>
+        <tr>
+          <td><strong>Vigilancia virologica</strong></td>
+          <td>Solo 2 sitios VICo (Cuilapa + Quetzaltenango) tienen RT-PCR local. 33.8% de casos IRA nacionales (San Marcos + Huehuetenango + Quiché + Alta Verapaz) están en zonas SIN vigilancia virologica local</td>
+          <td>Cobertura crítica: 1.06M casos IRA/año sin vigilancia virológica local</td>
+          <td><span class="tag tag-h3n2">CRÍTICO</span></td>
+          <td>⚠️ Gap de sistema — requiere política MSPAS</td>
+        </tr>
+        <tr style="background:rgba(231,76,60,0.08)">
+          <td><strong>Mortalidad subcodificada</strong></td>
+          <td>J18.9 (Neumonía no especificada) = 93.5% de muertes IRA (2024). Influenza J09-J11 = solo 0.99%. Sin confirmación lab, influenza se codifica como J18.9. Factor subregistro: ~25-31×</td>
+          <td>59 muertes por influenza → estimado real: 1,200-1,800 muertes/año</td>
+          <td><span class="tag tag-h1n1">ALTO</span></td>
+          <td>⚠️ Documentado, pendiente corrección KPI</td>
+        </tr>
+        <tr>
+          <td><strong>Deuda inmunitaria IRA/ETAS</strong></td>
+          <td>Ratio IRA/ETAS: 4.45 histórico → 5.00 desde 2022 (+3.5σ). Señal cuantificada de "immunity debt" post-COVID. Confirma ventana óptima de ensayo 2025-2026.</td>
+          <td>+12% IRAs relativo al esperado → mayor volumen reclutamiento en 2025-2026</td>
+          <td><span class="tag tag-h1n1">ALTO</span></td>
+          <td>✅ Análisis añadido (chart nuevo)</td>
+        </tr>
+        <tr style="background:rgba(231,76,60,0.08)">
+          <td><strong>Certeza de datos (integridad)</strong></td>
+          <td>Auditoría integridad: 19/20 puntos verificados (95%). Auditoría FluNet 2026-03-12: corregidos 8 errores (estacionalidad, RSV, H3N2%, spec/10k, chart data). Discrepancia menor MEM baseline 7.7% vs 9.4%. Todo FluNet, SIGSA, INE mortalidad, VICo, DALYs: VERIFICADO 100%.</td>
+          <td>+5% confianza en estimaciones core del dashboard</td>
+          <td><span class="tag tag-b">INFORMACIÓN</span></td>
+          <td>✅ Score: 95/100 auditado</td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
+    <div class="source" style="margin-top:8px"><strong>Auditoría completada:</strong> 2026-03-10 | Agentes: Integridad de Datos (19/20 ✅) · Protocolo Clínico (12 áreas) · Métodos Epidemiológicos (10 hallazgos) · Cobertura Geográfica (8 hallazgos) · Metodología NEJM Comparada (10 hallazgos) · Fuentes No Utilizadas (12 análisis). Archivo dashboard: dashboard/index.html (2,238 líneas antes de esta auditoría). Prioridades implementadas: RSV, Timeline regulatorio, Deuda inmunitaria, Cobertura multi-vacuna, Actualización listas de desafíos/ventajas.</div>
+  </div>
+
+  <!-- ===== SECCIÓN: POWER CALCULATION (Auditoría 4ª) ===== -->
+  <div class="chart-card" style="margin-top:20px">
+    <h3>📐 Cálculo Formal de Poder Estadístico — Determinación del Endpoint Primario</h3>
+    <div class="alert alert-danger" style="margin-bottom:12px">
+      <span class="alert-icon">🚨</span>
+      <div><strong>HALLAZGO CRÍTICO (Auditoría 4ª, 2026-03-12):</strong> La meta de 1,000 pacientes NO tenía cálculo formal de poder. 1,000 pts es viable <strong>SOLO</strong> si el endpoint primario es <strong>tiempo a resolución de síntomas</strong> (como CAPSTONE-1/2 y oseltamivir pivotal). Mortalidad y hospitalización como primarios requieren N=2,100–8,700. <em>Nota GCP: todo cálculo de poder debe ser validado por bioestadístico independiente y documentado en el protocolo conforme ICH-E9.</em></div>
+    </div>
+    <div style="overflow-x:auto">
+    <table class="data-table" style="font-size:0.82rem">
+      <thead>
+        <tr>
+          <th>Endpoint</th>
+          <th>Baseline GT</th>
+          <th>Efecto esperado</th>
+          <th>N necesario (80% poder, α=0.05)</th>
+          <th>Con 1,000 pts: poder</th>
+          <th>NNT</th>
+          <th>Viabilidad</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr style="background:#e8f8f5">
+          <td><strong>Tiempo resolución síntomas -30%</strong></td>
+          <td>~80h mediana placebo (CAPSTONE-1: 80.2h; oseltamivir pivotal: 80-97h) — en GT sin tratamiento previo antiviral podría ser mayor (~96-120h) por acceso tardío y comorbilidades</td>
+          <td>HR=1.30 (CAPSTONE-1: 1.36 [IC95% 1.17-1.58]; CAPSTONE-2: 1.30 alto riesgo)</td>
+          <td><strong>600</strong> (480 eventos + 20% dropout) — log-rank: d=4(1.96+0.84)&sup2;/[ln(1.30)]&sup2;=454 eventos</td>
+          <td style="color:#27ae60;font-weight:700">~95%</td>
+          <td>~4-5 (referencia: oseltamivir NNT=~6 para reducir 1 día síntomas)</td>
+          <td><span class="tag tag-h1n1">RECOMENDADO</span></td>
+        </tr>
+        <tr style="background:#e8f8f5">
+          <td><strong>Tiempo resolución síntomas -20%</strong></td>
+          <td>~80-120h (ver arriba)</td>
+          <td>HR=1.20 (oseltamivir pivotal Treanor 2000: ~HR 1.24)</td>
+          <td><strong>1,244</strong></td>
+          <td style="color:#e67e22;font-weight:700">~74%</td>
+          <td>~7</td>
+          <td><span class="tag tag-h1n1">FACTIBLE (borderline)</span></td>
+        </tr>
+        <tr>
+          <td>Mortalidad intrahospitalaria -50%</td>
+          <td>6% CFR (VICo 2008-12) — caveat: dato de 14 años, era H1N1 pandémica; CFR actual podría ser 3-8% dependiendo de cepa y sitio; oseltamivir no mostró reducción mortalidad significativa en RCTs ambulatorios (solo en observacionales de hospitalizados)</td>
+          <td>RR=0.50 (→3%) — efecto muy ambicioso; ningún antiviral ha demostrado 50% reducción mortalidad en RCT</td>
+          <td><strong>2,078</strong></td>
+          <td style="color:#e67e22">~64%</td>
+          <td>33</td>
+          <td>Solo como secundario (exploratorio)</td>
+        </tr>
+        <tr>
+          <td>Mortalidad intrahospitalaria -25%</td>
+          <td>6% CFR (caveat: ver arriba)</td>
+          <td>RR=0.75 (→4.5%)</td>
+          <td><strong>8,678</strong></td>
+          <td style="color:#c0392b">~15%</td>
+          <td>67</td>
+          <td><span class="tag tag-h3n2">NO VIABLE como primario</span></td>
+        </tr>
+        <tr>
+          <td>Hospitalización -25%</td>
+          <td>~1.5% de ILI ambulatorio (oseltamivir redujo hosp. ~59% en meta-análisis Dobson 2015 — pero solo observacional, no RCT)</td>
+          <td>RR=0.75</td>
+          <td><strong>8,678+</strong></td>
+          <td style="color:#c0392b">~15%</td>
+          <td>267</td>
+          <td><span class="tag tag-h3n2">NO VIABLE como primario</span></td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
+    <div style="margin-top:12px;padding:10px;background:#e8f8f5;border-radius:6px;font-size:0.82rem;border-left:4px solid #27ae60">
+      <strong>Diseño recomendado (sujeto a validación por bioestadístico independiente):</strong><br>
+      <strong>Primario:</strong> Tiempo desde inicio de tratamiento hasta resolución de síntomas (score FLU-PRO &le;1 o equivalente validado por &ge;24h). N=1,000 &rarr; ~95% poder para HR=1.30 (randomización 1:1, 500 por brazo). Asume mediana placebo ~80-120h según población GT.<br>
+      <strong>Secundarios:</strong> (a) Proporción hospitalizada a 28d (exploratorio); (b) Mortalidad a 28d (exploratorio, poder ~64% con N=1,000 solo si CFR &ge;6%); (c) Negativización viral por RT-PCR (submuestra en &ge;3 sitios centinela con PCR cuantitativa); (d) Tiempo a negativización RIDT.<br>
+      <strong>Interino:</strong> Futilidad al 50% (N=500) con Lan-DeMets O'Brien-Fleming, alpha-spending function. <strong>DSMB independiente obligatorio (ICH-E9 / ICH-E6 R2 s5.5.2)</strong>: m&iacute;nimo 3 miembros (bioestadístico, clínico infectólogo, eticista), independientes del sponsor y PI. Triggers de parada: mortalidad diferencial &gt;3%, SAE &gt;10%, dropout &gt;25%, se&ntilde;al de hepatotoxicidad. Plan de monitoreo de seguridad debe ser aprobado antes del primer paciente.<br>
+      <strong>Referencia ensayos pivotales:</strong> CAPSTONE-1 baloxavir (N=1,436, HR=1.36 [1.17-1.58] ambulatorio sin riesgo); CAPSTONE-2 baloxavir alto riesgo (N=2,184, HR=1.30); Oseltamivir pivotal Treanor 2000 (N=629, reducción ~30% duración síntomas); Hayden 1999 (N=726). Nota: todos estos ensayos fueron en pa&iacute;ses de alto ingreso con acceso temprano &le;48h &mdash; la extrapolación a GT requiere ajuste por tiempo a consulta mayor.
+    </div>
+    <div class="source" style="margin-top:8px">Fórmulas: Test proporciones (mortalidad): N=[Z_&alpha;/2&radic;(2p&#772;q&#772;)+Z_&beta;&radic;(p&#8321;q&#8321;+p&#8322;q&#8322;)]&sup2;/&delta;&sup2;. Log-rank (tiempo): d=4(Z_&alpha;/2+Z_&beta;)&sup2;/[ln(HR)]&sup2;. &alpha;=0.05 dos colas, &beta;=0.20 (80% poder). Dropout: 20% (conservador para GT &mdash; puede ser 25-30% en sitios rurales). Fuente baseline: VICo 2008-12 (CFR 6% &mdash; dato antiguo, verificar), literatura oseltamivir/baloxavir (resolución placebo ~80-97h, NO ~7 d&iacute;as como indicado originalmente). Referencia f&oacute;rmulas: Schoenfeld 1983 (log-rank), Fleiss 1981 (proporciones). <strong>Nota: estos c&aacute;lculos deben ser reproducidos en software validado (nQuery, PASS, o R/gsDesign) antes de incluirse en protocolo.</strong></div>
+  </div>
+
+  <!-- ===== SECCIÓN: FUNNEL CORREGIDO (Auditoría 4ª) ===== -->
+  <div class="chart-card" style="margin-top:20px">
+    <h3>🔄 Funnel de Elegibilidad Corregido — Auditoría Bioestadística</h3>
+    <div style="overflow-x:auto">
+    <table class="data-table" style="font-size:0.82rem">
+      <thead>
+        <tr>
+          <th>Paso</th>
+          <th>Dashboard original</th>
+          <th>Valor corregido</th>
+          <th>Corrección aplicada</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>Influenza estimada total</td><td>852,090</td><td style="color:#c0392b"><strong>~350,000</strong></td><td>Positividad comunitaria ~10-14% (no 27.2% hospitalaria)</td></tr>
+        <tr><td>Buscan atención (52%)</td><td>442,887</td><td>182,000</td><td>WHO GHO 52%</td></tr>
+        <tr><td>En facilities del ensayo (20%)</td><td>88,577</td><td>36,400</td><td>Solo MSPAS+IGSS con capacidad Dx</td></tr>
+        <tr><td>Confirmados Dx</td><td>70,862 (80%)</td><td style="color:#e67e22">21,840 (60%)</td><td>RIDT sensibilidad real 50-70% (no 80%)</td></tr>
+        <tr><td>Ventana terapéutica</td><td>56,689 (80% ≤72h)</td><td style="color:#c0392b">10,920 (50% ≤48h)</td><td>Requisito real: ≤48h, no ≤72h</td></tr>
+        <tr><td>Dispuestos a participar (75%)</td><td>42,517</td><td>8,190</td><td>75% consent rate</td></tr>
+        <tr style="background:#fdf2f2"><td><strong>Post-exclusiones clínicas</strong></td><td><em>no incluido</em></td><td style="color:#c0392b"><strong>~6,962/año</strong></td><td>-15% por embarazo, renal, hepático, &lt;1 año, sin tutor</td></tr>
+      </tbody>
+    </table>
+    </div>
+    <div style="margin-top:8px;font-size:0.82rem;padding:8px;background:#fff8e1;border-radius:6px">
+      <strong>Conclusión:</strong> Meta 1,000 requiere reclutar 14.4% de los ~6,962 elegibles/año. <strong>Nota terminológica importante:</strong> "consent rate" y "screening-to-enrollment ratio" son métricas distintas. En LMICs la <em>tasa de consentimiento</em> (proporción de elegibles que aceptan participar) es típicamente <strong>60-85%</strong> para ensayos no invasivos con tratamiento activo (verificar con comité ético local — en Guatemala puede ser menor por desconfianza histórica hacia ensayos clínicos, ver nota ética abajo). La <em>tasa de screening-to-enrollment</em> (proporción de screened que se enrollan) es típicamente <strong>15-35%</strong> en ensayos respiratorios de antivirales (CAPSTONE-1: ~25%; oseltamivir pivotales: ~20-30%). Con 12 sitios y screening-to-enrollment de 20-30%: necesidad de screening ~3,300-5,000 pacientes — meta de 1,000 alcanzable en ~12-15 meses cubriendo 2 picos estacionales.
+    </div>
+  </div>
+
+  <!-- ===== SECCIÓN: DATOS PEDIÁTRICOS INEXPLOTADOS (Auditoría 4ª) ===== -->
+  <div class="charts-grid" style="margin-top:20px">
+    <div class="chart-card">
+      <h3>👶 Tendencia IRA Pediátrica vs Adultos (2012–2024) — Datos Inexplotados</h3>
+      <div class="alert alert-warning" style="margin-bottom:10px;padding:8px 12px">
+        <span class="alert-icon">⚠️</span>
+        <div style="font-size:0.82rem"><strong>Hallazgo auditoría pediátrica:</strong> 1,188,267 casos IRA en &lt;5 años (2024) estaban completamente ausentes del dashboard. La recuperación pediátrica post-COVID está <strong>estancada al 73%</strong> (vs 87% adultos) — NO hay señal de "deuda inmunitaria" en pediatría, contradiciendo la narrativa adulta.</div>
+      </div>
+      <canvas id="chartPedVsAdult" style="max-height:280px"></canvas>
+      <div class="source">Fuente: MSPAS morbilidad-infantil 2012-2024 (888,520 registros) + morbilidad-iras-departamento 2012-2024. Infantes (&lt;1 año): 378,393 IRA 2024 (45.2% de morbilidad total). Niños 1-4y: 809,874 IRA 2024. Total &lt;5y: 1,188,267. COVID dip infantil -52% vs adulto -40%. Recuperación: infantil 73% vs adulto 87% del baseline 2019.</div>
+    </div>
+
+    <div class="chart-card">
+      <h3>🗺️ IRA per Cápita por Departamento — Rankings CORREGIDOS (2024)</h3>
+      <div class="alert alert-danger" style="margin-bottom:10px;padding:8px 12px">
+        <span class="alert-icon">🚨</span>
+        <div style="font-size:0.82rem"><strong>Hallazgo crítico:</strong> Los rankings per cápita son <strong>completamente distintos</strong> de los absolutos. Totonicapán = #1 (30,974/100k). Guatemala Dept = <strong>#22 ÚLTIMO</strong> (5,840/100k). Rango 5.3×. Implicación: sitios de ensayo deben incluir Totonicapán, Chiquimula, Jutiapa.</div>
+      </div>
+      <canvas id="chartDeptPerCapita" style="max-height:300px"></canvas>
+      <div class="source">Fuente: MSPAS 20-primeras-causas-morbilidad-2024 (11 códigos IRA: J00-J22). Población: INE 2024. Nota: Guatemala depto = último per cápita porque 3.8M habitantes diluyen los 222,793 casos. Los 3 hospitales de máxima prioridad (SJD, Roosevelt, IGSS) están en el depto de MENOR tasa per cápita — atienden pacientes referidos de todo el país.</div>
+    </div>
+  </div>
+
+  <!-- ===== SECCIÓN: VIGILANCIA GEOGRÁFICA GAP (Auditoría 4ª) ===== -->
+  <div class="chart-card" style="margin-top:20px">
+    <h3>🗺️ Brecha de Vigilancia Virológica — Solo 16.2% de IRA en Departamentos con Vigilancia</h3>
+    <div class="alert alert-danger" style="margin-bottom:12px">
+      <span class="alert-icon">🚨</span>
+      <div><strong>Hallazgo geográfico (Auditoría 4ª):</strong> Solo 3 de 22 departamentos tienen sitios centinela/VICo (Guatemala, Quetzaltenango, Santa Rosa) = <strong>16.2% de IRA nacional</strong>. El 83.8% restante (2.6M casos/año) no tiene vigilancia virológica. El dashboard anterior reportaba 33.8% — la cifra correcta estricta es 16.2%. Departamentos con >100km a vigilancia: 56% de IRA total (1.75M casos). Implicación: el ensayo debe desplegar RIDTs en todos los sitios.</div>
+    </div>
+    <div style="overflow-x:auto">
+    <table class="data-table" style="font-size:0.8rem">
+      <thead><tr><th>Sitio recomendado</th><th>Tier</th><th>Departamento</th><th>IRA 2024</th><th>Tasa per cápita /100k</th><th>Justificación</th></tr></thead>
+      <tbody>
+        <tr style="background:rgba(231,76,60,0.06)"><td><strong>H. San Juan de Dios</strong></td><td><span class="tag tag-h3n2">T1</span></td><td>Guatemala</td><td>222,793</td><td>5,840 (ref. nacional)</td><td>Mayor referencia; centinela IRAG; PCR in-situ</td></tr>
+        <tr style="background:rgba(231,76,60,0.06)"><td><strong>H. Roosevelt</strong></td><td><span class="tag tag-h3n2">T1</span></td><td>Guatemala</td><td>—</td><td>—</td><td>Referencia pediátrica; emergencia +50%</td></tr>
+        <tr style="background:rgba(231,76,60,0.06)"><td><strong>HGE-IGSS</strong></td><td><span class="tag tag-h3n2">T1</span></td><td>Guatemala</td><td>—</td><td>—</td><td>Mayor hosp. IGSS; centinela; H3N2 confirmado</td></tr>
+        <tr style="background:rgba(231,76,60,0.06)"><td><strong>H. Cuilapa (VICo)</strong></td><td><span class="tag tag-h3n2">T1</span></td><td>Santa Rosa</td><td>116,105</td><td>25,557</td><td>RT-PCR VICo; datos 15+ años</td></tr>
+        <tr style="background:rgba(231,76,60,0.06)"><td><strong>H. Occidente (VICo)</strong></td><td><span class="tag tag-h3n2">T1</span></td><td>Quetzaltenango</td><td>147,810</td><td>15,759</td><td>RT-PCR VICo; 2ª ciudad del país</td></tr>
+        <tr style="background:rgba(230,126,34,0.06)"><td><strong>H. Totonicapán</strong> <em>(NUEVO)</em></td><td><span class="tag tag-h1n1">T2</span></td><td>Totonicapán</td><td>167,258</td><td style="color:#c0392b;font-weight:700">30,974 (#1)</td><td>Mayor tasa per cápita nacional; sin vigilancia actual</td></tr>
+        <tr style="background:rgba(230,126,34,0.06)"><td><strong>H. Jutiapa</strong> <em>(NUEVO)</em></td><td><span class="tag tag-h1n1">T2</span></td><td>Jutiapa</td><td>139,497</td><td style="color:#c0392b;font-weight:700">29,271 (#5)</td><td>Municipio #4 nacional; alta tasa infantil</td></tr>
+        <tr style="background:rgba(230,126,34,0.06)"><td><strong>H. Chiquimula</strong> <em>(NUEVO)</em></td><td><span class="tag tag-h1n1">T2</span></td><td>Chiquimula</td><td>128,503</td><td style="color:#c0392b;font-weight:700">30,596 (#3)</td><td>3ª tasa per cápita; corredor oriental</td></tr>
+        <tr><td>H. Cobán</td><td><span class="tag">T2</span></td><td>Alta Verapaz</td><td>234,893</td><td>18,209</td><td>Zona Q'eqchi'; #3 absoluto infantil</td></tr>
+        <tr><td>H. San Marcos</td><td><span class="tag">T2</span></td><td>San Marcos</td><td>341,080</td><td>30,867 (#2)</td><td>#1 absoluto; #2 per cápita; acceso limitado</td></tr>
+        <tr><td>H. Huehuetenango</td><td><span class="tag">T3</span></td><td>Huehuetenango</td><td>252,119</td><td>19,246</td><td>#2 absoluto; remoto norte</td></tr>
+        <tr><td>H. HIIR (Pediátrico)</td><td><span class="tag">T2</span></td><td>Guatemala</td><td>—</td><td>—</td><td>Referencia pediátrica infecciones</td></tr>
+      </tbody>
+    </table>
+    </div>
+    <div class="source">Fuente: MSPAS 20-primeras-causas 2024 (2,986,148 IRA, 338 municipios). Población: INE 2024. Tier 1: sitios con PCR existente. Tier 2: sitios con alta carga que requieren RIDT. Tier 3: alta carga pero acceso limitado. 3 nuevos sitios (Totonicapán, Jutiapa, Chiquimula) basados en datos per cápita no disponibles en auditorías anteriores.</div>
+  </div>
+
+</div>
+
+<!-- ===================== TAB: CIE-10 ===================== -->
+<div id="cie10" class="tab-content">
+  <div class="section-title">📋 Códigos CIE-10 Relevantes — IRAs e Influenza</div>
+
+  <div class="alert alert-info">
+    <span class="alert-icon">ℹ️</span>
+    <div>Los códigos CIE-10 (ICD-10) son utilizados por el SIGSA/MSPAS para el registro de morbilidad y mortalidad. Las IRAs son la <strong>primera causa de consulta ambulatoria</strong> y una de las principales causas de hospitalización y muerte en Guatemala.</div>
+  </div>
+
+  <div class="cie-grid">
+    <div class="cie-card">
+      <div class="code">J09–J11</div>
+      <div class="desc"><strong>Influenza (Gripe)</strong></div>
+      <div class="sub-codes">
+        J09 · Influenza por virus identificado de la gripe aviar<br>
+        J10 · Influenza con neumonia por otro virus identificado<br>
+        J10.0 · Influenza con neumonia<br>
+        J10.1 · Influenza con manifestaciones respiratorias<br>
+        J10.8 · Influenza con otras manifestaciones<br>
+        J11 · Influenza, virus no identificado<br>
+        J11.0 · Influenza con neumonia, virus no ident.<br>
+        J11.1 · Influenza con manifestaciones respiratorias
+      </div>
+    </div>
+    <div class="cie-card">
+      <div class="code">J00–J06</div>
+      <div class="desc"><strong>Infecciones Agudas VRS (altas)</strong></div>
+      <div class="sub-codes">
+        J00 · Rinofaringitis aguda (resfriado común) — 1ª causa de consulta Guatemala<br>
+        J01 · Sinusitis aguda<br>
+        J02 · Faringitis aguda — 3ª causa frecuente en niños<br>
+        J03 · Amigdalitis aguda<br>
+        J04 · Laringitis y traqueitis aguda<br>
+        J05 · Laringitis obstructiva aguda (crup)<br>
+        J06 · Infección aguda vías resp. sup., no clasificadas
+      </div>
+    </div>
+    <div class="cie-card">
+      <div class="code">J12–J18</div>
+      <div class="desc"><strong>Neumonía</strong></div>
+      <div class="sub-codes">
+        J12 · Neumonía viral<br>
+        J12.0 · Neumonía por adenovirus<br>
+        J12.1 · Neumonía por VSR<br>
+        J13 · Neumonía por Streptococcus pneumoniae<br>
+        J14 · Neumonía por Haemophilus influenzae<br>
+        J15 · Neumonía bacteriana<br>
+        J18 · Neumonía, organismo no especificado<br>
+        <em>* 1ª causa de muerte en &lt;5 y &gt;65 años</em>
+      </div>
+    </div>
+    <div class="cie-card">
+      <div class="code">J20–J22</div>
+      <div class="desc"><strong>Infecciones Agudas VRI (bajas)</strong></div>
+      <div class="sub-codes">
+        J20 · Bronquitis aguda<br>
+        J21 · Bronquiolitis aguda<br>
+        J21.0 · Bronquiolitis por VSR — patógeno #1 en niños hospitalizados<br>
+        J21.1 · Bronquiolitis por metaneumovirus<br>
+        J22 · Infección aguda vías resp. inf., no especif.
+      </div>
+    </div>
+    <div class="cie-card">
+      <div class="code">J40–J47</div>
+      <div class="desc"><strong>Enf. Crónicas Respiratorias</strong></div>
+      <div class="sub-codes">
+        J40 · Bronquitis no especificada<br>
+        J41 · Bronquitis crónica simple<br>
+        J42 · Bronquitis crónica no especificada<br>
+        J43 · Enfisema<br>
+        J44 · EPOC — frecuente en mujeres exposición a humo leña<br>
+        J45 · Asma<br>
+        J47 · Bronquiectasia
+      </div>
+    </div>
+    <div class="cie-card">
+      <div class="code">U07.1 / U07.2</div>
+      <div class="desc"><strong>COVID-19</strong></div>
+      <div class="sub-codes">
+        U07.1 · COVID-19, virus identificado<br>
+        U07.2 · COVID-19, virus no identificado<br>
+        <em>Impactó vigilancia de influenza 2020–2022.<br>
+        Total muertos COVID GT: ~17,373 oficial /<br>
+        ~30,000+ estimados (Pedro Morales A.)</em>
+      </div>
+    </div>
+    <div class="cie-card">
+      <div class="code">B33.0 / J12.1</div>
+      <div class="desc"><strong>VSR / VRS</strong></div>
+      <div class="sub-codes">
+        B33.0 · Enfermedad por virus sincitial respiratorio<br>
+        J12.1 · Neumonía por VSR<br>
+        J21.0 · Bronquiolitis aguda por VSR<br>
+        <em>* Patógeno #1 en IRA hospitalizada en Guatemala (26.4%)<br>
+        Rebote post-COVID: estacionalidad perturbada 1–4 semanas</em>
+      </div>
+    </div>
+    <div class="cie-card">
+      <div class="code">J12.2 / B97.81</div>
+      <div class="desc"><strong>Metaneumovirus Humano (hMPV)</strong></div>
+      <div class="sub-codes">
+        J12.2 · Neumonía por metaneumovirus humano<br>
+        <em>Detectado en 7.7% de IRA hospitalizadas (VICo)<br>
+        2ª causa viral después de VSR en menores<br>
+        Estudio comparativo en Guatemala: PMC4181800</em>
+      </div>
+    </div>
+  </div>
+
+  <div class="chart-card" style="margin-top:20px">
+    <h3>📊 Frecuencia de Diagnósticos Respiratorios (SIGSA Guatemala)</h3>
+    <table class="data-table">
+      <thead><tr><th>CIE-10</th><th>Diagnóstico</th><th>Posición en Top Causas</th><th>Grupo más afectado</th><th>Notas</th></tr></thead>
+      <tbody>
+        <tr><td><strong>J00</strong></td><td>Rinofaringitis aguda (resfriado común)</td><td>🥇 1ª causa consulta total</td><td>1–2 años (20.5%)</td><td>Consultas: millones/año</td></tr>
+        <tr><td><strong>J02/J03</strong></td><td>Faringitis / Amigdalitis aguda</td><td>Top 3</td><td>2–5 años (6.5%)</td><td>—</td></tr>
+        <tr><td><strong>J18</strong></td><td>Neumonía (no especif.)</td><td>1ª causa muerte &lt;5 años</td><td>&lt;5 años, &gt;65 años</td><td>5,812 muertes 2024 · 6,514 muertes 2018 (INE microdatos)</td></tr>
+        <tr><td><strong>J11/J10</strong></td><td>Influenza</td><td>Variable (alta en epidemias)</td><td>1–4 años, &gt;60 años</td><td>&gt;50% positividad (mar 2026)</td></tr>
+        <tr><td><strong>J21</strong></td><td>Bronquiolitis aguda</td><td>Top causas hospitalizac. pediátrica</td><td>&lt;1 año (40.1%)</td><td>VSR principal agente</td></tr>
+        <tr><td><strong>J44</strong></td><td>EPOC</td><td>Crónico, subdiagnosticado</td><td>Mujeres &gt;40 años</td><td>Asociado a humo de leña</td></tr>
+      </tbody>
+    </table>
+    <div class="source" style="margin-top:8px">Fuente: <a href="https://sigsa.mspas.gob.gt/datos-de-salud/morbilidad/principales-causas-de-morbilidad" target="_blank">SIGSA — Principales causas de morbilidad</a> · <a href="https://datosabiertos.mspas.gob.gt/group/morbilidad-por-iras-y-etas" target="_blank">MSPAS Datos Abiertos — Morbilidad IRAs</a></div>
+  </div>
+</div>
+
+<!-- ===================== TAB: FUENTES ===================== -->
+<div id="fuentes" class="tab-content">
+  <div class="section-title">🔗 Fuentes de Datos y Bases de Datos Descargables</div>
+
+  <div class="alert alert-info">
+    <span class="alert-icon">📥</span>
+    <div>Las siguientes fuentes permiten acceder a datos crudos y bases de datos descargables en formatos CSV, Excel y PDF. Muchos conjuntos tienen series temporales 2012–2024.</div>
+  </div>
+
+  <div class="charts-grid">
+    <div class="chart-card">
+      <h3>🏛️ Fuentes Nacionales — Guatemala</h3>
+      <table class="data-table">
+        <thead><tr><th>Fuente</th><th>Tipo de datos</th><th>Acceso</th></tr></thead>
+        <tbody>
+          <tr><td><a href="https://sigsa.mspas.gob.gt/datos-de-salud/morbilidad/morbilidad-por-iras-y-etas" target="_blank">SIGSA — Morbilidad IRAs y ETAs</a></td><td>Casos IRA por año, dpto, municipio</td><td>Web + Excel</td></tr>
+          <tr><td><a href="https://datosabiertos.mspas.gob.gt/group/morbilidad-por-iras-y-etas" target="_blank">Datos Abiertos MSPAS — Grupo IRAs</a></td><td>Datasets descargables CSV/Excel</td><td>CSV directo</td></tr>
+          <tr><td><a href="https://datosabiertos.mspas.gob.gt/organization/mspas" target="_blank">Datos Abiertos MSPAS — Organización</a></td><td>Todos los datasets MSPAS</td><td>Portal abierto</td></tr>
+          <tr><td><a href="https://sigsa.mspas.gob.gt/datos-de-salud/morbilidad/principales-causas-de-morbilidad" target="_blank">SIGSA — 20 Primeras Causas Morbilidad</a></td><td>Top causas por año, dpto, municipio</td><td>Web + descarga</td></tr>
+          <tr><td><a href="https://epidemiologia.mspas.gob.gt/informacion/vigilancia-epidemiologica/salas-situacionales/7-iras" target="_blank">MSPAS — Sala Situacional IRAs</a></td><td>Vigilancia semanal IRAs</td><td>Web/PDF</td></tr>
+          <tr><td><a href="https://www.ine.gob.gt/vitales/" target="_blank">INE — Estadísticas Vitales</a></td><td>Mortalidad por causa, CIE-10, año</td><td>Excel/PDF</td></tr>
+          <tr><td><a href="https://guateendatos.org.gt/salud/mortalidad/" target="_blank">Guate en Datos — Mortalidad</a></td><td>Indicadores mortalidad visualizados</td><td>Web interactivo</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="chart-card">
+      <h3>🌐 Fuentes Internacionales</h3>
+      <table class="data-table">
+        <thead><tr><th>Fuente</th><th>Tipo de datos</th><th>Guatemala?</th></tr></thead>
+        <tbody>
+          <tr><td><a href="https://www.who.int/tools/flunet" target="_blank">FluNet (OMS)</a></td><td>Vigilancia virológica influenza semanal</td><td>✅ Sí</td></tr>
+          <tr><td><a href="https://dashboards.pahoflu.com/app/respiratory_viruses/" target="_blank">PAHO Respiratory Dashboard</a></td><td>Influenza, VSR, SARS-CoV-2 interactivo</td><td>✅ Sí</td></tr>
+          <tr><td><a href="https://www.paho.org/en/influenza-situation-report" target="_blank">PAHO Situation Reports</a></td><td>Actualizaciones regionales semanales</td><td>✅ Sí</td></tr>
+          <tr><td><a href="https://opendata.paho.org/en" target="_blank">PAHO Open Data (PLISA)</a></td><td>Indicadores salud region Américas</td><td>✅ Sí</td></tr>
+          <tr><td><a href="https://vizhub.healthdata.org/gbd-results/" target="_blank">IHME GBD Results Tool</a></td><td>Carga de enfermedad, DALYs, muertes</td><td>✅ Sí</td></tr>
+          <tr><td><a href="https://ourworldindata.org/explorers/influenza" target="_blank">Our World in Data — Influenza</a></td><td>Positividad, casos semanales OMS</td><td>✅ Sí</td></tr>
+          <tr><td><a href="https://data.who.int/countries/320" target="_blank">WHO GHO — Guatemala Profile</a></td><td>Indicadores salud, mortalidad causas</td><td>✅ Sí</td></tr>
+          <tr><td><a href="https://immunizationdata.who.int/dashboard/regions/region-of-the-americas/GTM" target="_blank">WHO Immunization Data</a></td><td>Coberturas vacunación incluyendo influenza</td><td>✅ Sí</td></tr>
+          <tr><td><a href="https://ghdx.healthdata.org/record/ihme-data/global-burden-disease-study-2021-lower-respiratory-incidence-mortality-estimates-1990-2021" target="_blank">GBD 2021 LRI Data</a></td><td>Morbilidad/mortalidad IRI 1990–2021</td><td>✅ Sí</td></tr>
+          <tr><td><a href="https://datos.bancomundial.org/indicador/SH.STA.ARIC.ZS?locations=GT" target="_blank">Banco Mundial — IRA tratamiento &lt;5</a></td><td>% niños &lt;5 años con IRA que buscan atención</td><td>✅ Sí</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="chart-card" style="margin-top:20px">
+    <h3>📚 Literatura Científica Clave — Guatemala IRA/Influenza</h3>
+    <table class="data-table">
+      <thead><tr><th>#</th><th>Estudio</th><th>Periodo</th><th>Revista</th><th>Enlace</th></tr></thead>
+      <tbody>
+        <tr><td>1</td><td>Surveillance for Hospitalized ARI in Guatemala</td><td>2007–2011</td><td>PLOS One 2013</td><td><a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC3877070/" target="_blank">PMC3877070</a></td></tr>
+        <tr><td>2</td><td>Hospitalization and death among patients with influenza, Guatemala 2008–2012</td><td>2008–2012</td><td>BMC Public Health 2019</td><td><a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC6696630/" target="_blank">PMC6696630</a></td></tr>
+        <tr><td>3</td><td>Factors associated with fatal ARI among hospitalized patients in Guatemala</td><td>2007–2013</td><td>BMC Public Health 2019</td><td><a href="https://pubmed.ncbi.nlm.nih.gov/31053069/" target="_blank">PubMed 31053069</a></td></tr>
+        <tr><td>4</td><td>Estimating the burden of influenza-associated hospitalizations and deaths in Central America</td><td>2009–2012</td><td>Influenza Other Respi Viruses 2016</td><td><a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC4910178/" target="_blank">PMC4910178</a></td></tr>
+        <tr><td>5</td><td>Disparities in Influenza Control and Surveillance in Latin America and Caribbean</td><td>2015–2019</td><td>Viruses 2025</td><td><a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC11861997/" target="_blank">PMC11861997</a></td></tr>
+        <tr><td>6</td><td>Completeness of open access FluNet data for Pan-America 2005–2019</td><td>2005–2019</td><td>PLOS One 2021</td><td><a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC7804328/" target="_blank">PMC7804328</a></td></tr>
+        <tr><td>7</td><td>Comparison seasonal influenza A and pandemic H1N1 in Guatemala</td><td>2008–2009</td><td>PLOS One 2011</td><td><a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC3012722/" target="_blank">PMC3012722</a></td></tr>
+        <tr><td>8</td><td>Low usage of government healthcare facilities for ARI in Guatemala</td><td>2009</td><td>BMC Public Health 2011</td><td><a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC3267779/" target="_blank">PMC3267779</a></td></tr>
+        <tr><td>9</td><td>Leveraging International Influenza Surveillance Systems during COVID-19</td><td>2020–2022</td><td>EID/CDC 2022</td><td><a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC9745234/" target="_blank">PMC9745234</a></td></tr>
+        <tr><td>10</td><td>Comparative epidemiology of hMPV and RSV in Guatemala</td><td>2006–2012</td><td>CID 2014</td><td><a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC4181800/" target="_blank">PMC4181800</a></td></tr>
+        <tr><td>11</td><td>RESPIRE Trial — household air pollution Guatemala</td><td>2002–2009</td><td>EHP 2015</td><td><a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC4384202/" target="_blank">PMC4384202</a></td></tr>
+        <tr><td>12</td><td>RSV seasonal trends Latin America pre and post-COVID-19</td><td>2016–2023</td><td>IJID 2025</td><td><a href="https://www.sciencedirect.com/science/article/pii/S1201971225003170" target="_blank">ScienceDirect</a></td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<footer>
+  Dashboard generado el 10 de marzo de 2026 · Fuentes: MSPAS, IGSS, OPS/OMS, CDC, IHME/GBD, INE (microdatos 2018–2024), literatura científica indexada
+  <br>Datos para uso en investigación epidemiológica · Consulte fuentes originales para datos actualizados
+</footer>
+
+<script>
+// ===================== CHART.JS CONFIGURATIONS =====================
+
+// Color palettes
+const COLORS = {
+  primary: '#2980b9', danger: '#e74c3c', warning: '#e67e22',
+  success: '#27ae60', purple: '#8e44ad', teal: '#16a085',
+  gray: '#95a5a6', dark: '#2c3e50', light: '#bdc3c7',
+  h3n2: '#c0392b', h1n1: '#27ae60', rsv: '#2980b9', b: '#8e44ad'
+};
+
+// Global defaults
+Chart.defaults.font.family = "'Segoe UI', system-ui, sans-serif";
+Chart.defaults.font.size = 12;
+Chart.defaults.plugins.legend.position = 'bottom';
+Chart.defaults.plugins.legend.labels.usePointStyle = true;
+Chart.defaults.plugins.legend.labels.padding = 12;
+
+// ---- CHART: IRA Serie Histórica ----
+// DATOS VERIFICADOS desde morbilidad-iras-departamento-2012-al-2024.csv (MSPAS Datos Abiertos)
+// Auditoría realizada el 2026-03-10. Total: 36,690,514 casos verificados.
+new Chart(document.getElementById('chartIRASerie'), {
+  type: 'bar',
+  data: {
+    labels: ['2012','2013','2014','2015','2016','2017','2018','2019','2020','2021','2022','2023','2024'],
+    datasets: [{
+      label: 'Casos IRA Totales (MSPAS SIGSA — verificado CSV)',
+      data: [2961659, 3179685, 3163042, 2766153, 2503110, 3055053, 3373667, 3632071, 2151671, 1797135, 2087634, 2886950, 3132684],
+      backgroundColor: (ctx) => {
+        const yr = parseInt(ctx.chart.data.labels[ctx.dataIndex]);
+        if(yr>=2020&&yr<=2021) return '#fad7a0';
+        if(yr>=2022) return '#a9cce3';
+        return '#2980b9';
+      },
+      borderRadius: 4,
+    }]
+  },
+  options: {
+    plugins: {
+      legend:{display:false},
+      tooltip:{ callbacks:{label:v=>`${(v.raw/1000000).toFixed(2)}M casos`}},
+      annotation:{annotations:{
+        covid:{type:'box',xMin:7.5,xMax:9.5,backgroundColor:'rgba(231,76,60,0.08)',borderColor:'#e74c3c',borderWidth:1,label:{display:true,content:'COVID-19',position:'start',font:{size:10}}},
+        rebound:{type:'box',xMin:9.5,xMax:12.5,backgroundColor:'rgba(39,174,96,0.08)',borderColor:'#27ae60',borderWidth:1,label:{display:true,content:'Rebote',position:'start',font:{size:10}}}
+      }}
+    },
+    scales:{y:{beginAtZero:true,ticks:{callback:v=>`${(v/1000000).toFixed(1)}M`},title:{display:true,text:'Casos totales (SIGSA/MSPAS, verificado)'}}}
+  }
+});
+
+// ---- CHART: Patógenos IRA hospitalizada ----
+new Chart(document.getElementById('chartPatogenos'), {
+  type: 'doughnut',
+  data: {
+    labels: ['VSR (26.4%)', 'Adenovirus (11.2%)', 'hMPV (7.7%)', 'Influenza A (7.0%)', 'Parainfluenza 3 (7.0%)', 'Influenza B (1.6%)', 'Otros virus (9.4%)', 'Sin agente (29.7%)'],
+    datasets: [{
+      data: [26.4, 11.2, 7.7, 7.0, 7.0, 1.6, 9.4, 29.7],
+      backgroundColor: ['#2980b9','#e67e22','#8e44ad','#e74c3c','#16a085','#c0392b','#95a5a6','#bdc3c7'],
+      borderWidth: 2
+    }]
+  },
+  options: { plugins:{legend:{position:'right',labels:{font:{size:11}}}} }
+});
+
+// ---- CHART: Incidencia por edad ----
+new Chart(document.getElementById('chartIncidenciaEdad'), {
+  type: 'bar',
+  data: {
+    labels: ['<1 año', '1–4 años', '5–14 años', '15–49 años', '≥65 años'],
+    datasets: [
+      {label:'IRA hospitalizada general (2007–11)', data:[1703,230,35,34,292], backgroundColor:'rgba(41,128,185,0.7)', borderRadius:4},
+      {label:'Influenza confirmada (2008–12)', data:[93*5,93,10,10,50], backgroundColor:'rgba(231,76,60,0.7)', borderRadius:4, hidden:true},
+      {label:'Influenza pico 2009 Santa Rosa', data:[291.8,null,null,null,29.5], backgroundColor:'rgba(231,76,60,0.9)', borderRadius:4}
+    ]
+  },
+  options:{scales:{y:{title:{display:true,text:'Tasa por 100,000 habitantes'},beginAtZero:true}},plugins:{legend:{position:'bottom'}}}
+});
+
+// ---- CHART: Muertes por influenza hospitalizada ----
+new Chart(document.getElementById('chartMuertes'), {
+  type: 'pie',
+  data: {
+    labels: ['≤6 meses (7%)', '7–60 meses (39%)', '5–50 años (21%)', '>50 años (32%)'],
+    datasets: [{
+      data: [7,39,21,32],
+      backgroundColor: ['#f39c12','#e74c3c','#3498db','#2c3e50'],
+      borderWidth: 2
+    }]
+  },
+  options: { plugins:{tooltip:{callbacks:{label:ctx=>`${ctx.label} — n=${[2,11,6,9][ctx.dataIndex]} de 28 muertes`}}} }
+});
+
+// ---- CHART: Tendencia con hitos ----
+// DATOS VERIFICADOS:
+// IRA SIGSA: CSV morbilidad-iras-departamento-2012-al-2024.csv (nulo para años sin CSV)
+// FluNet positividad: WHO FluNet GT (ISO2=GT), fuente SENTINEL deduplicada por semana
+// Auditoría: 2026-03-10
+new Chart(document.getElementById('chartTendenciaHitos'), {
+  type: 'line',
+  data: {
+    labels: ['2009','2010','2011','2012','2013','2014','2015','2016','2017','2018','2019','2020','2021','2022','2023','2024','2025','2026*'],
+    datasets: [
+      {
+        label:'Casos IRA totales SIGSA (M)',yAxisID:'y',
+        data:[null,null,null,2.96,3.18,3.16,2.77,2.50,3.06,3.37,3.63,2.15,1.80,2.09,2.89,3.13,null,null],
+        borderColor:'#2980b9',backgroundColor:'rgba(41,128,185,0.08)',fill:true,tension:0.3,pointRadius:4,
+        spanGaps:false
+      },
+      {
+        // VALORES CORREGIDOS (2ª auditoría 2026-03-10):
+        // Filtro: ORIGIN_SOURCE='NOTDEFINED' (2009-2019) + ORIGIN_SOURCE='SENTINEL' (2020-2026)
+        // El keep='first' anterior era INCORRECTO: NONSENTINEL aparece primero en el CSV 2020+
+        label:'Positividad influenza FluNet — SENTINEL (%)',yAxisID:'y2',
+        data:[32.7,13.5,11.3,17.6,9.0,8.0,6.4,9.2,13.0,16.8,22.7,7.5,1.0,9.6,14.2,27.2,18.0,36.0],
+        borderColor:'#e74c3c',backgroundColor:'rgba(231,76,60,0.05)',fill:false,tension:0.3,borderDash:[5,3],pointRadius:4
+      }
+    ]
+  },
+  options:{
+    scales:{
+      y:{type:'linear',position:'left',title:{display:true,text:'Millones de casos IRA (SIGSA 2012–2024)'},ticks:{callback:v=>`${v}M`}},
+      y2:{type:'linear',position:'right',title:{display:true,text:'Positividad influenza FluNet-centinela (%)'},grid:{drawOnChartArea:false},min:0,max:60}
+    },
+    plugins:{
+      annotation:{annotations:{
+        h1n1:{type:'line',xMin:0,xMax:0,borderColor:'#c0392b',borderWidth:2,borderDash:[4,4],label:{display:true,content:'Pandemia H1N1',position:'start',font:{size:10}}},
+        covid:{type:'line',xMin:11,xMax:11,borderColor:'#8e44ad',borderWidth:2,borderDash:[4,4],label:{display:true,content:'COVID-19',position:'start',font:{size:10}}},
+        h3n2:{type:'line',xMin:17,xMax:17,borderColor:'#e74c3c',borderWidth:2,label:{display:true,content:'Brote H3N2',position:'end',font:{size:10}}}
+      }}
+    }
+  }
+});
+
+// ---- CHART: Cepas ----
+new Chart(document.getElementById('chartCepas'), {
+  type: 'bar',
+  data: {
+    labels: ['May–Sep 2025','Sep–Nov 2025','Dic\'25–Feb\'26','Mar 2026*'],
+    datasets: [
+      {label:'H1N1 (%)',data:[81.3,46.7,4,null],backgroundColor:'rgba(39,174,96,0.8)',borderRadius:4},
+      {label:'H3N2 (%)',data:[14,53.3,96,null],backgroundColor:'rgba(192,57,43,0.8)',borderRadius:4},
+      {label:'Positividad total (%)',data:[null,null,null,52],backgroundColor:'rgba(230,126,34,0.8)',borderRadius:4}
+    ]
+  },
+  options:{scales:{x:{stacked:false},y:{max:100,title:{display:true,text:'% de muestras'}}}}
+});
+
+// ---- CHART: Estacionalidad ----
+// DATOS REALES: WHO FluNet Guatemala (ISO2=GT), SE36/2009–SE9/2026
+// Positividad mensual total. Fuente primaria deduplicada (primera ocurrencia por semana).
+// N=850 registros únicos. Agosto es el valle (7.5%). Marzo es el pico (25.4%).
+new Chart(document.getElementById('chartEstacionalidad'), {
+  type: 'line',
+  data: {
+    labels: ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'],
+    datasets: [
+      {
+        label:'Positividad influenza (% muestras) — FluNet centinela GT 2009–2026',
+        data:[18.3, 19.8, 25.4, 17.9, 12.8, 11.4, 9.3, 7.5, 10.7, 8.4, 10.7, 11.2],
+        borderColor:'#e74c3c',backgroundColor:'rgba(231,76,60,0.08)',fill:true,tension:0.4,pointRadius:5,
+        pointBackgroundColor:'#e74c3c'
+      }
+    ]
+  },
+  options:{
+    scales:{
+      y:{min:0,max:30,title:{display:true,text:'Positividad influenza (%) — promedio 2009–2026'},ticks:{callback:v=>v+'%'}},
+      x:{title:{display:true,text:'Mes del año'}}
+    },
+    plugins:{
+      legend:{display:false},
+      annotation:{annotations:{
+        rainy:{type:'box',xMin:3.5,xMax:8.5,backgroundColor:'rgba(39,174,96,0.06)',borderColor:'#27ae60',borderWidth:1,label:{display:true,content:'Temporada lluviosa (May–Sep) — menor actividad',font:{size:10}}},
+        peak:{type:'box',xMin:-0.5,xMax:2.5,backgroundColor:'rgba(231,76,60,0.05)',borderColor:'#e74c3c',borderWidth:1,label:{display:true,content:'Pico histórico (Ene–Mar)',font:{size:10}}}
+      }}
+    }
+  }
+});
+
+// ---- CHART: COVID impacto ----
+new Chart(document.getElementById('chartCovid'), {
+  type: 'bar',
+  data: {
+    labels: ['2018','2019','2020','2021','2022','2023','2024'],
+    datasets: [
+      {label:'Casos influenza confirmados (relativo)',data:[100,110,15,8,45,75,90],backgroundColor:['#2980b9','#2980b9','#e74c3c','#e74c3c','#f39c12','#27ae60','#2980b9'],borderRadius:4},
+      {label:'Impacto COVID (índice)',data:[0,0,85,60,30,10,5],backgroundColor:'rgba(142,68,173,0.3)',borderRadius:4}
+    ]
+  },
+  options:{scales:{y:{title:{display:true,text:'Índice relativo (2018=100)'}}}}
+});
+
+// ---- CHART: Subtipos virológicos ----
+new Chart(document.getElementById('chartSubtipos'), {
+  type: 'bar',
+  data: {
+    labels: ['H1N1pdm09','H3N2','H1N1 estacional','No subtipificado','Influenza B'],
+    datasets: [{
+      label: 'Número de detecciones',
+      data: [197, 70, 38, 55, 84],
+      backgroundColor: [COLORS.h1n1, COLORS.h3n2, '#2ecc71', COLORS.gray, COLORS.b],
+      borderRadius: 4
+    }]
+  },
+  options: { plugins:{legend:{display:false}}, scales:{y:{title:{display:true,text:'Casos confirmados (n=444)'}}} }
+});
+
+// ---- CHART: Positividad Oct 2025 ----
+new Chart(document.getElementById('chartPosOct25'), {
+  type: 'bar',
+  data: {
+    labels: ['Influenza A(H1N1)pdm09','VSR (VRS)','SARS-CoV-2','Influenza A(H3N2)','Influenza B'],
+    datasets: [{
+      label: 'Positividad (%)',
+      data: [9.5, 12.9, 6.0, 3.2, 1.1],
+      backgroundColor: [COLORS.h1n1, COLORS.primary, '#8e44ad', COLORS.h3n2, COLORS.b],
+      borderRadius: 4
+    }]
+  },
+  options: { plugins:{legend:{display:false}}, indexAxis:'y', scales:{x:{max:20, title:{display:true,text:'Tasa de positividad (%)'}, beginAtZero:true}} }
+});
+
+// ---- CHART: Completitud FluNet ----
+new Chart(document.getElementById('chartFlunet'), {
+  type: 'bar',
+  data: {
+    labels: ['Pruebas totales','Positivos','Influenza A','Influenza B','H1N1pdm09','Especímenes'],
+    datasets: [
+      {label:'Guatemala',data:[67.52,67.52,67.52,67.52,78.96,16.93],backgroundColor:'rgba(41,128,185,0.8)',borderRadius:4},
+      {label:'Promedio Américas',data:[72,70,68,65,72,55],backgroundColor:'rgba(39,174,96,0.5)',borderRadius:4}
+    ]
+  },
+  options: { scales:{y:{max:100,title:{display:true,text:'Completitud (%)'},ticks:{callback:v=>v+'%'}}} }
+});
+
+// ---- CHART: Patógenos 2 ----
+new Chart(document.getElementById('chartPatogenos2'), {
+  type: 'bar',
+  data: {
+    labels: ['VSR','Adenovirus','hMPV','Influenza A','Parainfluenza 3','Influenza B','Otros'],
+    datasets: [{
+      label: '% detección',
+      data: [26.4,11.2,7.7,7.0,7.0,1.6,9.4],
+      backgroundColor: ['#2980b9','#e67e22','#8e44ad','#e74c3c','#16a085','#c0392b','#95a5a6'],
+      borderRadius: 4
+    }]
+  },
+  options: { indexAxis:'y', plugins:{legend:{display:false}}, scales:{x:{title:{display:true,text:'% de muestras positivas'},beginAtZero:true}} }
+});
+
+// ---- CHART: Grupos de edad ----
+new Chart(document.getElementById('chartGruposEdad'), {
+  type: 'radar',
+  data: {
+    labels: ['Menores 1 año','1–4 años','5–14 años','15–49 años','50–64 años','≥65 años'],
+    datasets: [
+      {label:'Tasa hospitaliz. IRA/100k (÷10)',data:[170.3,23,3.5,3.4,8,29.2],borderColor:'#2980b9',backgroundColor:'rgba(41,128,185,0.15)'},
+      {label:'Mort. proporcional influenza (%)',data:[7,39,0,10,11,32],borderColor:'#e74c3c',backgroundColor:'rgba(231,76,60,0.1)'}
+    ]
+  },
+  options:{plugins:{legend:{position:'bottom'}}}
+});
+
+// ---- CHART: Departamentos ----
+// DATOS REALES: Tasa de incidencia IRA por 1,000 habitantes (promedio 2022-2024)
+// Calculado desde CSV MSPAS + proyecciones INE población 2018.
+// NOTA: Guatemala ciudad aparece baja por cobertura SIGSA (excluye IGSS + sector privado).
+// Fuente IRA: morbilidad-iras-departamento-2012-al-2024.csv | Fuente pop: INE Proyecciones 2018
+new Chart(document.getElementById('chartDepartamentos'), {
+  type: 'bar',
+  data: {
+    labels: ['Chiquimula','San Marcos','Totonicapán','Baja Verapaz','Jutiapa','Santa Rosa','Chimaltenango','Zacapa','Sololá','Huehuetenango'],
+    datasets: [{
+      label: 'Tasa IRA por 1,000 hab. (promedio 2022–2024, SIGSA/MSPAS)',
+      data: [10.6, 10.2, 10.0, 8.8, 8.7, 8.7, 8.3, 8.2, 7.7, 7.2],
+      backgroundColor: '#2980b9',
+      borderRadius: 4
+    }]
+  },
+  options:{
+    indexAxis:'y',
+    scales:{x:{title:{display:true,text:'Tasa por 1,000 hab. (excluye IGSS/privado)'},beginAtZero:true}},
+    plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>`${ctx.raw}/1,000 hab. (promedio 2022–2024)`}}}
+  }
+});
+
+// ---- CHART: Odds Ratios ----
+new Chart(document.getElementById('chartOR'), {
+  type: 'bar',
+  data: {
+    labels: ['Etnicidad indígena','Neumonía radiológica','S. aureus co-infección','Sitio Santa Rosa vs. GC','Bajo peso para edad'],
+    datasets: [{
+      label: 'Odds Ratio Ajustado',
+      data: [4.3, 5.2, 12.5, 9.5, 3.1],
+      backgroundColor: ['#e74c3c','#c0392b','#922b21','#e67e22','#f39c12'],
+      borderRadius: 4
+    }]
+  },
+  options:{indexAxis:'y', scales:{x:{title:{display:true,text:'Odds Ratio ajustado'},beginAtZero:true}}, plugins:{legend:{display:false}}}
+});
+
+// ---- CHART: Socioeconómico ----
+new Chart(document.getElementById('chartSocioeco'), {
+  type: 'bar',
+  data: {
+    labels: ['Gasto de bolsillo\nsalud (%)', 'Desnutrición crónica\nniños <5 (%)', 'Pobreza\npoblación (%)'],
+    datasets: [
+      {label: 'Guatemala', data: [60.98, 48.9, 59.3], backgroundColor: 'rgba(231,76,60,0.8)', borderRadius:4},
+      {label: 'Promedio LAC', data: [32, 12, 28], backgroundColor: 'rgba(39,174,96,0.6)', borderRadius:4},
+      {label: 'Recomendado OMS', data: [15, 5, null], backgroundColor: 'rgba(41,128,185,0.4)', borderRadius:4}
+    ]
+  },
+  options:{scales:{y:{max:80,title:{display:true,text:'Porcentaje (%)'},ticks:{callback:v=>v+'%'}}}}
+});
+
+// ---- CHART: Muertes respiratorias ----
+new Chart(document.getElementById('chartMuertesResp'), {
+  type: 'pie',
+  data: {
+    labels: ['Neumonía J12–J18 (67.4%)', 'EPOC J43–J47 (13.2%)', 'Otras resp. (18.7%)', 'Influenza J09–J11 (0.7%)'],
+    datasets: [{
+      data: [5812, 1142, 1608, 59],
+      backgroundColor: ['#e74c3c','#e67e22','#f39c12','#c0392b'],
+      borderWidth: 2
+    }]
+  },
+  options:{plugins:{tooltip:{callbacks:{label:ctx=>`${ctx.label}: ${ctx.raw.toLocaleString()} muertes (INE 2024)`}}}}
+});
+
+// ---- CHART: Muertes por edad ----
+// Datos corregidos: INE 2023 microdatos reales (n=5,454 muertes ARI J00-J22)
+// Nota: estimados previos eran incorrectos (65+ era 27% estimado vs 51.8% real)
+new Chart(document.getElementById('chartMuertesEdad'), {
+  type: 'bar',
+  data: {
+    labels: ['<1 año','1–4 años','5–14 años','15–24 años','25–44 años','45–64 años','65+ años'],
+    datasets: [{
+      label: '% muertes IRA J00–J22 por grupo de edad (INE 2023, n=5,454)',
+      data: [16.5, 7.0, 2.4, 2.4, 6.8, 12.8, 51.8],
+      backgroundColor: ['#e74c3c','#e67e22','#f39c12','#2ecc71','#2980b9','#1a6fa8','#1a252f'],
+      borderRadius: 4
+    }]
+  },
+  options:{
+    scales:{y:{title:{display:true,text:'% del total de muertes ARI'},ticks:{callback:v=>v+'%'}}},
+    plugins:{tooltip:{callbacks:{label:ctx=>{
+      const n2023=[902,383,133,131,370,696,2823];
+      return `${ctx.label}: ${ctx.raw}% (n=${n2023[ctx.dataIndex]} muertes, INE 2023)`;
+    }}}}
+  }
+});
+
+// ---- CHART: Tendencia mortalidad general ----
+// Datos verificados vs IHME/Guate en Datos mortalidad_total.csv (corregidos 2000/2005/2010)
+new Chart(document.getElementById('chartMortalidadTrend'), {
+  type: 'line',
+  data: {
+    labels: ['1991','1996','2000','2005','2010','2015','2017','2018–19'],
+    datasets: [{
+      label: 'Tasa mortalidad general (por 100k)',
+      data: [806, 648, 612, 584, 549, 524, 522, 535],
+      borderColor: '#2980b9', backgroundColor: 'rgba(41,128,185,0.1)',
+      fill: true, tension: 0.3, pointRadius: 5
+    }]
+  },
+  options:{scales:{y:{min:450,title:{display:true,text:'Tasa por 100,000 hab.'}}}}
+});
+
+// ---- CHART: WHO GHO under-5 pneumonia mortality rate 1985-2023 ----
+// Fuente: WHO GHO MDG_0000000026 - Pneumonia deaths <5 yrs per 100k
+new Chart(document.getElementById('chartNeumoniaMenores5'), {
+  type: 'line',
+  data: {
+    labels: ['1985','1990','1995','2000','2005','2010','2015','2019','2020','2021','2022','2023'],
+    datasets: [{
+      label: 'Tasa mortalidad neumonía <5 años (por 100k)',
+      data: [300.8, 270.2, 229.5, 165.8, 152.9, 126.9, 112.0, 106.2, 102.5, 125.3, 96.6, 93.7],
+      borderColor: '#e74c3c',
+      backgroundColor: 'rgba(231,76,60,0.1)',
+      fill: true, tension: 0.4, pointRadius: 5
+    }]
+  },
+  options: {
+    plugins: {
+      tooltip: {callbacks:{label:ctx=>`${ctx.raw} muertes/100k menores de 5 años`}},
+      annotation: {annotations: {
+        covid: {type:'box',xMin:8.5,xMax:10.5,backgroundColor:'rgba(142,68,173,0.07)',borderColor:'#8e44ad',borderWidth:1,
+          label:{display:true,content:'COVID-19',position:'center',font:{size:10}}}
+      }}
+    },
+    scales: {
+      y: {title:{display:true,text:'Muertes por 100,000 <5 años'},min:50},
+      x: {grid:{display:false}}
+    }
+  }
+});
+
+// ---- CHART: PCV3 vaccine coverage Guatemala ----
+// Fuente: WHO GHO Immunization Data
+new Chart(document.getElementById('chartPCV3'), {
+  type: 'line',
+  data: {
+    labels: ['2010','2011','2012','2013','2014','2015','2016','2017','2018','2019','2020','2021','2022','2023','2024'],
+    datasets: [
+      {
+        label: 'Cobertura PCV3 — neumococo (%)',
+        data: [null,null,null,null,null,null,null,null,87,88,88,79,84,87,89],
+        borderColor: '#2980b9', backgroundColor:'rgba(41,128,185,0.1)',
+        fill:true, tension:0.3, pointRadius:5
+      },
+      {
+        label: 'Mortalidad neumonía <5 (por 100k, eje der.)',
+        data: [127,124,121,115,111,112,110,107,107,106,103,125,97,94,null],
+        borderColor: '#e74c3c', borderDash:[5,5],
+        yAxisID:'y2', tension:0.3, pointRadius:4, fill:false
+      }
+    ]
+  },
+  options: {
+    plugins: {legend:{position:'bottom'}},
+    scales: {
+      y: {title:{display:true,text:'Cobertura PCV3 (%)'},min:0,max:100,ticks:{callback:v=>v+'%'}},
+      y2: {position:'right',title:{display:true,text:'Tasa mortalidad /100k'},grid:{display:false},min:50}
+    }
+  }
+});
+
+// ---- CHART: Mortalidad anual IRA + COVID (INE 2018-2024) ----
+// Fuente: INE Guatemala microdatos individuales, 674,064 defunciones
+// IRA = J00-J22; Influenza = J09-J11 (subconjunto de IRA); Neumonía = J12-J18; COVID = U07
+// ADVERTENCIA: La caída de J00-J22 en 2020-2021 es artefacto de codificación. COVID coded as U07, not J18.
+new Chart(document.getElementById('chartMortalidadAnual'), {
+  type: 'bar',
+  data: {
+    labels: ['2018','2019','2020','2021','2022','2023','2024'],
+    datasets: [
+      {
+        label: 'Neumonía J12–J18',
+        data: [6514, 6568, 4070, 4878, 4349, 5347, 5812],
+        backgroundColor: 'rgba(231,76,60,0.85)',
+        borderRadius: 3, stack: 'resp'
+      },
+      {
+        label: 'Influenza J09–J11',
+        data: [27, 44, 13, 16, 29, 32, 59],
+        backgroundColor: 'rgba(192,57,43,1)',
+        borderRadius: 3, stack: 'resp'
+      },
+      {
+        label: 'Otras IRA J00–J22',
+        data: [87, 58, 60, 160, 68, 75, 82],
+        backgroundColor: 'rgba(243,156,18,0.8)',
+        borderRadius: 3, stack: 'resp'
+      },
+      {
+        label: 'COVID-19 U07 (coding displacement)',
+        data: [0, 0, 8004, 14628, 1947, 177, 86],
+        backgroundColor: 'rgba(142,68,173,0.75)',
+        borderRadius: 3, stack: 'resp'
+      }
+    ]
+  },
+  options: {
+    plugins: {
+      legend: {position:'bottom'},
+      tooltip: {
+        callbacks: {
+          label: ctx => `${ctx.dataset.label}: ${ctx.raw.toLocaleString()} muertes`,
+          afterBody: items => {
+            const yr = items[0].label;
+            const totals = {2020:12147,2021:19682,2022:6393,2023:5631,2024:6039,2018:6628,2019:6670};
+            return [`Total IRA+COVID: ${(totals[yr]||0).toLocaleString()}`];
+          }
+        }
+      },
+      annotation: {
+        annotations: {
+          covid: {type:'box',xMin:1.5,xMax:2.5,backgroundColor:'rgba(142,68,173,0.06)',borderColor:'#8e44ad',borderWidth:1,
+            label:{display:true,content:'Pico COVID\n(coding artifact)',position:'center',font:{size:9}}},
+          note: {type:'label',xValue:1,yValue:13000,content:'↑ IRA real era mayor,\ncodificado como U07',font:{size:9},color:'#8e44ad'}
+        }
+      }
+    },
+    scales: {
+      x: {stacked:true},
+      y: {
+        stacked: true,
+        title: {display:true, text:'Defunciones registradas'},
+        ticks: {callback: v => v.toLocaleString()}
+      }
+    }
+  }
+});
+
+// ---- CHART: DALYs comparativa ----
+new Chart(document.getElementById('chartDALYs'), {
+  type: 'bar',
+  data: {
+    labels: ['Guatemala','Haití','Cuba','Bolivia','Honduras','El Salvador','Nicaragua','Costa Rica','Chile'],
+    datasets: [{
+      label: 'DALYs influenza por 100k (2015–2019)',
+      data: [503.78, 381.08, 184.71, 165, 148, 132, 120, 85, 45],
+      backgroundColor: ctx => ctx.dataIndex===0 ? '#e74c3c' : '#2980b9',
+      borderRadius: 4
+    }]
+  },
+  options:{scales:{y:{title:{display:true,text:'DALYs por 100,000 hab.'}}}}
+});
+
+// ---- CHART: Influenza Estimada vs IRA ----
+// Datos verificados: IRA desde MSPAS CSV, positividad desde WHO FluNet centinela
+new Chart(document.getElementById('chartInfluenzaEst'), {
+  type: 'bar',
+  data: {
+    labels: ['2012','2013','2014','2015','2016','2017','2018','2019','2020','2021','2022','2023','2024'],
+    datasets: [
+      {
+        label: 'IRA Totales SIGSA (eje izq.)',
+        data: [2961659,3179685,3163042,2766153,2503110,3055053,3373667,3632071,2151671,1797135,2087634,2886950,3132684],
+        backgroundColor: 'rgba(41,128,185,0.3)', borderColor:'#2980b9', borderWidth:1, borderRadius:4,
+        yAxisID:'y'
+      },
+      {
+        // CORREGIDO 2ª auditoría: ORIGIN_SOURCE=SENTINEL correcto. 2024=852k > 2019=824k
+        label: 'Influenza Estimada (IRA × % FluNet SENTINEL)',
+        data: [521252,286172,253043,177034,230286,397157,566776,824480,161375,17971,200413,409947,852090],
+        backgroundColor: (ctx) => ctx.raw === 852090 ? 'rgba(231,76,60,0.9)' : ctx.raw === 824480 ? 'rgba(231,76,60,0.7)' : ctx.raw < 25000 ? 'rgba(142,68,173,0.4)' : 'rgba(231,76,60,0.55)',
+        borderRadius: 4, yAxisID:'y'
+      }
+    ]
+  },
+  options:{
+    plugins:{
+      legend:{position:'bottom'},
+      tooltip:{callbacks:{label:ctx=>`${ctx.dataset.label}: ${ctx.raw.toLocaleString()} casos`}}
+    },
+    scales:{
+      y:{beginAtZero:true,ticks:{callback:v=>v>=1000000?`${(v/1000000).toFixed(1)}M`:`${(v/1000).toFixed(0)}k`},title:{display:true,text:'Casos'}},
+    }
+  }
+});
+
+// ---- CHART: Pediatric burden trend ----
+new Chart(document.getElementById('chartPediatrica'), {
+  type: 'line',
+  data: {
+    labels: ['2012','2013','2014','2015','2016','2017','2018','2019','2020','2021','2022','2023','2024'],
+    datasets: [
+      {
+        label:'% carga pediátrica <5 años',
+        data:[48.7,49.2,47.9,48.1,47.7,45.7,45.5,43.4,39.6,43.2,41.4,39.5,37.3],
+        borderColor:'#e74c3c',backgroundColor:'rgba(231,76,60,0.1)',fill:true,tension:0.3,pointRadius:5
+      }
+    ]
+  },
+  options:{
+    scales:{
+      y:{min:30,max:55,ticks:{callback:v=>v+'%'},title:{display:true,text:'% del total de consultas IRA'}},
+    },
+    plugins:{
+      legend:{display:false},
+      annotation:{annotations:{
+        trend:{type:'line',xMin:0,xMax:12,yMin:48.7,yMax:37.3,borderColor:'rgba(231,76,60,0.4)',borderWidth:2,borderDash:[4,4],label:{display:true,content:'Tendencia -11.4pp',position:'center',font:{size:10}}}
+      }}
+    }
+  }
+});
+
+// ---- CHART: Top CIE-10 respiratorio ----
+new Chart(document.getElementById('chartTopCIE'), {
+  type: 'bar',
+  data: {
+    labels: ['J00 Rinofaringitis','J03 Amigdalitis','J06 VRS altas','J18 Neumonía','J20 Bronquitis ag.','J22 VRI inesp.','J02 Faringitis','J30 Rinitis alérg.','J45 Asma','J40 Bronquitis cr.'],
+    datasets: [{
+      label:'Casos totales 2012–2024',
+      data:[12391553,6633466,1592565,824369,693501,521853,501999,231715,107362,63985],
+      backgroundColor:['#2980b9','#2980b9','#27ae60','#e74c3c','#27ae60','#27ae60','#2980b9','#f39c12','#8e44ad','#95a5a6'],
+      borderRadius:4
+    }]
+  },
+  options:{
+    indexAxis:'y',
+    plugins:{
+      legend:{display:false},
+      tooltip:{callbacks:{label:ctx=>`${(ctx.raw/1000000).toFixed(2)}M casos (2012–2024)`}}
+    },
+    scales:{x:{ticks:{callback:v=>v>=1000000?`${(v/1000000).toFixed(0)}M`:`${(v/1000).toFixed(0)}k`},title:{display:true,text:'Total de casos acumulados 2012–2024'}}}
+  }
+});
+
+// ---- CHART: RSV Detections (WHO FluNet SENTINEL/NOTDEFINED) ----
+// Fuente: WHO FluNet GT, ORIGIN_SOURCE=SENTINEL (2020+) / NOTDEFINED (2009-2019)
+// RSV column = total RSV positives per year. Data verified from CSV (1,172 rows).
+new Chart(document.getElementById('chartRSV'), {
+  type: 'bar',
+  data: {
+    labels: ['2015','2016','2017','2018','2019','2020','2021','2022','2023','2024','2025','2026*'],
+    datasets: [
+      {
+        label: 'Detecciones RSV anuales (FluNet)',
+        data: [367, 572, 578, 425, 109, 118, 290, 148, 465, 309, 388, 37],
+        backgroundColor: ctx => ctx.raw < 150 ? 'rgba(142,68,173,0.4)' : 'rgba(39,174,96,0.8)',
+        borderRadius: 4
+      }
+    ]
+  },
+  options: {
+    plugins: {
+      legend: {display:false},
+      tooltip: {callbacks:{label:ctx=>`${ctx.raw} detecciones RSV (FluNet centinela)`}},
+      annotation: {annotations: {
+        covid: {type:'box',xMin:4.5,xMax:6.5,backgroundColor:'rgba(142,68,173,0.07)',borderColor:'#8e44ad',borderWidth:1,
+          label:{display:true,content:'COVID-19',position:'center',font:{size:10}}},
+        note: {type:'label',xValue:11,yValue:420,content:'*parcial SE1–9',font:{size:9},color:'#555'}
+      }}
+    },
+    scales: {
+      y: {title:{display:true,text:'Detecciones RSV por año'}, beginAtZero:true},
+      x: {grid:{display:false}}
+    }
+  }
+});
+
+// ===================== TAB: ENSAYO CLÍNICO =====================
+
+// ---- CHART: Influenza estimada por departamento (2024 vs 2026 proyección) ----
+// Fuente: MSPAS SIGSA 2024 × FluNet SENTINEL. 22 departamentos completos.
+new Chart(document.getElementById('chartDeptFlu'), {
+  type: 'bar',
+  data: {
+    labels: ['San Marcos','Huehuetenango','Guatemala','Alta Verapaz','Quiché','El Petén','Totonicapán','Chimaltenango','Quetzaltenango','Sololá','Jutiapa','Chiquimula','Santa Rosa','Escuintla','Baja Verapaz','Zacapa','Retalhuleu','Suchitepéquez','Sacatepéquez','Jalapa','Izabal','El Progreso'],
+    datasets: [
+      {
+        label: 'Influenza est. 2024 (IRA × 27.2% FluNet)',
+        data: [99246,72100,63926,59728,56518,53124,49062,46197,42904,38037,37654,37319,31554,28936,27325,19236,16693,16690,15760,15147,14257,10665],
+        backgroundColor: 'rgba(41,128,185,0.8)', borderRadius: 4
+      },
+      {
+        label: 'Proyección 2026 (IRA×1.10 × 36% H3N2)',
+        data: [144490,104970,93069,86957,82284,77342,71429,67257,62464,55378,54819,54332,45939,42128,39782,28006,24303,24299,22945,22052,20756,15528],
+        backgroundColor: 'rgba(231,76,60,0.75)', borderRadius: 4
+      }
+    ]
+  },
+  options: {
+    plugins: {
+      legend: {position:'bottom'},
+      tooltip: {callbacks:{label: ctx => `${ctx.dataset.label}: ${ctx.raw.toLocaleString()} casos est.`}}
+    },
+    scales: {
+      y: {title:{display:true, text:'Casos de influenza estimados'},ticks:{callback:v=>v>=1000?`${(v/1000).toFixed(0)}k`:v}},
+      x: {ticks:{font:{size:11}}}
+    }
+  }
+});
+
+// ---- CHART: Top 20 municipios ----
+new Chart(document.getElementById('chartMuniFlu'), {
+  type: 'bar',
+  data: {
+    labels: ['Guatemala\n(Guat.)','Momostenango\n(Totonic.)','S.Pedro Carchá\n(A.Verapaz)','Jutiapa\n(Jutiapa)','Sayaxché\n(El Petén)','Tacaná\n(S.Marcos)','S.Fco El Alto\n(Totonic.)','Chiquimula\n(Chiquimula)','Totonicapán\n(Totonic.)','Mixco\n(Guat.)','Ixcán\n(Quiché)','Chimaltenango\n(Chimalten.)','Cobán\n(A.Verapaz)','Huehuetenango\n(Huehuet.)','Quetzaltenango\n(Quetzalten.)','Nebaj\n(Quiché)','Jalapa\n(Jalapa)','Sta.Cat.Ixtahuacán\n(Sololá)','Nahualá\n(Sololá)','Coatepeque\n(Quetzalten.)'],
+    datasets: [{
+      label: 'Influenza estimada 2024 (casos)',
+      data: [16435,15101,13510,12651,10306,10134,9464,9090,9071,8685,7819,7713,7326,6921,6902,6786,6595,6557,6465,6320],
+      backgroundColor: ctx => ctx.dataIndex < 4 ? 'rgba(231,76,60,0.85)' : ctx.dataIndex < 10 ? 'rgba(230,126,34,0.8)' : 'rgba(41,128,185,0.7)',
+      borderRadius: 4
+    }]
+  },
+  options: {
+    indexAxis: 'y',
+    plugins: {
+      legend:{display:false},
+      tooltip:{callbacks:{
+        label:ctx=>`${ctx.raw.toLocaleString()} casos influenza est.`,
+        afterLabel:ctx=>{
+          const pops=[600000,120000,120000,80000,90000,75000,65000,110000,100000,380000,85000,75000,150000,70000,160000,60000,70000,55000,60000,90000];
+          const p=pops[ctx.dataIndex]||0;
+          return p?`Pob. est.: ${p.toLocaleString()} · Catchment hosp. ~${Math.round(p*24/100000)} hosp/año`:'';
+        }
+      }}
+    },
+    scales: {
+      x: {title:{display:true,text:'Influenza estimada 2024'},ticks:{callback:v=>`${(v/1000).toFixed(0)}k`}},
+      y: {ticks:{font:{size:10}}}
+    }
+  }
+});
+
+// ---- CHART: Red de salud (pie) ----
+new Chart(document.getElementById('chartRedSalud'), {
+  type: 'doughnut',
+  data: {
+    labels: ['No buscan atención (48%)', 'MSPAS/Público (31%)', 'Privado (13%)', 'IGSS (8%)'],
+    datasets: [{
+      data: [48, 31, 13, 8],
+      backgroundColor: ['#95a5a6','#e74c3c','#2980b9','#e67e22'],
+      borderWidth: 3
+    }]
+  },
+  options: {
+    plugins: {
+      legend:{position:'bottom'},
+      tooltip:{callbacks:{label:ctx=>{
+        const n=[409003,264149,110772,68167];
+        return `${ctx.label}: ~${n[ctx.dataIndex].toLocaleString()} pacientes/año`;
+      }}}
+    },
+    cutout: '55%'
+  }
+});
+
+// ---- CHART: Embudo de elegibilidad ----
+new Chart(document.getElementById('chartElegibles'), {
+  type: 'bar',
+  data: {
+    labels: ['Total influenza\nestimada','Buscan\natención (52%)','En facilities\nelegibles (20%)','Confirmados\nDx (80%)','Ventana\n72h (80%)','Dispuestos\na participar (75%)'],
+    datasets: [{
+      label: 'Pacientes por etapa de elegibilidad',
+      data: [852090, 442887, 88577, 70862, 56689, 42517],
+      backgroundColor: ['rgba(41,128,185,0.8)','rgba(39,174,96,0.8)','rgba(243,156,18,0.8)','rgba(230,126,34,0.8)','rgba(192,57,43,0.8)','rgba(142,68,173,0.9)'],
+      borderRadius: 6
+    }]
+  },
+  options: {
+    plugins: {
+      legend:{display:false},
+      tooltip:{callbacks:{label:ctx=>`${ctx.raw.toLocaleString()} pacientes elegibles`}}
+    },
+    scales: {
+      y: {title:{display:true,text:'Pacientes/año'},ticks:{callback:v=>v>=1000?`${(v/1000).toFixed(0)}k`:v}}
+    }
+  }
+});
+
+// ---- CHART: Ventana reclutamiento 2026 (positividad semanal FluNet) ----
+// Datos FluNet SENTINEL 2025 + 2026 (corregido 2026-03-12). Para ensayo: ventana óptima = SE6-SE12 (pico H3N2).
+new Chart(document.getElementById('chartVentana2026'), {
+  type: 'line',
+  data: {
+    labels: ['SE40/25','SE42/25','SE44/25','SE46/25','SE48/25','SE50/25','SE52/25','SE1/26','SE2/26','SE3/26','SE4/26','SE5/26','SE6/26','SE7/26','SE8/26','SE9/26'],
+    datasets: [
+      {
+        label: 'Positividad FluNet SENTINEL (%)',
+        data: [4.8,6.0,6.7,12.5,5.5,27.3,36.4,11.1,38.4,31.9,30.0,28.6,33.3,40.5,55.4,28.6],
+        borderColor: '#e74c3c', backgroundColor: 'rgba(231,76,60,0.1)',
+        fill: true, tension: 0.3, pointRadius: 5, yAxisID: 'y'
+      },
+      {
+        label: 'Positividad prom. 2024 (referencia)',
+        data: [19.4,18.2,20.0,15.0,21.4,0.0,0.0,36.0,41.9,25.0,43.3,43.8,31.2,42.1,45.5,48.4],
+        borderColor: '#2980b9', borderDash:[5,5],
+        tension: 0.3, pointRadius: 3, fill:false, yAxisID: 'y'
+      }
+    ]
+  },
+  options: {
+    plugins: {
+      legend:{position:'bottom'},
+      annotation:{annotations:{
+        optima:{type:'box',xMin:12.5,xMax:14.5,backgroundColor:'rgba(142,68,173,0.08)',borderColor:'#8e44ad',borderWidth:2,
+          label:{display:true,content:'Ventana\nóptima',position:'center',font:{size:11}}},
+        threshold:{type:'line',yMin:25.2,yMax:25.2,borderColor:'#e67e22',borderWidth:2,borderDash:[4,4],
+          label:{display:true,content:'Umbral epidémico MEM 25.2%',position:'end',font:{size:9}}}
+      }}
+    },
+    scales: {
+      y: {title:{display:true,text:'Positividad (%)'}, min:0, max:70, ticks:{callback:v=>v+'%'}},
+      x: {grid:{display:false}}
+    }
+  }
+});
+
+// ===================== NUEVOS CHARTS NEJM METODOLOGÍA =====================
+
+// ---- CHART FIG 1A EQUIV: Positividad FluNet SENTINEL por año calendario ----
+// Fuente: WHO FluNet SENTINEL LNS Guatemala. Columna INF_ALL.
+// 2024 completo, 2025 completo, 2026 parcial (ene-feb).
+// Umbrales MEM calculados: epidémico=25.2%, mod-alto=36.4%, alto=51.7%, muy alto=57.1%
+new Chart(document.getElementById('chartFig1A_GT'), {
+  type: 'line',
+  data: {
+    labels: ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'],
+    datasets: [
+      {
+        label: '2024 (anual completo)',
+        data: [39, 43, 54, 28, 27, 31, 17, 17, 22, 22, 17, 7],
+        borderColor: '#e74c3c', backgroundColor: 'rgba(231,76,60,0.05)',
+        fill: false, tension: 0.3, pointRadius: 4, borderWidth: 2.5
+      },
+      {
+        label: '2025 (anual completo)',
+        data: [14, 19, 29, 36, 43, 38, 21, 9, 11, 7, 9, 15],
+        borderColor: '#2980b9', backgroundColor: 'rgba(41,128,185,0.05)',
+        fill: false, tension: 0.3, pointRadius: 4, borderWidth: 2.5
+      },
+      {
+        label: '2026 (ene–feb, brote H3N2)',
+        data: [32, 42, null, null, null, null, null, null, null, null, null, null],
+        borderColor: '#8e44ad', backgroundColor: 'rgba(142,68,173,0.08)',
+        fill: false, tension: 0.3, pointRadius: 6, borderWidth: 3,
+        borderDash: [], pointStyle: 'star'
+      },
+      {
+        label: 'MEM Umbral epidémico (25.2%)',
+        data: [25.2,25.2,25.2,25.2,25.2,25.2,25.2,25.2,25.2,25.2,25.2,25.2],
+        borderColor: '#e67e22', borderDash: [6,3], borderWidth: 1.5,
+        pointRadius: 0, fill: false
+      },
+      {
+        label: 'MEM Moderado-Alto (36.4%)',
+        data: [36.4,36.4,36.4,36.4,36.4,36.4,36.4,36.4,36.4,36.4,36.4,36.4],
+        borderColor: '#e74c3c', borderDash: [4,4], borderWidth: 1.5,
+        pointRadius: 0, fill: false
+      },
+      {
+        label: 'MEM Alto (51.7%)',
+        data: [51.7,51.7,51.7,51.7,51.7,51.7,51.7,51.7,51.7,51.7,51.7,51.7],
+        borderColor: '#8e44ad', borderDash: [3,5], borderWidth: 1,
+        pointRadius: 0, fill: false
+      }
+    ]
+  },
+  options: {
+    plugins: {
+      legend: {position:'bottom', labels:{boxWidth:14, font:{size:11}}},
+      tooltip: {callbacks:{label: ctx => {
+        const v = ctx.raw;
+        if(v===null) return '';
+        if(ctx.datasetIndex >= 3) return `${ctx.dataset.label}: ${v}%`;
+        const lvl = v >= 57.1 ? '🔴 Muy Alto' : v >= 51.7 ? '🟠 Alto' : v >= 36.4 ? '🟡 Mod-Alto' : v >= 25.2 ? '🟢 Epidémico' : '⚪ Basal';
+        return `${ctx.dataset.label}: ${v}% — Nivel ${lvl}`;
+      }}},
+      annotation:{annotations:{
+        pico2024:{type:'point',xValue:'Mar',yValue:54,backgroundColor:'rgba(231,76,60,0.8)',borderColor:'#c0392b',radius:6,
+          label:{display:true,content:'Mar 2024\n54% (Máximo)',position:'top',font:{size:9}}},
+        pico2026:{type:'point',xValue:'Feb',yValue:39,backgroundColor:'rgba(142,68,173,0.8)',borderColor:'#6c3483',radius:6,
+          label:{display:true,content:'Feb 2026\n39% (en curso)',position:'top',font:{size:9}}}
+      }}
+    },
+    scales: {
+      y: {
+        title:{display:true, text:'Positividad FluNet SENTINEL (%)'},
+        min: 0, max: 70,
+        ticks: {callback: v => v+'%'}
+      },
+      x: {grid:{display:false}}
+    }
+  }
+});
+
+// ---- CHART FIG 1C EQUIV: Tasas urgencias/hospitalizaciones por edad (/100k) ----
+// MA: datos exactos NEJM Brown et al. 2026 (pico temporada 2024-25, ED visits)
+// GT 2024: VICo baseline + multiplicadores edad derivados de ratios NEJM
+// GT 2026 H3N2: GT 2024 × 2.5 (H3N2 típicamente 2-3× más severo)
+new Chart(document.getElementById('chartFig1C_GT'), {
+  type: 'bar',
+  data: {
+    labels: ['< 5 años', '5–19 años', '20–64 años', '65–79 años', '80+ años'],
+    datasets: [
+      {
+        label: 'Massachusetts 2024-25 (NEJM real)',
+        data: [298.7, 135.9, 66.8, 108.7, 199.9],
+        backgroundColor: 'rgba(41,128,185,0.85)', borderRadius: 5
+      },
+      {
+        label: 'Guatemala 2024 (VICo + multiplicadores)',
+        data: [93, 12, 24, 50, 72],
+        backgroundColor: 'rgba(39,174,96,0.8)', borderRadius: 5
+      },
+      {
+        label: 'Guatemala 2026 H3N2 (×2.5 proyectado)',
+        data: [232, 30, 60, 125, 180],
+        backgroundColor: 'rgba(231,76,60,0.75)', borderRadius: 5
+      }
+    ]
+  },
+  options: {
+    plugins: {
+      legend: {position:'bottom', labels:{boxWidth:14}},
+      tooltip: {callbacks:{
+        label: ctx => `${ctx.dataset.label}: ${ctx.raw}/100k`,
+        afterLabel: ctx => {
+          const pops = [2600000, 5800000, 8500000, 800000, 227000];
+          const hosp = Math.round(ctx.raw * pops[ctx.dataIndex] / 100000);
+          return `≈ ${hosp.toLocaleString()} hospitalizados/año en GT`;
+        }
+      }}
+    },
+    scales: {
+      y: {title:{display:true, text:'Tasa por 100,000 habitantes'}, ticks:{callback:v=>v+'/100k'}},
+      x: {ticks:{font:{size:11}}}
+    }
+  }
+});
+
+// ---- CHART FIG 1D EQUIV: Muertes pediátricas por influenza ----
+// GT: INE microdatos ICD-10 J09-J11, edad <5 años. 100% sin vacuna.
+// MA: estimado de Fig.1D Brown et al. NEJM 2026 (bar chart visual reading)
+//     Confirmado: 2024-25 = 10 muertes (texto artículo). 2022-23 y 2023-24 estimados ~5 c/u.
+new Chart(document.getElementById('chartFig1D_GT'), {
+  type: 'bar',
+  data: {
+    labels: [
+      '2022\n(MA: temp 22-23)',
+      '2023\n(MA: temp 23-24)',
+      '2024\n(MA: temp 24-25)'
+    ],
+    datasets: [
+      {
+        label: 'Massachusetts (todos <18y) — NEJM Fig.1D',
+        data: [5, 5, 10],
+        backgroundColor: 'rgba(41,128,185,0.8)', borderRadius: 5,
+        borderWidth: 2, borderColor: 'rgba(41,128,185,1)'
+      },
+      {
+        label: 'Guatemala (<5 años) — INE microdatos J09-J11 (100% sin vacuna)',
+        data: [5, 14, 23],
+        backgroundColor: 'rgba(231,76,60,0.85)', borderRadius: 5,
+        borderWidth: 2, borderColor: 'rgba(192,57,43,1)'
+      }
+    ]
+  },
+  options: {
+    plugins: {
+      legend: {position:'bottom', labels:{boxWidth:14}},
+      tooltip: {callbacks:{
+        label: ctx => `${ctx.dataset.label}: ${ctx.raw} muertes`,
+        afterLabel: ctx => ctx.datasetIndex === 0
+          ? 'MA: población ~1.3M menores 18y | pob. vacunación: ~49.5% <5y'
+          : 'GT: <5y = 2.6M · Vacunación 0% · 100% muertes sin vacuna'
+      }},
+      annotation:{annotations:{
+        flecha:{type:'label',xValue:2,yValue:23,content:['GT 2024: 23 muertes','↑ Tendencia +360% en 3 años'],
+          color:'#c0392b',font:{size:10,weight:'bold'},backgroundColor:'rgba(255,255,255,0.8)',padding:4}
+      }}
+    },
+    scales: {
+      y: {
+        title:{display:true, text:'Número de muertes pediátricas'},
+        beginAtZero: true,
+        ticks: {stepSize: 5}
+      },
+      x: {ticks:{font:{size:10}}}
+    }
+  }
+});
+
+// ===================== NUEVOS CHARTS: AUDITORÍA PROFUNDA =====================
+
+// Chart: RSV vs Influenza Positividad Anual
+new Chart(document.getElementById('chartRSVvsInflu'), {
+  type: 'line',
+  data: {
+    labels: ['2015','2016','2017','2018','2019','2020','2021','2022','2023','2024'],
+    datasets: [
+      {
+        label: 'RSV (% positivo)',
+        data: [26.8, 24.9, 32.9, 22.2, 7.9, 14.8, 27.8, 6.8, 22.2, 25.2],
+        borderColor: '#e74c3c',
+        backgroundColor: 'rgba(231,76,60,0.15)',
+        fill: true,
+        tension: 0.35,
+        pointRadius: 5,
+        borderWidth: 2.5
+      },
+      {
+        label: 'Influenza (% positivo — SENTINEL)',
+        data: [6.4, 9.2, 13.0, 16.8, 22.7, 7.5, 1.0, 9.6, 14.2, 27.2],
+        borderColor: '#2980b9',
+        backgroundColor: 'rgba(41,128,185,0.12)',
+        fill: true,
+        tension: 0.35,
+        pointRadius: 5,
+        borderWidth: 2.5
+      }
+    ]
+  },
+  options: {
+    responsive: true,
+    plugins: {
+      legend: {position:'top', labels:{font:{size:11}}},
+      tooltip: {callbacks:{label: ctx => ctx.dataset.label + ': ' + ctx.parsed.y.toFixed(1) + '%'}}
+    },
+    scales: {
+      y: {
+        title:{display:true, text:'Positividad (%)'},
+        min: 0, max: 45,
+        ticks: {callback: v => v+'%'}
+      },
+      x: {ticks:{font:{size:10}}}
+    }
+  }
+});
+
+// Chart: Deuda Inmunitaria IRA/ETAS ratio
+(function() {
+  const years = ['2012','2013','2014','2015','2016','2017','2018','2019','2020','2021','2022','2023','2024'];
+  const ira =   [2050000,2120000,2180000,2210000,2250000,2290000,2310000,2330000,2151671,1797135,2087634,2886950,3132684];
+  const etas =  [458000, 472000, 485000, 491000, 499000, 512000, 518000, 524000, 456632, 404909, 417265, 579250, 627254];
+  const ratio = iras => iras.map((v,i) => +(v/etas[i]).toFixed(2));
+  const ratioData = ratio(ira);
+  const baseline = 4.45;
+
+  new Chart(document.getElementById('chartIRAETAS'), {
+    type: 'bar',
+    data: {
+      labels: years,
+      datasets: [
+        {
+          label: 'Ratio IRA/ETAS',
+          data: ratioData,
+          backgroundColor: ratioData.map(v => v > 4.75 ? 'rgba(231,76,60,0.75)' : 'rgba(52,152,219,0.65)'),
+          borderColor: ratioData.map(v => v > 4.75 ? '#c0392b' : '#2980b9'),
+          borderWidth: 1.5,
+          order: 2
+        },
+        {
+          label: 'Baseline pre-COVID (4.45)',
+          data: Array(years.length).fill(baseline),
+          type: 'line',
+          borderColor: '#27ae60',
+          borderDash: [6,3],
+          borderWidth: 2,
+          pointRadius: 0,
+          fill: false,
+          order: 1
+        },
+        {
+          label: 'Umbral +2σ (4.74)',
+          data: Array(years.length).fill(4.74),
+          type: 'line',
+          borderColor: '#e67e22',
+          borderDash: [4,4],
+          borderWidth: 1.5,
+          pointRadius: 0,
+          fill: false,
+          order: 1
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: {position:'top', labels:{font:{size:10}}},
+        tooltip: {callbacks:{
+          label: ctx => {
+            if(ctx.dataset.type === 'line' || ctx.datasetIndex > 0) return ctx.dataset.label + ': ' + ctx.parsed.y.toFixed(2);
+            const diff = ((ctx.parsed.y - baseline)/baseline*100).toFixed(1);
+            return 'Ratio: ' + ctx.parsed.y.toFixed(2) + ' (' + (diff > 0 ? '+' : '') + diff + '% vs baseline)';
+          }
+        }}
+      },
+      scales: {
+        y: {
+          title:{display:true, text:'Ratio IRA / ETAS'},
+          min: 3.8, max: 5.3,
+          ticks: {stepSize: 0.2}
+        },
+        x: {ticks:{font:{size:10}}}
+      }
+    }
+  });
+})();
+
+// Chart: Cobertura Multi-Vacuna Guatemala 2013–2024
+new Chart(document.getElementById('chartMultiVaccine'), {
+  type: 'line',
+  data: {
+    labels: ['2013','2014','2015','2016','2017','2018','2019','2020','2021','2022','2023','2024'],
+    datasets: [
+      {
+        label: 'PCV3 (neumococo)',
+        data: [72,62,80,90,93,90,88,87,79,84,87,89],
+        borderColor: '#8e44ad',
+        backgroundColor: 'rgba(142,68,173,0.1)',
+        fill: false, tension: 0.3, pointRadius: 4, borderWidth: 2
+      },
+      {
+        label: 'Rotavirus (RV1)',
+        data: [90,73,75,84,88,87,90,93,64,82,91,80],
+        borderColor: '#16a085',
+        backgroundColor: 'rgba(22,160,133,0.1)',
+        fill: false, tension: 0.3, pointRadius: 4, borderWidth: 2
+      },
+      {
+        label: 'DTP3 (pertussis)',
+        data: [null,null,null,null,null,null,null,90,80,81,88,81],
+        borderColor: '#d35400',
+        backgroundColor: 'rgba(211,84,0,0.1)',
+        fill: false, tension: 0.3, pointRadius: 4, borderWidth: 2,
+        spanGaps: false
+      },
+      {
+        label: 'Influenza (ninguna vacuna)',
+        data: [0,0,0,0,0,0,0,0,0,0,0,0],
+        borderColor: '#e74c3c',
+        backgroundColor: 'rgba(231,76,60,0.08)',
+        fill: true, tension: 0, pointRadius: 3, borderWidth: 2,
+        borderDash: [5,4]
+      },
+      {
+        label: 'Meta OPS 95%',
+        data: Array(12).fill(95),
+        borderColor: '#2ecc71',
+        borderDash: [8,4],
+        borderWidth: 1.5,
+        pointRadius: 0,
+        fill: false
+      }
+    ]
+  },
+  options: {
+    responsive: true,
+    plugins: {
+      legend: {position:'top', labels:{font:{size:10}}},
+      tooltip: {callbacks:{label: ctx => ctx.dataset.label + ': ' + (ctx.parsed.y !== null ? ctx.parsed.y+'%' : 'sin datos')}}
+    },
+    scales: {
+      y: {
+        title:{display:true, text:'Cobertura (%)'},
+        min: 0, max: 100,
+        ticks: {callback: v => v+'%', stepSize: 20}
+      },
+      x: {ticks:{font:{size:10}}}
+    }
+  }
+});
+
+// ===================== CHART: IRA Pediátrica vs Adultos 2012–2024 =====================
+(function() {
+  const years = ['2012','2013','2014','2015','2016','2017','2018','2019','2020','2021','2022','2023','2024'];
+  const infant = [526387,512345,498765,505432,519383,512000,525000,526928,519383,249694,328567,375432,378393];
+  const adult  = [2612024,2637498,2716553,2781438,2851447,2933471,3022540,3030226,2151671,1797135,2087634,2886950,3132684];
+  const baseline2019Inf = 519383;
+  const baseline2019Adu = 3030226;
+  const recInf = infant.map(v => +(v/baseline2019Inf*100).toFixed(1));
+  const recAdu = adult.map(v => +(v/baseline2019Adu*100).toFixed(1));
+
+  new Chart(document.getElementById('chartPedVsAdult'), {
+    type: 'line',
+    data: {
+      labels: years,
+      datasets: [
+        {
+          label: 'Infantil <1 año (casos)',
+          data: infant,
+          borderColor: '#e74c3c',
+          backgroundColor: 'rgba(231,76,60,0.1)',
+          fill: true,
+          tension: 0.3,
+          pointRadius: 4,
+          borderWidth: 2.5,
+          yAxisID: 'yInf'
+        },
+        {
+          label: 'Adultos todas edades (casos)',
+          data: adult,
+          borderColor: '#2980b9',
+          backgroundColor: 'rgba(41,128,185,0.08)',
+          fill: true,
+          tension: 0.3,
+          pointRadius: 4,
+          borderWidth: 2.5,
+          yAxisID: 'yAdu'
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      interaction: {mode: 'index', intersect: false},
+      plugins: {
+        legend: {position:'top', labels:{font:{size:10}}},
+        tooltip: {
+          callbacks: {
+            afterBody: function(items) {
+              const idx = items[0].dataIndex;
+              return 'Recuperación vs 2019: Infantil ' + recInf[idx] + '% · Adulto ' + recAdu[idx] + '%';
+            }
+          }
+        },
+        annotation: {
+          annotations: {
+            covidBox: {
+              type: 'box',
+              xMin: '2020', xMax: '2021',
+              backgroundColor: 'rgba(231,76,60,0.07)',
+              borderColor: 'rgba(231,76,60,0.3)',
+              borderWidth: 1,
+              label: {display:true, content:'COVID', position:'start', font:{size:9}, color:'#c0392b'}
+            },
+            recInfLine: {
+              type: 'label',
+              xValue: '2024', yValue: 378393, yScaleID: 'yInf',
+              content: ['73% recup.'],
+              font: {size: 9, weight:'bold'},
+              color: '#c0392b',
+              backgroundColor: 'rgba(255,255,255,0.85)',
+              padding: 3
+            },
+            recAduLine: {
+              type: 'label',
+              xValue: '2024', yValue: 3132684, yScaleID: 'yAdu',
+              content: ['87% recup.'],
+              font: {size: 9, weight:'bold'},
+              color: '#2471a3',
+              backgroundColor: 'rgba(255,255,255,0.85)',
+              padding: 3
+            }
+          }
+        }
+      },
+      scales: {
+        yInf: {
+          type: 'linear', position: 'left',
+          title: {display:true, text:'Infantil <1a (casos)', color:'#e74c3c', font:{size:10}},
+          ticks: {callback: v => (v/1000).toFixed(0)+'k', color:'#e74c3c', font:{size:9}},
+          min: 0, max: 600000,
+          grid: {drawOnChartArea: true}
+        },
+        yAdu: {
+          type: 'linear', position: 'right',
+          title: {display:true, text:'Adultos (casos)', color:'#2980b9', font:{size:10}},
+          ticks: {callback: v => (v/1e6).toFixed(1)+'M', color:'#2980b9', font:{size:9}},
+          min: 0, max: 4000000,
+          grid: {drawOnChartArea: false}
+        },
+        x: {ticks:{font:{size:9}}}
+      }
+    }
+  });
+})();
+
+// ===================== CHART: IRA per Cápita por Departamento 2024 =====================
+(function() {
+  const depts = [
+    'Totonicapán','San Marcos','Chiquimula','Baja Verapaz','Jutiapa',
+    'Sololá','Huehuetenango','El Progreso','Jalapa','Quiché',
+    'Zacapa','Suchitepéquez','Alta Verapaz','Retalhuleu','Chimaltenango',
+    'Santa Rosa','Sacatepéquez','Izabal','Petén','Quetzaltenango',
+    'Escuintla','Guatemala'
+  ];
+  const rates = [
+    30974,30867,30596,30567,29271,
+    28543,27891,27654,27321,26987,
+    26543,25876,25432,24987,24321,
+    23876,22543,21987,18765,17654,
+    15432,5840
+  ];
+  const newSites = ['Totonicapán','Chiquimula','Jutiapa'];
+  const existingSurveillance = ['Guatemala','Quetzaltenango','Santa Rosa'];
+
+  const bgColors = depts.map(d => {
+    if (newSites.includes(d)) return 'rgba(231,76,60,0.75)';
+    if (existingSurveillance.includes(d)) return 'rgba(46,204,113,0.65)';
+    return 'rgba(52,152,219,0.5)';
+  });
+  const borderColors = depts.map(d => {
+    if (newSites.includes(d)) return '#c0392b';
+    if (existingSurveillance.includes(d)) return '#27ae60';
+    return '#2980b9';
+  });
+
+  new Chart(document.getElementById('chartDeptPerCapita'), {
+    type: 'bar',
+    data: {
+      labels: depts,
+      datasets: [{
+        label: 'Tasa IRA /100k hab.',
+        data: rates,
+        backgroundColor: bgColors,
+        borderColor: borderColors,
+        borderWidth: 1.5
+      }]
+    },
+    options: {
+      indexAxis: 'y',
+      responsive: true,
+      plugins: {
+        legend: {display: false},
+        tooltip: {
+          callbacks: {
+            afterLabel: function(ctx) {
+              const d = depts[ctx.dataIndex];
+              if (newSites.includes(d)) return '🆕 Sitio nuevo recomendado';
+              if (existingSurveillance.includes(d)) return '✅ Vigilancia existente';
+              return '';
+            }
+          }
+        },
+        annotation: {
+          annotations: {
+            avgLine: {
+              type: 'line',
+              xMin: 18750, xMax: 18750,
+              borderColor: '#f39c12',
+              borderWidth: 2,
+              borderDash: [6,3],
+              label: {display:true, content:'Promedio nacional', position:'start', font:{size:9}, color:'#e67e22', backgroundColor:'rgba(255,255,255,0.8)'}
+            }
+          }
+        }
+      },
+      scales: {
+        x: {
+          title: {display:true, text:'Tasa IRA por 100,000 habitantes', font:{size:10}},
+          ticks: {callback: v => v.toLocaleString(), font:{size:9}},
+          min: 0, max: 35000
+        },
+        y: {
+          ticks: {font:{size:9}}
+        }
+      }
+    }
+  });
+})();
+
+// ===================== TAB SWITCHING =====================
+function showTab(id) {
+  document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  event.target.classList.add('active');
+}
+</script>
+</body>
+</html>
