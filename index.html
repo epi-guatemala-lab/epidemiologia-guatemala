@@ -380,6 +380,74 @@
     </table>
     <div class="source" style="margin-top:8px">Fuentes: SICA, PAHO, Prensa Libre · <a href="https://www.sica.int/noticias/realizan-visita-tecnica-a-sitios-centinela-de-vigilancia-de-influenza-y-otros-virus-respiratorios-en-guatemala_1_134086.html" target="_blank">Visita técnica sitios centinela 2024</a></div>
   </div>
+
+  <!-- ===== SECCIÓN: DATOS IGSS — PCR Influenza 2024-2025 ===== -->
+  <div style="margin-top:24px">
+    <div class="section-title">🏥 Datos IGSS — Pruebas PCR Influenza (2024–2025)</div>
+    <div class="alert alert-info" style="margin-bottom:12px">
+      <span class="alert-icon">🆕</span>
+      <div><strong>Nueva fuente: IGSS (Instituto Guatemalteco de Seguridad Social).</strong> 3,677 pacientes con PCR Influenza A/B (ene 2024 – dic 2025). Datos hospitalarios NO centinela — complementan la vigilancia FluNet/MSPAS. Hospital General de Enfermedades (Ciudad de Guatemala) + hospitales periféricos. Positividad general: <strong>12.7%</strong> (vs FluNet SENTINEL 27.2% en 2024) — el IGSS testea más ampliamente (maternidad, cirugía, screening) con menor probabilidad pre-test.</div>
+    </div>
+
+    <div class="kpi-grid" style="grid-template-columns: repeat(4, 1fr); margin-bottom:16px">
+      <div class="kpi-card">
+        <div class="kpi-label">Pacientes Testeados</div>
+        <div class="kpi-value">3,677</div>
+        <div class="sub">2024: 1,005 · 2025: 2,672 (+166%)</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Influenza A Positivos</div>
+        <div class="kpi-value" style="color:#e74c3c">425 (11.7%)</div>
+        <div class="sub">2024: 10.7% · 2025: 12.0%</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Influenza B Positivos</div>
+        <div class="kpi-value" style="color:#8e44ad">43 (1.2%)</div>
+        <div class="sub">2024: 4.2% · 2025: 0.1% (casi ausente)</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Coinfección A+B</div>
+        <div class="kpi-value">2</div>
+        <div class="sub">0.05% de testeados</div>
+      </div>
+    </div>
+
+    <div class="charts-grid">
+      <div class="chart-card">
+        <h3>📊 Positividad Mensual IGSS vs FluNet SENTINEL (2024)</h3>
+        <canvas id="chartIGSS2024" style="max-height:280px"></canvas>
+        <div class="source">Fuente: IGSS — ESTADISTICA INFLUENZA PCR 2024-2025.csv (7,537 registros, 3,677 pacientes únicos). FluNet: WHO GT SENTINEL. Nota: IGSS incluye servicios de baja probabilidad pre-test (maternidad 18.1%, cirugía 3.6%) que diluyen la positividad global.</div>
+      </div>
+      <div class="chart-card">
+        <h3>📊 Positividad Mensual IGSS — Influenza A vs B (2024)</h3>
+        <canvas id="chartIGSSab" style="max-height:280px"></canvas>
+        <div class="source">Nota: Ola de Influenza B detectada ago-sep 2024 (pico 14.6%) — NO visible en FluNet por baja resolución mensual. Flu B prácticamente ausente en 2025 (solo 2 positivos en 2,672 pacientes).</div>
+      </div>
+      <div class="chart-card">
+        <h3>🏥 Positividad por Servicio IGSS (2024–2025)</h3>
+        <canvas id="chartIGSSservicio" style="max-height:280px"></canvas>
+        <div class="source">Consulta Externa y Observación tienen mayor positividad (25% y 21.8%) por mayor sospecha clínica. Pediatría = mayor volumen (1,529 pacientes, 41.6%) pero menor positividad (7.8%). UCI muy baja (4.7%) — pacientes ya diagnosticados o no-influenza.</div>
+      </div>
+      <div class="chart-card">
+        <h3>🗺️ Capacidad PCR en Hospitales IGSS Periféricos</h3>
+        <div style="padding:12px">
+          <table class="data-table" style="font-size:0.8rem">
+            <thead><tr><th>Hospital IGSS</th><th>Departamento</th><th>PCR 2024</th><th>PCR 2025</th><th>Positividad</th><th>Estado</th></tr></thead>
+            <tbody>
+              <tr style="background:#d4edda"><td><strong>HGE Guatemala</strong></td><td>Guatemala</td><td>1,005</td><td>2,672</td><td>12.7%</td><td>✅ Activo</td></tr>
+              <tr style="background:#fff3cd"><td>Hosp. Tiquisate</td><td>Escuintla</td><td>101</td><td>0</td><td>0.5%</td><td>⚠️ Suspendido 2025</td></tr>
+              <tr style="background:#f8d7da"><td>Hosp. Patulul</td><td>Suchitepéquez</td><td>0</td><td>0</td><td>—</td><td>❌ Sin capacidad PCR</td></tr>
+            </tbody>
+          </table>
+          <div class="alert alert-danger" style="margin-top:10px;padding:8px 12px">
+            <span class="alert-icon">🚨</span>
+            <div style="font-size:0.82rem"><strong>Brecha diagnóstica IGSS:</strong> De los hospitales IGSS consultados, solo el HGE Guatemala tiene capacidad PCR activa. Tiquisate suspendió PCR en 2025. Patulul NO tiene capacidad instalada. Implicación para ensayo clínico: los sitios IGSS periféricos necesitarán RIDTs o alianza con LNS para diagnóstico.</div>
+          </div>
+        </div>
+        <div class="source">Fuente: Oficios IGSS (Oficio LAB 018-26 Patulul, Oficio 46-2026 Tiquisate), respuesta a solicitud Sección Epidemiología, marzo 2026.</div>
+      </div>
+    </div>
+  </div>
 </div>
 
 <!-- ===================== TAB: DEMOGRAFÍA ===================== -->
@@ -3056,6 +3124,142 @@ new Chart(document.getElementById('chartMultiVaccine'), {
         y: {
           ticks: {font:{size:9}}
         }
+      }
+    }
+  });
+})();
+
+// ===================== CHARTS: IGSS PCR DATA 2024-2025 =====================
+(function() {
+  const months = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+
+  // Chart 1: IGSS vs FluNet 2024 monthly positivity
+  new Chart(document.getElementById('chartIGSS2024'), {
+    type: 'bar',
+    data: {
+      labels: months,
+      datasets: [
+        {
+          label: 'IGSS positividad (%)',
+          data: [52.5,10.5,11.8,13.3,14.4,13.0,14.4,7.4,15.5,13.2,2.6,1.4],
+          backgroundColor: 'rgba(41,128,185,0.6)',
+          borderColor: '#2980b9',
+          borderWidth: 1.5,
+          order: 2
+        },
+        {
+          label: 'FluNet SENTINEL (%)',
+          data: [19.4,18.2,20.0,15.0,21.4,0.0,0.0,36.0,41.9,25.0,43.3,43.8],
+          type: 'line',
+          borderColor: '#e74c3c',
+          backgroundColor: 'transparent',
+          borderWidth: 2.5,
+          pointRadius: 4,
+          tension: 0.3,
+          order: 1
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: {position:'top', labels:{font:{size:10}}},
+        tooltip: {callbacks:{label: ctx => ctx.dataset.label + ': ' + ctx.parsed.y + '%'}}
+      },
+      scales: {
+        y: {title:{display:true, text:'Positividad (%)'}, min:0, max:60, ticks:{callback:v=>v+'%', stepSize:10}},
+        x: {ticks:{font:{size:9}}}
+      }
+    }
+  });
+
+  // Chart 2: IGSS Flu A vs Flu B 2024 monthly
+  new Chart(document.getElementById('chartIGSSab'), {
+    type: 'line',
+    data: {
+      labels: months,
+      datasets: [
+        {
+          label: 'Influenza A (%)',
+          data: [47.4,10.7,12.0,12.6,13.0,11.9,11.6,1.1,1.0,5.7,1.3,1.4],
+          borderColor: '#e74c3c',
+          backgroundColor: 'rgba(231,76,60,0.1)',
+          fill: true, tension: 0.3, pointRadius: 5, borderWidth: 2.5
+        },
+        {
+          label: 'Influenza B (%)',
+          data: [8.7,1.3,0.0,0.9,1.7,4.8,3.2,6.5,14.6,7.5,1.3,1.4],
+          borderColor: '#8e44ad',
+          backgroundColor: 'rgba(142,68,173,0.1)',
+          fill: true, tension: 0.3, pointRadius: 5, borderWidth: 2.5
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: {position:'top', labels:{font:{size:10}}},
+        tooltip: {callbacks:{label: ctx => ctx.dataset.label + ': ' + ctx.parsed.y + '%'}},
+        annotation: {
+          annotations: {
+            fluBpeak: {
+              type: 'label', xValue: 'Sep', yValue: 14.6,
+              content: ['Ola Flu B', '14.6%'],
+              font: {size:9, weight:'bold'}, color:'#8e44ad',
+              backgroundColor:'rgba(255,255,255,0.85)', padding:3
+            }
+          }
+        }
+      },
+      scales: {
+        y: {title:{display:true, text:'Positividad (%)'}, min:0, max:55, ticks:{callback:v=>v+'%'}},
+        x: {ticks:{font:{size:9}}}
+      }
+    }
+  });
+
+  // Chart 3: Positivity by service (horizontal bar)
+  new Chart(document.getElementById('chartIGSSservicio'), {
+    type: 'bar',
+    data: {
+      labels: ['Consulta Ext.','Observación','Maternidad','Emergencia Ad.','Hospitalización','Pediatría','UCI/UTI','Cirugía'],
+      datasets: [
+        {
+          label: 'Positividad (%)',
+          data: [25.0,21.8,18.1,14.4,13.1,7.8,4.7,3.6],
+          backgroundColor: [
+            'rgba(231,76,60,0.7)','rgba(230,126,34,0.7)','rgba(241,196,15,0.7)',
+            'rgba(46,204,113,0.6)','rgba(52,152,219,0.6)','rgba(155,89,182,0.6)',
+            'rgba(149,165,166,0.6)','rgba(189,195,199,0.6)'
+          ],
+          borderWidth: 1
+        },
+        {
+          label: 'Pacientes testeados',
+          data: [104,331,419,969,199,1529,64,56],
+          backgroundColor: 'rgba(44,62,80,0.15)',
+          borderColor: 'rgba(44,62,80,0.4)',
+          borderWidth: 1
+        }
+      ]
+    },
+    options: {
+      indexAxis: 'y',
+      responsive: true,
+      plugins: {
+        legend: {position:'top', labels:{font:{size:10}}},
+        tooltip: {
+          callbacks: {
+            label: function(ctx) {
+              if (ctx.datasetIndex === 0) return 'Positividad: ' + ctx.parsed.x + '%';
+              return 'n=' + ctx.parsed.x + ' pacientes';
+            }
+          }
+        }
+      },
+      scales: {
+        x: {title:{display:true, text:'Positividad (%) / Pacientes'}, ticks:{font:{size:9}}},
+        y: {ticks:{font:{size:9}}}
       }
     }
   });
