@@ -391,24 +391,24 @@
 
     <div class="kpi-grid" style="grid-template-columns: repeat(4, 1fr); margin-bottom:16px">
       <div class="kpi-card">
-        <div class="kpi-label">Pacientes Testeados</div>
-        <div class="kpi-value">3,677</div>
-        <div class="sub">2024: 1,005 · 2025: 2,672 (+166%)</div>
+        <div class="kpi-label">Red IGSS: Tests Totales</div>
+        <div class="kpi-value">9,336</div>
+        <div class="sub">2024: 4,185 · 2025: 5,124 · 2026: 27 · 8 hospitales consultados</div>
       </div>
       <div class="kpi-card">
-        <div class="kpi-label">Influenza A Positivos</div>
-        <div class="kpi-value" style="color:#e74c3c">425 (11.7%)</div>
-        <div class="sub">2024: 10.7% · 2025: 12.0%</div>
+        <div class="kpi-label">Hospitales Activos</div>
+        <div class="kpi-value" style="color:#27ae60">6 / 8</div>
+        <div class="sub">PCR: 3 (HGE, Z11, Ceibal) · Rápida: 3 (Antigua, CAMIP, Amates)</div>
       </div>
       <div class="kpi-card">
-        <div class="kpi-label">Influenza B Positivos</div>
-        <div class="kpi-value" style="color:#8e44ad">43 (1.2%)</div>
-        <div class="sub">2024: 4.2% · 2025: 0.1% (casi ausente)</div>
+        <div class="kpi-label">Positividad Red 2025</div>
+        <div class="kpi-value" style="color:#e74c3c">10.3%</div>
+        <div class="sub">2024: 5.4% · Flu B desaparece: 53→11 casos</div>
       </div>
       <div class="kpi-card">
-        <div class="kpi-label">Coinfección A+B</div>
-        <div class="kpi-value">2</div>
-        <div class="sub">0.05% de testeados</div>
+        <div class="kpi-label">Brote H3N2 (mar 2026)</div>
+        <div class="kpi-value" style="color:#c0392b">48.1%</div>
+        <div class="sub">Amates, Izabal — 13/27 positivos. Expansión fuera de capital</div>
       </div>
     </div>
 
@@ -429,23 +429,46 @@
         <div class="source">Consulta Externa y Observación tienen mayor positividad (25% y 21.8%) por mayor sospecha clínica. Pediatría = mayor volumen (1,529 pacientes, 41.6%) pero menor positividad (7.8%). UCI muy baja (4.7%) — pacientes ya diagnosticados o no-influenza.</div>
       </div>
       <div class="chart-card">
-        <h3>🗺️ Capacidad PCR en Hospitales IGSS Periféricos</h3>
-        <div style="padding:12px">
-          <table class="data-table" style="font-size:0.8rem">
-            <thead><tr><th>Hospital IGSS</th><th>Departamento</th><th>PCR 2024</th><th>PCR 2025</th><th>Positividad</th><th>Estado</th></tr></thead>
-            <tbody>
-              <tr style="background:#d4edda"><td><strong>HGE Guatemala</strong></td><td>Guatemala</td><td>1,005</td><td>2,672</td><td>12.7%</td><td>✅ Activo</td></tr>
-              <tr style="background:#fff3cd"><td>Hosp. Tiquisate</td><td>Escuintla</td><td>101</td><td>0</td><td>0.5%</td><td>⚠️ Suspendido 2025</td></tr>
-              <tr style="background:#f8d7da"><td>Hosp. Patulul</td><td>Suchitepéquez</td><td>0</td><td>0</td><td>—</td><td>❌ Sin capacidad PCR</td></tr>
-            </tbody>
-          </table>
-          <div class="alert alert-danger" style="margin-top:10px;padding:8px 12px">
-            <span class="alert-icon">🚨</span>
-            <div style="font-size:0.82rem"><strong>Brecha diagnóstica IGSS:</strong> De los hospitales IGSS consultados, solo el HGE Guatemala tiene capacidad PCR activa. Tiquisate suspendió PCR en 2025. Patulul NO tiene capacidad instalada. Implicación para ensayo clínico: los sitios IGSS periféricos necesitarán RIDTs o alianza con LNS para diagnóstico.</div>
-          </div>
-        </div>
-        <div class="source">Fuente: Oficios IGSS (Oficio LAB 018-26 Patulul, Oficio 46-2026 Tiquisate), respuesta a solicitud Sección Epidemiología, marzo 2026.</div>
+        <h3>📊 Antigua "La Capitanía" — Positividad Mensual Flu A vs B (prueba rápida)</h3>
+        <canvas id="chartIGSSantigua" style="max-height:280px"></canvas>
+        <div class="source">Fuente: IGSS Hospital de Antigua Guatemala, Sacatepéquez. 1,335 pacientes (290 en 2024, 1,045 en 2025) con prueba rápida de antígeno. Ola de Flu B ago-nov 2024 (pico sep: 33%). Surgimiento masivo Flu A dic 2025 (37.7%). PCR confirmatorio: 56 tests en 2025, 3 Flu A detectados (5.4%).</div>
       </div>
+    </div>
+
+    <!-- Tabla consolidada de todos los hospitales IGSS -->
+    <div class="chart-card" style="margin-top:16px">
+      <h3>🏥 Red IGSS: Capacidad Diagnóstica de Influenza por Hospital (2024–2026)</h3>
+      <div style="overflow-x:auto">
+        <table class="data-table" style="font-size:0.78rem">
+          <thead><tr><th>Hospital IGSS</th><th>Departamento</th><th>Tipo Test</th><th>Tests 2024</th><th>Tests 2025</th><th>Tests 2026</th><th>Pos. 2024</th><th>Pos. 2025</th><th>Hallazgo Clave</th><th>Estado</th></tr></thead>
+          <tbody>
+            <tr style="background:#d4edda"><td><strong>HGE Guatemala (Z11)</strong></td><td>Guatemala</td><td>PCR</td><td>1,005</td><td>2,672</td><td>—</td><td>14.3%</td><td>12.1%</td><td>Mayor volumen de la red. Flu B desaparece en 2025</td><td>✅ Activo</td></tr>
+            <tr style="background:#d4edda"><td><strong>HGE Zona 11 (FilmArray)</strong></td><td>Guatemala</td><td>PCR molecular</td><td>12</td><td>123</td><td>—</td><td>0%</td><td>4.1%</td><td>Panel respiratorio completo. Solo 5 Flu A+ en 2025</td><td>✅ Activo</td></tr>
+            <tr style="background:#d4edda"><td><strong>Hosp. Antigua "La Capitanía"</strong></td><td>Sacatepéquez</td><td>Rápida + PCR</td><td>290</td><td>1,101</td><td>—</td><td>21.4%</td><td>16.1%</td><td>Ola Flu B sep'24 (33%). Surge Flu A dic'25 (37.7%)</td><td>✅ Activo</td></tr>
+            <tr style="background:#d4edda"><td><strong>CAMIP Pensionados (Z12)</strong></td><td>Guatemala</td><td>Rápida</td><td>618</td><td>1,076</td><td>—</td><td>2.8%</td><td>1.7%</td><td>Población mayor. Positividad muy baja por screening amplio</td><td>✅ Activo</td></tr>
+            <tr style="background:#d4edda"><td><strong>HGA Ceibal (Accidentes)</strong></td><td>Guatemala</td><td>PCR</td><td>2,159</td><td>152</td><td>—</td><td>2.0%</td><td>20.4%</td><td>Volumen cayó 93% pero positividad subió 10×. Cambio protocolo</td><td>✅ Activo</td></tr>
+            <tr style="background:#fff3cd"><td>Cons. Amates</td><td>Izabal</td><td>Rápida</td><td>0</td><td>0</td><td>27</td><td>—</td><td>—</td><td>Inició feb 2026. Positiv. 48% (brote activo H3N2)</td><td>⚠️ Nuevo 2026</td></tr>
+            <tr style="background:#fff3cd"><td>Hosp. Tiquisate</td><td>Escuintla</td><td>Rápida</td><td>101</td><td>0</td><td>—</td><td>1.0%</td><td>—</td><td>PCR suspendido 2025. Solo 1 positivo en 101 tests</td><td>⚠️ Suspendido</td></tr>
+            <tr style="background:#f8d7da"><td>Hosp. Patulul</td><td>Suchitepéquez</td><td>Ninguno</td><td>0</td><td>0</td><td>0</td><td>—</td><td>—</td><td>Sin capacidad PCR ni prueba rápida instalada</td><td>❌ Sin capacidad</td></tr>
+          </tbody>
+          <tfoot>
+            <tr style="font-weight:bold;background:#e8f4fd"><td colspan="3">TOTAL RED IGSS</td><td>4,185</td><td>5,124</td><td>27</td><td>5.4%</td><td>10.3%</td><td colspan="2">8 hospitales consultados, 6 activos</td></tr>
+          </tfoot>
+        </table>
+      </div>
+      <div class="alert alert-warning" style="margin-top:10px;padding:8px 12px">
+        <span class="alert-icon">⚠️</span>
+        <div style="font-size:0.82rem"><strong>Hallazgos clave de la red IGSS:</strong>
+          <ul style="margin:4px 0 0 16px;padding:0">
+            <li><strong>Flu B desapareció en 2025:</strong> De 53 positivos en 2024 (significativo en Antigua y HGE), cayó a 11 en toda la red — un cambio de tipo completo hacia Flu A/H3N2</li>
+            <li><strong>Brote activo mar 2026:</strong> Amates (Izabal) reporta 48% positividad con solo pruebas rápidas — el brote H3N2 se está expandiendo fuera de la capital</li>
+            <li><strong>PCR vs Rápida:</strong> Positividad PCR (4-12%) &lt; Rápida (17-21%) porque los paneles PCR se ordenan por diferencial respiratorio amplio, no solo sospecha de influenza</li>
+            <li><strong>Ceibal:</strong> Caída del 93% en volumen de tests (2,159→152) con aumento de 10× en positividad sugiere cambio de protocolo de screening masivo a testeo dirigido</li>
+            <li><strong>Capacidad total:</strong> ~9,300 tests/año en 6 hospitales activos. Para ensayo clínico, suficiente como pool de screening con alianza IGSS</li>
+          </ul>
+        </div>
+      </div>
+      <div class="source">Fuente: Oficios IGSS respuesta a Oficio EPI 60/2026, Sección de Epidemiología (marzo 2026). Datos de: HGE Guatemala (ESTADISTICA INFLUENZA PCR 2024-2025.csv), Z11 FilmArray (INFLUENZA IGSS Z11.xlsx), Antigua (INLFUENZA IGSS ANTIGUA.xlsx + PCR INLFUENZA IGSS ANTIGUA.pdf), CAMIP (RESULTADOS INFLUENZA A Y B 2024-2025.xlsx + OFICIO MC 13-2026), HGA Ceibal (PRUEBAS DE INFLUENZA 2024-2025.xlsx), Amates (INFLUENZA IGSS AMATES.xlsx + LAB-LA 402026.pdf), Tiquisate (RESULTADOS PCR 2024 + Oficio 46-2026), Patulul (Oficio LAB 018-26).</div>
     </div>
   </div>
 </div>
@@ -3260,6 +3283,90 @@ new Chart(document.getElementById('chartMultiVaccine'), {
       scales: {
         x: {title:{display:true, text:'Positividad (%) / Pacientes'}, ticks:{font:{size:9}}},
         y: {ticks:{font:{size:9}}}
+      }
+    }
+  });
+})();
+
+// ===================== CHART: IGSS Antigua La Capitanía 2024-2025 =====================
+(function() {
+  const months = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+  // 2024 Antigua rapid antigen (290 patients)
+  const a24tests = [13,26,17,19,8,4,23,21,52,67,29,11];
+  const a24fluA = [0,5,3,3,0,0,2,0,2,3,0,2];
+  const a24fluB = [0,2,0,2,0,0,2,5,17,10,4,0];
+  // 2025 Antigua rapid antigen (1,045 patients)
+  const a25tests = [53,30,58,81,64,50,78,68,119,127,126,191];
+  const a25fluA = [4,4,2,23,5,7,5,4,4,14,22,72];
+  const a25fluB = [2,0,0,0,2,0,0,0,0,1,1,3];
+  // Positivity rates
+  const posA24 = a24tests.map((t,i) => t>0 ? +((a24fluA[i]+a24fluB[i])/t*100).toFixed(1) : 0);
+  const posA25 = a25tests.map((t,i) => t>0 ? +((a25fluA[i]+a25fluB[i])/t*100).toFixed(1) : 0);
+  const posFluB24 = a24tests.map((t,i) => t>0 ? +(a24fluB[i]/t*100).toFixed(1) : 0);
+
+  new Chart(document.getElementById('chartIGSSantigua'), {
+    type: 'bar',
+    data: {
+      labels: months,
+      datasets: [
+        {
+          label: '2025 Flu A+B positividad (%)',
+          data: posA25,
+          backgroundColor: 'rgba(231,76,60,0.6)',
+          borderColor: '#c0392b',
+          borderWidth: 1,
+          order: 3
+        },
+        {
+          label: '2024 Flu A positividad (%)',
+          data: a24tests.map((t,i) => t>0 ? +(a24fluA[i]/t*100).toFixed(1) : 0),
+          type: 'line',
+          borderColor: '#2980b9',
+          backgroundColor: 'transparent',
+          borderWidth: 2,
+          pointRadius: 3,
+          tension: 0.3,
+          order: 1
+        },
+        {
+          label: '2024 Flu B positividad (%)',
+          data: posFluB24,
+          type: 'line',
+          borderColor: '#8e44ad',
+          backgroundColor: 'transparent',
+          borderWidth: 2,
+          pointRadius: 3,
+          borderDash: [5,3],
+          tension: 0.3,
+          order: 2
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: {position:'top', labels:{font:{size:9}}},
+        tooltip: {callbacks:{label: ctx => ctx.dataset.label + ': ' + ctx.parsed.y + '%'}},
+        annotation: {
+          annotations: {
+            fluBwave: {
+              type: 'label', xValue: 'Sep', yValue: 33,
+              content: ['Ola Flu B','33% sep\'24'],
+              font: {size:8, weight:'bold'}, color:'#8e44ad',
+              backgroundColor:'rgba(255,255,255,0.9)', padding:2
+            },
+            fluAsurge: {
+              type: 'label', xValue: 'Dic', yValue: 37.7,
+              content: ['Surge Flu A','37.7% dic\'25'],
+              font: {size:8, weight:'bold'}, color:'#c0392b',
+              backgroundColor:'rgba(255,255,255,0.9)', padding:2
+            }
+          }
+        }
+      },
+      scales: {
+        y: {title:{display:true, text:'Positividad (%)'}, min:0, max:45, ticks:{callback:v=>v+'%', font:{size:9}}},
+        x: {ticks:{font:{size:9}}}
       }
     }
   });

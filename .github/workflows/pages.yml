@@ -1,4 +1,4 @@
-name: Deploy to GitHub Pages
+name: Deploy to GitHub Pages + Sync to Reportes-IGSS
 on:
   push:
     branches: [main]
@@ -20,3 +20,27 @@ jobs:
           path: '.'
       - id: deployment
         uses: actions/deploy-pages@v4
+
+  sync-to-reportes-igss:
+    runs-on: ubuntu-latest
+    needs: deploy
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Sync index.html to Reportes-IGSS
+        env:
+          GH_TOKEN: ${{ secrets.REPORTES_IGSS_TOKEN }}
+        run: |
+          git clone --depth 1 https://x-access-token:${GH_TOKEN}@github.com/anon-design/Reportes-IGSS.git /tmp/reportes
+          cp index.html /tmp/reportes/dashboards/influenza_ira/index.html
+          cd /tmp/reportes
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add dashboards/influenza_ira/index.html
+          if git diff --cached --quiet; then
+            echo "No changes to sync"
+          else
+            git commit -m "sync: update IRA/Influenza dashboard from epidemiologia-guatemala"
+            git push
+            echo "✅ Synced to Reportes-IGSS"
+          fi
