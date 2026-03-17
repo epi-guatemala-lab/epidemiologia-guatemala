@@ -490,6 +490,99 @@
       </div>
       <div class="source">Fuente: Oficios IGSS respuesta a Oficio EPI 60/2026, Sección de Epidemiología (marzo 2026). Datos de: HGE Guatemala (ESTADISTICA INFLUENZA PCR 2024-2025.csv), Z11 FilmArray (INFLUENZA IGSS Z11.xlsx), Antigua (INLFUENZA IGSS ANTIGUA.xlsx + PCR INLFUENZA IGSS ANTIGUA.pdf), CAMIP (RESULTADOS INFLUENZA A Y B 2024-2025.xlsx + OFICIO MC 13-2026), HGA Ceibal (PRUEBAS DE INFLUENZA 2024-2025.xlsx), Amates (INFLUENZA IGSS AMATES.xlsx + LAB-LA 402026.pdf), Tiquisate (RESULTADOS PCR 2024 + Oficio 46-2026), Patulul (Oficio LAB 018-26).</div>
     </div>
+
+    <!-- ===== Capacidad PCR para Ensayo Clínico ===== -->
+    <div class="chart-card" style="margin-top:20px">
+      <h3>🔬 Capacidad PCR Influenza en Red IGSS — Relevancia para Ensayo Clínico</h3>
+      <div class="alert alert-danger" style="margin-bottom:12px">
+        <span class="alert-icon">🚨</span>
+        <div><strong>Hallazgo crítico:</strong> Solo 3 de 8 hospitales IGSS tienen capacidad PCR activa. La capacidad PCR real de la red es de <strong>~2,800–3,000 tests/año</strong> (excluyendo Ceibal post-cambio de protocolo). Con esta capacidad, IGSS solo puede aportar <strong>~107 pacientes PCR-confirmados elegibles/año</strong> para el ensayo — insuficiente como fuente única.</div>
+      </div>
+
+      <div style="overflow-x:auto">
+        <table class="data-table" style="font-size:0.78rem">
+          <thead>
+            <tr style="background:#1a237e;color:#fff"><th colspan="7">🟢 Hospitales CON capacidad PCR — Viables para confirmación diagnóstica del ensayo</th></tr>
+            <tr><th>Hospital</th><th>Tipo PCR</th><th>PCR/año (2025)</th><th>Positivos PCR</th><th>Positividad</th><th>Elegibles/año*</th><th>Viabilidad para Ensayo</th></tr>
+          </thead>
+          <tbody>
+            <tr style="background:#c8e6c9"><td><strong>HGE Guatemala</strong></td><td>PCR convencional</td><td>2,672</td><td>322</td><td>12.1%</td><td><strong>~96</strong></td><td>✅ Sitio primario. Mayor volumen PCR de toda la red IGSS</td></tr>
+            <tr style="background:#e8f5e9"><td>HGE Z11 (FilmArray)</td><td>PCR molecular multiplex</td><td>123</td><td>5</td><td>4.1%</td><td>~1.5</td><td>⚠️ Gold standard pero volumen insuficiente como sitio primario</td></tr>
+            <tr style="background:#fff9c4"><td>HGA Ceibal</td><td>PCR convencional</td><td>152</td><td>31</td><td>20.4%</td><td>~9</td><td>⚠️ Si reactiva volumen pre-2025 (~2,000/año) aportaría ~120 elegibles</td></tr>
+            <tr style="background:#fff9c4"><td>Antigua</td><td>PCR limitado (56/año)</td><td>56</td><td>3</td><td>5.4%</td><td>~0.7</td><td>⚠️ Necesita inversión. Con upgrade: ~1,100 rápidas → PCR confirm → ~52 elegibles</td></tr>
+          </tbody>
+          <tfoot>
+            <tr style="font-weight:bold;background:#e3f2fd"><td colspan="2">TOTAL PCR IGSS</td><td>3,003</td><td>361</td><td>12.0%</td><td><strong>~107</strong></td><td>Para N=1,000: ~9.3 años (IGSS solo, inaceptable)</td></tr>
+          </tfoot>
+        </table>
+      </div>
+
+      <div style="overflow-x:auto;margin-top:12px">
+        <table class="data-table" style="font-size:0.78rem">
+          <thead>
+            <tr style="background:#b71c1c;color:#fff"><th colspan="5">🔴 Hospitales SIN PCR — Requieren inversión o alianza para participar en el ensayo</th></tr>
+            <tr><th>Hospital</th><th>Capacidad actual</th><th>Tests rápidos/año</th><th>Barrera principal</th><th>Solución propuesta</th></tr>
+          </thead>
+          <tbody>
+            <tr style="background:#ffebee"><td>CAMIP Pensionados (Z12)</td><td>Solo prueba rápida</td><td>1,076</td><td>Sin equipo PCR. Población geriátrica (positividad 1.7%)</td><td>Transporte de muestras al LNS (15 min en misma ciudad)</td></tr>
+            <tr style="background:#ffebee"><td>Consultorio Amates</td><td>Solo prueba rápida</td><td>27 (nuevo 2026)</td><td>Sin equipo PCR. Zona rural remota (Izabal)</td><td>RIDT screening + envío de muestras refrigeradas</td></tr>
+            <tr style="background:#fce4ec"><td>Hosp. Tiquisate</td><td>Suspendido</td><td>0</td><td>Todo diagnóstico de influenza suspendido en 2025</td><td>Reactivar con kit RIDT mínimo + cadena de frío al LNS</td></tr>
+            <tr style="background:#fce4ec"><td>Hosp. Patulul</td><td>Ninguno</td><td>0</td><td>Sin infraestructura de laboratorio para influenza</td><td>No viable sin inversión significativa</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div style="font-size:0.78rem;margin-top:10px;padding:6px 8px;background:#fff8e1;border-radius:4px">
+        <strong>* Cálculo de elegibles/año:</strong> PCR tests × positividad × 50% ventana ≤48h × 70% consentimiento × 85% sin exclusiones clínicas. Ej: HGE = 2,672 × 0.121 × 0.50 × 0.70 × 0.85 = 96.
+      </div>
+
+      <!-- Gráfica de capacidad PCR mensual HGE -->
+      <div style="margin-top:16px">
+        <h4 style="font-size:0.95rem;margin-bottom:8px">📊 Capacidad PCR Mensual — HGE Guatemala 2025 (único sitio de alto volumen)</h4>
+        <canvas id="chartPCRcapacity" style="max-height:250px"></canvas>
+        <div class="source">Fuente: ESTADISTICA INFLUENZA PCR 2024-2025.csv. El HGE procesa 66–402 PCR/mes (mediana: 233). Meses pico de positivos PCR: jul (60) y dic (42). La capacidad del laboratorio NO es el cuello de botella — el cuello de botella es la positividad (12.1% anual) y la ventana de enrollment ≤48h.</div>
+      </div>
+
+      <!-- Opciones estratégicas para el ensayo -->
+      <div style="margin-top:16px">
+        <h4 style="font-size:0.95rem;margin-bottom:8px">🎯 Tres Estrategias de Confirmación Diagnóstica para el Ensayo</h4>
+        <div style="overflow-x:auto">
+          <table class="data-table" style="font-size:0.78rem">
+            <thead><tr><th>Estrategia</th><th>Descripción</th><th>Elegibles/año (IGSS)</th><th>Costo estimado</th><th>Viabilidad</th><th>Riesgo principal</th></tr></thead>
+            <tbody>
+              <tr style="background:#c8e6c9">
+                <td><strong>A. PCR in situ</strong></td>
+                <td>Usar solo hospitales con PCR existente (HGE, Z11, Ceibal)</td>
+                <td>~107</td>
+                <td>Bajo ($0 equipo)</td>
+                <td>⚠️ Lento: 9+ años para N=1,000</td>
+                <td>Ceibal inestable (cambió protocolo)</td>
+              </tr>
+              <tr style="background:#fff9c4">
+                <td><strong>B. RIDT + PCR central</strong></td>
+                <td>Screen con prueba rápida en TODA la red → confirmar PCR en LNS/HGE</td>
+                <td>~280–350</td>
+                <td>Medio ($50–80k logística)</td>
+                <td>✅ Mejor opción IGSS-only (3–4 años)</td>
+                <td>Cadena de frío, tiempo de transporte, falsos negativos RIDT</td>
+              </tr>
+              <tr style="background:#c8e6c9">
+                <td><strong>C. Red mixta IGSS + MSPAS</strong></td>
+                <td>IGSS (3 sitios PCR) + MSPAS centinela (SJD, Roosevelt, VICo)</td>
+                <td>~350 IGSS + ~650 MSPAS = <strong>~1,000</strong></td>
+                <td>Alto ($125–200k total)</td>
+                <td>✅✅ Única opción viable para 14–18 meses</td>
+                <td>Coordinación inter-institucional IGSS-MSPAS</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="alert alert-info" style="margin-top:10px;padding:8px 12px">
+          <span class="alert-icon">💡</span>
+          <div style="font-size:0.82rem"><strong>Recomendación:</strong> La <strong>Estrategia C (red mixta)</strong> es la única que alcanza N=1,000 en un timeline aceptable. IGSS aporta ~35% del enrollment (ventaja: pacientes urbanos, mejor adherencia al ≤48h) mientras MSPAS/VICo aporta ~65% (ventaja: diversidad geográfica, representatividad poblacional). La Estrategia B es el respaldo si la coordinación IGSS-MSPAS no se logra.</div>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -4073,6 +4166,95 @@ new Chart(document.getElementById('chartMultiVaccine'), {
       },
       scales: {
         y: {title:{display:true, text:'Positividad (%)'}, min:0, max:45, ticks:{callback:v=>v+'%', font:{size:9}}},
+        x: {ticks:{font:{size:9}}}
+      }
+    }
+  });
+})();
+
+// ===================== CHART: PCR Capacity HGE Monthly 2025 =====================
+(function() {
+  const months = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+  const tests = [101,66,126,143,257,344,402,266,295,311,155,206];
+  const pos = [11,6,18,19,36,44,60,19,17,28,22,42];
+  const rate = tests.map((t,i) => +(pos[i]/t*100).toFixed(1));
+  // Eligible per month: pos × 0.50 × 0.70 × 0.85
+  const eligible = pos.map(p => +(p * 0.50 * 0.70 * 0.85).toFixed(1));
+
+  new Chart(document.getElementById('chartPCRcapacity'), {
+    type: 'bar',
+    data: {
+      labels: months,
+      datasets: [
+        {
+          label: 'PCR tests realizados',
+          data: tests,
+          backgroundColor: 'rgba(52,152,219,0.5)',
+          borderColor: '#2980b9',
+          borderWidth: 1,
+          yAxisID: 'yTests',
+          order: 3
+        },
+        {
+          label: 'PCR positivos',
+          data: pos,
+          backgroundColor: 'rgba(231,76,60,0.7)',
+          borderColor: '#c0392b',
+          borderWidth: 1,
+          yAxisID: 'yTests',
+          order: 2
+        },
+        {
+          label: 'Elegibles estimados para ensayo',
+          data: eligible,
+          type: 'line',
+          borderColor: '#27ae60',
+          backgroundColor: 'rgba(46,204,113,0.15)',
+          fill: true,
+          borderWidth: 2.5,
+          pointRadius: 5,
+          tension: 0.3,
+          yAxisID: 'yElig',
+          order: 1
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      interaction: {mode:'index', intersect:false},
+      plugins: {
+        legend: {position:'top', labels:{font:{size:9}}},
+        tooltip: {
+          callbacks: {
+            afterBody: function(items) {
+              const i = items[0].dataIndex;
+              return 'Positividad: ' + rate[i] + '% · Elegibles: ' + eligible[i] + '/mes';
+            }
+          }
+        },
+        annotation: {
+          annotations: {
+            target: {
+              type: 'line', yMin: 83, yMax: 83, yScaleID: 'yElig',
+              borderColor: '#e67e22', borderWidth: 2, borderDash: [6,3],
+              label: {display:true, content:'Meta: 83/mes para N=1,000 en 12 meses', position:'start', font:{size:8}, color:'#e67e22', backgroundColor:'rgba(255,255,255,0.85)'}
+            }
+          }
+        }
+      },
+      scales: {
+        yTests: {
+          type:'linear', position:'left',
+          title:{display:true, text:'PCR tests / positivos', font:{size:9}},
+          ticks:{font:{size:8}}, min:0, max:450
+        },
+        yElig: {
+          type:'linear', position:'right',
+          title:{display:true, text:'Elegibles estimados', color:'#27ae60', font:{size:9}},
+          ticks:{callback:v=>v.toFixed(0), color:'#27ae60', font:{size:8}},
+          min:0, max:100,
+          grid:{drawOnChartArea:false}
+        },
         x: {ticks:{font:{size:9}}}
       }
     }
