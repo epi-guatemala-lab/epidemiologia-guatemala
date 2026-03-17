@@ -177,15 +177,15 @@
 </header>
 
 <nav class="tabs">
-  <button class="tab-btn active" onclick="showTab('resumen')">📊 Introducción</button>
-  <button class="tab-btn" onclick="showTab('tendencias')">📈 Tendencias 2016–2026</button>
-  <button class="tab-btn" onclick="showTab('virologia')">🦠 Vigilancia Virológica</button>
-  <button class="tab-btn" onclick="showTab('demografia')">👥 Demografía y Riesgo</button>
-  <button class="tab-btn" onclick="showTab('analisis')">🔬 Análisis Cruzado</button>
-  <button class="tab-btn" onclick="showTab('mortalidad')">💀 Mortalidad</button>
-  <button class="tab-btn" onclick="showTab('ensayo')">🧪 Ensayo Clínico</button>
-  <button class="tab-btn" onclick="showTab('cie10')">📋 Códigos CIE-10</button>
-  <button class="tab-btn" onclick="showTab('fuentes')">🔗 Fuentes y Datos</button>
+  <button class="tab-btn active" onclick="showTab('resumen', event)">📊 Introducción</button>
+  <button class="tab-btn" onclick="showTab('tendencias', event)">📈 Tendencias 2016–2026</button>
+  <button class="tab-btn" onclick="showTab('virologia', event)">🦠 Vigilancia Virológica</button>
+  <button class="tab-btn" onclick="showTab('demografia', event)">👥 Demografía y Riesgo</button>
+  <button class="tab-btn" onclick="showTab('analisis', event)">🔬 Análisis Cruzado</button>
+  <button class="tab-btn" onclick="showTab('mortalidad', event)">💀 Mortalidad</button>
+  <button class="tab-btn" onclick="showTab('ensayo', event)">🧪 Ensayo Clínico</button>
+  <button class="tab-btn" onclick="showTab('cie10', event)">📋 Códigos CIE-10</button>
+  <button class="tab-btn" onclick="showTab('fuentes', event)">🔗 Fuentes y Datos</button>
 </nav>
 
 <!-- ===================== TAB: RESUMEN EJECUTIVO ===================== -->
@@ -273,6 +273,22 @@
       <li>⚠️ El subregistro es masivo: solo 25–30% de casos IRA acuden a establecimientos MSPAS (estimado: 52% busca atención total [OMS GHO 2015] x ~55% va a MSPAS; Q1=46.5% vs Q5=68.2%)</li>
     </ul>
   </div>
+
+  <div class="alert alert-warning" style="margin-top:16px">
+    <span class="alert-icon">&#9888;&#65039;</span>
+    <div><strong>Limitaciones generales de este dashboard:</strong>
+      <ul style="margin:6px 0 0 16px;padding:0;line-height:1.8;font-size:0.84rem">
+        <li><strong>Datos de hospitalizaci&oacute;n desactualizados:</strong> Las tasas de hospitalizaci&oacute;n y mortalidad intrahospitalaria (6%) provienen de VICo 2008-2012, durante la era pand&eacute;mica H1N1 &mdash; hace 14 a&ntilde;os, potencialmente no representativas de cepas H3N2 actuales.</li>
+        <li><strong>Fuentes no directamente comparables:</strong> FluNet (positividad centinela ILI/SARI), IGSS (testeo amplio hospitalario) y MSPAS SIGSA (consultas ambulatorias) miden fen&oacute;menos diferentes y no deben compararse sin contexto metodol&oacute;gico.</li>
+        <li><strong>Estacionalidad discordante:</strong> FluNet pico en marzo, IGSS HGE en enero, Antigua en diciembre/abril &mdash; refleja diferencias poblacionales y variabilidad interanual, no un patr&oacute;n estacional &uacute;nico.</li>
+        <li><strong>Ventana terap&eacute;utica sin dato local:</strong> El &quot;50% en &le;48h&quot; no tiene fuente local publicada; probablemente var&iacute;a entre IGSS urbano (~60-70%) y MSPAS rural (~30-40%).</li>
+        <li><strong>Mortalidad OMS (9,245) vs INE (6,541):</strong> Metodolog&iacute;as distintas (modelamiento vs certificados de defunci&oacute;n), ambas v&aacute;lidas pero no intercambiables.</li>
+        <li><strong>Sensibilidad RIDT para Flu B:</strong> Menor sensibilidad (~53%) que para Flu A (~62%) puede amplificar la ca&iacute;da aparente de Flu B en sitios sin PCR.</li>
+        <li><strong>Subregistro masivo:</strong> Todas las estimaciones de carga representan l&iacute;mite inferior (solo 25-30% de IRA acude a MSPAS).</li>
+        <li><strong>Contexto ensayo cl&iacute;nico:</strong> Las secciones de ensayo presentan datos en funci&oacute;n de planificaci&oacute;n de un trial. La intervenci&oacute;n prioritaria para Guatemala ser&iacute;a un programa nacional de vacunaci&oacute;n contra influenza.</li>
+      </ul>
+    </div>
+  </div>
 </div>
 
 <!-- ===================== TAB: TENDENCIAS ===================== -->
@@ -296,6 +312,10 @@
       <h3>📅 Estacionalidad Real de Influenza en Guatemala (FluNet 2009–2026)</h3>
       <canvas id="chartEstacionalidad"></canvas>
       <div class="source">Fuente: <a href="https://www.who.int/tools/flunet" target="_blank">WHO FluNet GT (ISO2=GT)</a> · SE36/2009–SE9/2026 · N=850 semanas-año únicas · Fuente centinela deduplicada · Pico: Mar (25.4%) · Valle: Ago (7.5%)</div>
+      <div class="alert alert-warning" style="margin-top:10px;padding:8px 12px">
+        <span class="alert-icon">⚠️</span>
+        <div style="font-size:0.8rem"><strong>Discordancia estacional entre fuentes:</strong> FluNet (centinela nacional, LNS) muestra pico en <strong>marzo</strong> (25.4%). Sin embargo, los datos IGSS muestran patrones diferentes: HGE pico en <strong>enero</strong> (52.5% en ene 2024, pico secundario julio 2025), Antigua pico en <strong>diciembre/abril</strong>. Esta discordancia NO invalida los datos — refleja: (1) diferencias en poblaciones atendidas (IGSS urbano-formal vs centinela mixto), (2) variabilidad interanual extrema (ene 2024 = 52.5% vs ene 2025 = 10.9% en HGE), (3) posible desfase geográfico entre Ciudad de Guatemala y el agregado nacional. Para planificación de ensayos, esta discordancia es una <em>ventaja operacional</em>: siempre hay algún sitio en temporada activa. No debe asumirse un pico nacional único.</div>
+      </div>
     </div>
 
     <div class="chart-card">
@@ -386,28 +406,28 @@
     <div class="section-title">🏥 Datos IGSS — Pruebas PCR Influenza (2024–2025)</div>
     <div class="alert alert-info" style="margin-bottom:12px">
       <span class="alert-icon">🆕</span>
-      <div><strong>Nueva fuente: IGSS (Instituto Guatemalteco de Seguridad Social).</strong> 3,677 pacientes con PCR Influenza A/B (ene 2024 – dic 2025). Datos hospitalarios NO centinela — complementan la vigilancia FluNet/MSPAS. Hospital General de Enfermedades (Ciudad de Guatemala) + hospitales periféricos. Positividad general: <strong>12.7%</strong> (vs FluNet SENTINEL 27.2% en 2024) — el IGSS testea más ampliamente (maternidad, cirugía, screening) con menor probabilidad pre-test.</div>
+      <div><strong>Nueva fuente: IGSS (Instituto Guatemalteco de Seguridad Social).</strong> 3,677 pacientes con PCR Influenza A/B (ene 2024 – dic 2025). Datos hospitalarios NO centinela — complementan la vigilancia FluNet/MSPAS. Hospital General de Enfermedades (Ciudad de Guatemala) + hospitales periféricos. Positividad general: <strong>12.7%</strong> (vs FluNet SENTINEL 27.2% en 2024). <strong>Nota metodológica sobre la diferencia de positividad:</strong> Puede parecer contraintuitivo que un hospital (IGSS) tenga <em>menor</em> positividad que la red centinela. La explicación es que FluNet SENTINEL solo testea pacientes que cumplen definición de caso ILI/SARI (alta probabilidad pre-test), mientras que el IGSS testea ampliamente a pacientes de servicios con baja sospecha clínica (maternidad 18.1%, cirugía 3.6%, screening preoperatorio), diluyendo la positividad global. No refleja menor circulación viral sino diferente estrategia de testeo.</div>
     </div>
 
     <div class="kpi-grid" style="grid-template-columns: repeat(4, 1fr); margin-bottom:16px">
-      <div class="kpi-card">
-        <div class="kpi-label">Red IGSS: Tests Totales</div>
-        <div class="kpi-value">9,336</div>
+      <div class="kpi">
+        <div class="label">Red IGSS: Tests Totales</div>
+        <div class="value">9,336</div>
         <div class="sub">2024: 4,185 · 2025: 5,124 · 2026: 27 · 8 hospitales consultados</div>
       </div>
-      <div class="kpi-card">
-        <div class="kpi-label">Hospitales Activos</div>
-        <div class="kpi-value" style="color:#27ae60">6 / 8</div>
+      <div class="kpi success">
+        <div class="label">Hospitales Activos</div>
+        <div class="value" style="color:#27ae60">6 / 8</div>
         <div class="sub">PCR: 3 (HGE, Z11, Ceibal) · Rápida: 3 (Antigua, CAMIP, Amates)</div>
       </div>
-      <div class="kpi-card">
-        <div class="kpi-label">Positividad Red 2025</div>
-        <div class="kpi-value" style="color:#e74c3c">10.3%</div>
-        <div class="sub">2024: 5.4% · Flu B desaparece: 53→11 casos</div>
+      <div class="kpi danger">
+        <div class="label">Positividad Red 2025</div>
+        <div class="value" style="color:#e74c3c">10.8%</div>
+        <div class="sub">2024: 6.4% · Flu B desaparece: 53→11 casos</div>
       </div>
-      <div class="kpi-card">
-        <div class="kpi-label">Brote H3N2 (mar 2026)</div>
-        <div class="kpi-value" style="color:#c0392b">48.1%</div>
+      <div class="kpi danger">
+        <div class="label">Brote H3N2 (mar 2026)</div>
+        <div class="value" style="color:#c0392b">48.1%</div>
         <div class="sub">Amates, Izabal — 13/27 positivos. Expansión fuera de capital</div>
       </div>
     </div>
@@ -452,7 +472,7 @@
             <tr style="background:#f8d7da"><td>Hosp. Patulul</td><td>Suchitepéquez</td><td>Ninguno</td><td>0</td><td>0</td><td>0</td><td>—</td><td>—</td><td>Sin capacidad PCR ni prueba rápida instalada</td><td>❌ Sin capacidad</td></tr>
           </tbody>
           <tfoot>
-            <tr style="font-weight:bold;background:#e8f4fd"><td colspan="3">TOTAL RED IGSS</td><td>4,185</td><td>5,124</td><td>27</td><td>5.4%</td><td>10.3%</td><td colspan="2">8 hospitales consultados, 6 activos</td></tr>
+            <tr style="font-weight:bold;background:#e8f4fd"><td colspan="3">TOTAL RED IGSS</td><td>4,185</td><td>5,124</td><td>27</td><td>6.4%</td><td>10.8%</td><td colspan="2">8 hospitales consultados, 6 activos</td></tr>
           </tfoot>
         </table>
       </div>
@@ -460,7 +480,7 @@
         <span class="alert-icon">⚠️</span>
         <div style="font-size:0.82rem"><strong>Hallazgos clave de la red IGSS:</strong>
           <ul style="margin:4px 0 0 16px;padding:0">
-            <li><strong>Flu B desapareció en 2025:</strong> De 53 positivos en 2024 (significativo en Antigua y HGE), cayó a 11 en toda la red — un cambio de tipo completo hacia Flu A/H3N2</li>
+            <li><strong>Flu B desapareció en 2025:</strong> De 53 positivos en 2024 (significativo en Antigua y HGE), cayó a 11 en toda la red — un cambio de tipo completo hacia Flu A/H3N2. Confirmado por PCR en HGE (2/320 = 0.6%). Caveat: RIDT tiene menor sensibilidad para Flu B (~53%) que para Flu A (~62%), lo que puede amplificar la caída aparente en sitios sin PCR</li>
             <li><strong>Brote activo mar 2026:</strong> Amates (Izabal) reporta 48% positividad con solo pruebas rápidas — el brote H3N2 se está expandiendo fuera de la capital</li>
             <li><strong>PCR vs Rápida:</strong> Positividad PCR (4-12%) &lt; Rápida (17-21%) porque los paneles PCR se ordenan por diferencial respiratorio amplio, no solo sospecha de influenza</li>
             <li><strong>Ceibal:</strong> Caída del 93% en volumen de tests (2,159→152) con aumento de 10× en positividad sugiere cambio de protocolo de screening masivo a testeo dirigido</li>
@@ -656,7 +676,7 @@
     <div class="kpi">
       <div class="label">Mort. intrahospital. influenza</div>
       <div class="value">6%</div>
-      <div class="sub">entre hospitalizados confirmados (VICo 2008–12, era H1N1pdm09)</div>
+      <div class="sub">entre hospitalizados confirmados (VICo 2008–12, era H1N1pdm09) — dato de hace 14 años, durante pandemia H1N1; puede no ser representativo de temporadas H3N2 actuales ni del sistema de salud post-COVID</div>
     </div>
     <div class="kpi">
       <div class="label">Mort. intrahospital. IRA general</div>
@@ -971,7 +991,7 @@
     <h3>💉 Tabla 1 (NEJM real) — Cobertura Vacunal Acumulada por Grupo Etario: Massachusetts 2019–2025 vs Guatemala</h3>
     <div class="alert alert-danger" style="margin-bottom:12px">
       <span class="alert-icon">🚨</span>
-      <div><strong>Brecha crítica de vacunación:</strong> Massachusetts tiene cobertura significativa pero declinante en pediátricos (67.3%→49.5% en &lt;5 años) y alta en adultos mayores (65-79y: 71.5%). Guatemala = <strong>0% en todos los grupos todos los años</strong> — sin programa nacional de vacunación contra influenza. 100% de la población guatemalteca es naive → alta susceptibilidad, mayor transmisión y mayor justificación ética para un ensayo de nuevo fármaco.</div>
+      <div><strong>Brecha crítica de vacunación:</strong> Massachusetts tiene cobertura significativa pero declinante en pediátricos (67.3%→49.5% en &lt;5 años) y alta en adultos mayores (65-79y: 71.5%). Guatemala = <strong>0% en todos los grupos todos los años</strong> — sin programa nacional de vacunación contra influenza. 100% de la población guatemalteca es inmunológicamente naive, lo que implica alta susceptibilidad y mayor transmisión. Nota: la ausencia de vacunación es ante todo una brecha de salud pública; la población naive permite evaluar eficacia sin confusor vacunal, pero la prioridad debería ser un programa de vacunación.</div>
     </div>
     <div style="overflow-x:auto">
     <table class="data-table">
@@ -1079,7 +1099,7 @@
           <td><strong>49.5%</strong> (2024-25) — en declive desde 70.0% (2020-21). NEJM señala esto como contribuyente a aumento de mortalidad pediátrica</td>
           <td><strong>0%</strong> (sin programa nacional)</td>
           <td><strong>0%</strong></td>
-          <td>MA identifica baja vacunación + alta incidencia como causa de ↑ muertes. GT: ambos factores al máximo → justificación ética máxima</td>
+          <td>MA identifica baja vacunación + alta incidencia como causa de ↑ muertes. GT: ambos factores presentes — contexto relevante para diseño del ensayo, pero no sustituye la necesidad de vacunación</td>
         </tr>
         <tr style="background:rgba(231,76,60,0.06)">
           <td><strong>Cobertura vacunal 65-79 años</strong></td>
@@ -1241,31 +1261,31 @@
 
   <!-- ===== MARCO REGULATORIO Y ETICO (Auditoria GCP 2026-03-12) ===== -->
   <div class="chart-card" style="margin-top:20px">
-    <h3>&#9878;&#65039; Marco Regulatorio, Etico y Normativo &mdash; Requisitos para Ensayo Clinico en Guatemala</h3>
+    <h3>&#9878;&#65039; Marco Regulatorio, Ético y Normativo &mdash; Requisitos para Ensayo Clínico en Guatemala</h3>
     <div class="alert alert-danger" style="margin-bottom:12px">
       <span class="alert-icon">&#9888;&#65039;</span>
-      <div><strong>CONTEXTO HISTORICO CRITICO:</strong> Guatemala tiene una sensibilidad etica excepcional hacia ensayos clinicos debido a los <strong>experimentos de inoculacion de ETS realizados por investigadores estadounidenses entre 1946-1948</strong> (revelados en 2010, disculpa presidencial de EE.UU.). Este precedente historico hace que el escrutinio etico sea particularmente riguroso. Todo protocolo debe demostrar beneficio directo para la poblacion guatemalteca y cumplir estandares eticos superiores al minimo ICH-GCP.</div>
+      <div><strong>CONTEXTO HISTÓRICO CRÍTICO:</strong> Guatemala tiene una sensibilidad ética excepcional hacia ensayos clínicos debido a los <strong>experimentos de inoculacion de ETS realizados por investigadores estadounidenses entre 1946-1948</strong> (revelados en 2010, disculpa presidencial de EE.UU.). Este precedente histórico hace que el escrutinio ético sea particularmente riguroso. Todo protocolo debe demostrar beneficio directo para la población guatemalteca y cumplir estandares eticos superiores al mínimo ICH-GCP.</div>
     </div>
     <div style="overflow-x:auto">
     <table class="data-table" style="font-size:0.82rem">
       <thead><tr><th>Marco normativo</th><th>Documento/Referencia</th><th>Requisito clave para este ensayo</th><th>Estado</th></tr></thead>
       <tbody>
-        <tr style="background:rgba(231,76,60,0.06)"><td><strong>ICH-GCP E6(R2)</strong></td><td>Guia ICH de Buenas Practicas Clinicas, adoptada por OMS y referencia para MSPAS</td><td>Protocolo, IB, consentimiento informado, monitoreo, DSMB, farmacovigilancia, archivo TMF</td><td><span class="tag tag-h3n2">OBLIGATORIO</span></td></tr>
-        <tr><td><strong>Declaracion de Helsinki (2013)</strong></td><td>Principios eticos para investigacion medica en seres humanos &mdash; WMA</td><td>Art. 20: poblaciones vulnerables; Art. 22: consentimiento libre; Art. 33: placebo solo si no hay tratamiento probado (en GT no hay acceso a antivirales &mdash; placebo puede ser etico si se provee standard of care)</td><td><span class="tag tag-h3n2">OBLIGATORIO</span></td></tr>
-        <tr style="background:rgba(231,76,60,0.06)"><td><strong>Guatemala: Codigo de Salud (Decreto 90-97)</strong></td><td>Ley organica del sistema de salud &mdash; Arts. 34-41 regulan investigacion en salud</td><td>Toda investigacion en seres humanos requiere autorizacion del MSPAS y comite de etica</td><td><span class="tag tag-h3n2">OBLIGATORIO</span></td></tr>
+        <tr style="background:rgba(231,76,60,0.06)"><td><strong>ICH-GCP E6(R2)</strong></td><td>Guia ICH de Buenas Practicas Clínicas, adoptada por OMS y referencia para MSPAS</td><td>Protocolo, IB, consentimiento informado, monitoreo, DSMB, farmacovigilancia, archivo TMF</td><td><span class="tag tag-h3n2">OBLIGATORIO</span></td></tr>
+        <tr><td><strong>Declaración de Helsinki (2013)</strong></td><td>Principios éticos para investigación médica en seres humanos &mdash; WMA</td><td>Art. 20: poblaciones vulnerables; Art. 22: consentimiento libre; Art. 33: placebo solo si no hay tratamiento probado (en GT no hay acceso a antivirales &mdash; placebo puede ser ético si se provee standard of care)</td><td><span class="tag tag-h3n2">OBLIGATORIO</span></td></tr>
+        <tr style="background:rgba(231,76,60,0.06)"><td><strong>Guatemala: Código de Salud (Decreto 90-97)</strong></td><td>Ley orgánica del sistema de salud &mdash; Arts. 34-41 regulan investigación en salud</td><td>Toda investigación en seres humanos requiere autorización del MSPAS y comite de etica</td><td><span class="tag tag-h3n2">OBLIGATORIO</span></td></tr>
         <tr><td><strong>Acuerdo Gubernativo 514-98</strong></td><td>Reglamento Control Sanitario de Medicamentos y Productos Afines</td><td>Regula importacion de IMP, registro, cadena de custodia</td><td><span class="tag tag-h1n1">VERIFICAR vigencia</span></td></tr>
-        <tr style="background:rgba(231,76,60,0.06)"><td><strong>Comite Nacional de Bioetica en Salud</strong></td><td>MSPAS &mdash; organo etico nacional (fortalecido post-escandalo 2010)</td><td>Aprobacion etica independiente OBLIGATORIA. Revision de consentimiento, analisis riesgo-beneficio, proteccion poblaciones vulnerables</td><td><span class="tag tag-h3n2">OBLIGATORIO</span></td></tr>
-        <tr><td><strong>Pautas CIOMS (2016)</strong></td><td>Pautas Eticas Internacionales &mdash; OMS/CIOMS</td><td>Pauta 15: investigacion en LMICs debe responder a necesidades locales; Pauta 17: capacidad limitada de consentimiento; Pauta 7: vulnerabilidad por pobreza</td><td><span class="tag tag-h1n1">ALTAMENTE RECOMENDADO</span></td></tr>
-        <tr style="background:rgba(231,76,60,0.06)"><td><strong>Consentimiento en idiomas indigenas</strong></td><td>43.4% poblacion indigena (K&apos;iche&apos; 11.3%, Q&apos;eqchi&apos; 8.3%, Kaqchikel 7.6%, Mam 5.2%)</td><td>Consentimiento en espanol + K&apos;iche&apos;, Q&apos;eqchi&apos;, Kaqchikel, Mam para sitios con &gt;20% indigena. Traduccion culturalmente adaptada. Interprete + testigo para analfabetos (tasa analfabetismo: ~18% nacional, &gt;35% mujeres indigenas rurales)</td><td><span class="tag tag-h3n2">OBLIGATORIO etico</span></td></tr>
+        <tr style="background:rgba(231,76,60,0.06)"><td><strong>Comité Nacional de Bioética en Salud</strong></td><td>MSPAS &mdash; órgano ético nacional (fortalecido post-escándalo 2010)</td><td>Aprobación ética independiente OBLIGATORIA. Revisión de consentimiento, análisis riesgo-beneficio, protección poblaciones vulnerables</td><td><span class="tag tag-h3n2">OBLIGATORIO</span></td></tr>
+        <tr><td><strong>Pautas CIOMS (2016)</strong></td><td>Pautas Éticas Internacionales &mdash; OMS/CIOMS</td><td>Pauta 15: investigación en LMICs debe responder a necesidades locales; Pauta 17: capacidad limitada de consentimiento; Pauta 7: vulnerabilidad por pobreza</td><td><span class="tag tag-h1n1">ALTAMENTE RECOMENDADO</span></td></tr>
+        <tr style="background:rgba(231,76,60,0.06)"><td><strong>Consentimiento en idiomas indígenas</strong></td><td>43.4% población indígena (K&apos;iche&apos; 11.3%, Q&apos;eqchi&apos; 8.3%, Kaqchikel 7.6%, Mam 5.2%)</td><td>Consentimiento en espanol + K&apos;iche&apos;, Q&apos;eqchi&apos;, Kaqchikel, Mam para sitios con &gt;20% indigena. Traduccion culturalmente adaptada. Interprete + testigo para analfabetos (tasa analfabetismo: ~18% nacional, &gt;35% mujeres indigenas rurales)</td><td><span class="tag tag-h3n2">OBLIGATORIO ético</span></td></tr>
         <tr><td><strong>Asentimiento pediatrico</strong></td><td>ICH-E11(R1)</td><td>Menores 7-17: asentimiento + consentimiento tutor. Menores de 7: solo consentimiento paterno</td><td><span class="tag tag-h1n1">OBLIGATORIO si incluye pediatricos</span></td></tr>
-        <tr style="background:rgba(231,76,60,0.06)"><td><strong>Post-trial access</strong></td><td>Helsinki Art. 34, CIOMS Pauta 6</td><td>Plan de acceso post-ensayo al farmaco OBLIGATORIO. En GT (0% acceso a antivirales) esto es eticamente imperativo</td><td><span class="tag tag-h3n2">OBLIGATORIO etico</span></td></tr>
-        <tr><td><strong>IGSS Comite de Etica</strong></td><td>Comite independiente del MSPAS</td><td>Sitios IGSS requieren aprobacion SEPARADA. Proceso paralelo posible</td><td><span class="tag tag-h1n1">OBLIGATORIO para sitios IGSS</span></td></tr>
+        <tr style="background:rgba(231,76,60,0.06)"><td><strong>Post-trial access</strong></td><td>Helsinki Art. 34, CIOMS Pauta 6</td><td>Plan de acceso post-ensayo al fármaco OBLIGATORIO. En GT (0% acceso a antivirales) esto es éticamente imperativo</td><td><span class="tag tag-h3n2">OBLIGATORIO ético</span></td></tr>
+        <tr><td><strong>IGSS Comité de Ética</strong></td><td>Comité independiente del MSPAS</td><td>Sitios IGSS requieren aprobación SEPARADA. Proceso paralelo posible</td><td><span class="tag tag-h1n1">OBLIGATORIO para sitios IGSS</span></td></tr>
         <tr style="background:rgba(231,76,60,0.06)"><td><strong>DSMB independiente</strong></td><td>ICH-E6(R2) s5.5.2, ICH-E9</td><td>Minimo 3 miembros (bioestadistico, infectologo, eticista). Al menos 1 guatemalteco/centroamericano. Charter antes del 1er paciente</td><td><span class="tag tag-h3n2">OBLIGATORIO</span></td></tr>
-        <tr><td><strong>Compensacion participantes</strong></td><td>ICH-GCP 4.8.10, CIOMS Pauta 13</td><td>Reembolso transporte + lucro cesante; NO coercitivo (59.3% pobreza). Q50-150 = 1-3 dias salario minimo rural</td><td><span class="tag tag-h1n1">REQUIERE aprobacion etica</span></td></tr>
+        <tr><td><strong>Compensación participantes</strong></td><td>ICH-GCP 4.8.10, CIOMS Pauta 13</td><td>Reembolso transporte + lucro cesante; NO coercitivo (59.3% pobreza). Q50-150 = 1-3 dias salario mínimo rural</td><td><span class="tag tag-h1n1">REQUIERE aprobación ética</span></td></tr>
       </tbody>
     </table>
     </div>
-    <div class="source" style="margin-top:8px">Fuentes: ICH-GCP E6(R2) 2016; Declaracion de Helsinki WMA 2013; CIOMS 2016; Codigo de Salud Guatemala Decreto 90-97; AG 514-98. Guatemala NO es miembro ICH pero MSPAS adopta ICH-GCP via OPS/OMS. Verificar legislacion especifica post-2010 sobre ensayos clinicos. Ref historica: Reverby SM. J Policy Hist. 2011;23(1):6-28.</div>
+    <div class="source" style="margin-top:8px">Fuentes: ICH-GCP E6(R2) 2016; Declaración de Helsinki WMA 2013; CIOMS 2016; Código de Salud Guatemala Decreto 90-97; AG 514-98. Guatemala NO es miembro ICH pero MSPAS adopta ICH-GCP via OPS/OMS. Verificar legislación específica post-2010 sobre ensayos clínicos. Ref histórica: Reverby SM. J Policy Hist. 2011;23(1):6-28.</div>
   </div>
 
   <!-- Brecha diagnóstica y recomendaciones -->
@@ -1277,7 +1297,7 @@
         <ul style="line-height:1.9;font-size:0.85rem">
           <li>Solo ~25–30% de casos IRA acuden a establecimientos MSPAS (de 52% que busca atención total [OMS GHO 2015]) → subregistro masivo</li>
           <li>RT-PCR solo en LNS (nacional) + VICo → latencia 24-48h → requiere RIDT en sitios</li>
-          <li>Ventana terapéutica: solo ~50% de pacientes llegarán en ≤48h (no 80% en 72h) — auditado</li>
+          <li>Ventana terapéutica: solo ~50% de pacientes llegarán en ≤48h (no 80% en 72h) — <strong>estimación sin fuente local validada</strong> (extrapolada de literatura LMIC general; no existe estudio publicado de tiempo síntoma-a-consulta en IRA en Guatemala). Probable sesgo diferencial: pacientes IGSS (urbanos, asegurados, mayor alfabetismo en salud) probablemente consultan más rápido (~60-70% en ≤48h) vs pacientes MSPAS rurales (~30-40% en ≤48h, por distancia, barreras idiomáticas y costo de transporte). Esta diferencia afecta directamente la elegibilidad por sitio</li>
           <li>VICo 2008-2012: datos de tasas de hospitalización son de hace 14 años, cepa H1N1 pandémica</li>
           <li>Positividad FluNet 27.2% tiene sesgo hospitalario 2-3× (positivity comunitaria est.: ~10-15%)</li>
           <li>Solo 52% de la población busca atención · brecha socioeconómica: Q1=46.5% vs Q5=68.2%</li>
@@ -1329,7 +1349,7 @@
       <h3>📈 "Deuda Inmunitaria" Post-COVID — Señal de Mayor Susceptibilidad 2022–2024</h3>
       <div class="alert alert-success" style="margin-bottom:10px;padding:8px 12px">
         <span class="alert-icon">💡</span>
-        <div style="font-size:0.82rem"><strong>Hallazgo de auditoría (+3.5σ):</strong> El ratio IRA/ETAS (enfermedades gastrointestinales) se elevó de 4.45 histórico a ~5.0 desde 2022 — señal de rebote respiratorio post-COVID superior al gastrointestinal. Indica alta susceptibilidad residual → óptimo para ensayo AHORA antes de que la inmunidad se recupere.</div>
+        <div style="font-size:0.82rem"><strong>Hallazgo de auditoría (+3.5σ):</strong> El ratio IRA/ETAS (enfermedades gastrointestinales) se elevó de 4.45 histórico a ~5.0 desde 2022 — señal de rebote respiratorio post-COVID superior al gastrointestinal. Indica alta susceptibilidad residual en la población. Si esta señal se normaliza en 2-3 años, la carga de IRA podría reducirse, lo cual es relevante para la planificación temporal de cualquier intervención.</div>
       </div>
       <canvas id="chartIRAETAS" style="max-height:280px"></canvas>
       <div class="source">Fuente: MSPAS SIGSA 2012-2024 (IRAs) + ETAS (Enfermedades Transmitidas por Alimentos/Agua). Ratio IRA/ETAS pre-COVID (2012-2021): 4.45 ± 0.15. Post-COVID 2022-2024: 4.98–5.00 = <strong>+3.5 desviaciones estándar</strong> sobre baseline histórico. Interpretación: IRAs están rebotando más rápido que ETAS → "deuda inmunitaria" confirma mayor susceptibilidad respiratoria en población guatemalteca. Implicación ensayo: 2025-2026 = ventana óptima antes de recuperación inmune completa.</div>
@@ -1339,7 +1359,7 @@
       <h3>💉 Cobertura Multi-Vacuna Guatemala 2013–2024 — Contexto: Sin Vacuna Anti-Influenza</h3>
       <div class="alert alert-danger" style="margin-bottom:10px;padding:8px 12px">
         <span class="alert-icon">🚨</span>
-        <div style="font-size:0.82rem">PCV3 (antineumocócica) cubre 89% pediátrico pero <strong>no existe programa nacional de vacunación anti-influenza</strong>. Cobertura influenza = 0% todos los años. Esto diferencia el contexto GT del trial MA donde 49.5% ya están vacunados. Oportunidad: ensayo con antiviral puede actuar como "<em>sustituto terapéutico de la vacuna</em>".</div>
+        <div style="font-size:0.82rem">PCV3 (antineumocócica) cubre 89% pediátrico pero <strong>no existe programa nacional de vacunación anti-influenza</strong>. Cobertura influenza = 0% todos los años. Esto diferencia el contexto GT del trial MA donde 49.5% ya están vacunados. La ausencia de vacuna implica que un antiviral se evaluaría en población completamente naive, lo cual es metodológicamente relevante pero <em>no reemplaza la necesidad de un programa nacional de vacunación</em>.</div>
       </div>
       <canvas id="chartMultiVaccine" style="max-height:280px"></canvas>
       <div class="source">Fuente: WHO GHO Guatemala — WHO_GHO_Guatemala_vaccine_coverage.csv. PCV3: programa iniciado 2013 (72%) → pico 2017 (93%) → COVID colapso 2021 (79%) → recuperación 2024 (89%). DTP3 2024: 81% (decline). Rotavirus 2024: 80% (declining). Influenza: 0% todos los años — sin programa MSPAS.</div>
@@ -1481,7 +1501,7 @@
     <h3>📐 Cálculo Formal de Poder Estadístico — Determinación del Endpoint Primario</h3>
     <div class="alert alert-danger" style="margin-bottom:12px">
       <span class="alert-icon">🚨</span>
-      <div><strong>HALLAZGO CRÍTICO (Auditoría 4ª, 2026-03-12):</strong> La meta de 1,000 pacientes NO tenía cálculo formal de poder. 1,000 pts es viable <strong>SOLO</strong> si el endpoint primario es <strong>tiempo a resolución de síntomas</strong> (como CAPSTONE-1/2 y oseltamivir pivotal). Mortalidad y hospitalización como primarios requieren N=2,100–8,700. <em>Nota GCP: todo cálculo de poder debe ser validado por bioestadístico independiente y documentado en el protocolo conforme ICH-E9.</em></div>
+      <div><strong>HALLAZGO CRÍTICO (Auditoría 4ª, 2026-03-12):</strong> La meta de 1,000 pacientes NO tenía cálculo formal de poder. 1,000 pts es viable <strong>SOLO</strong> si el endpoint primario es <strong>tiempo a resolución de síntomas</strong> (como CAPSTONE-1/2 y oseltamivir pivotal). Mortalidad como primario requiere N=1,490–6,926; hospitalización -25% requiere N&asymp;28,880. <em>Nota GCP: todo cálculo de poder debe ser validado por bioestadístico independiente y documentado en el protocolo conforme ICH-E9.</em></div>
     </div>
     <div style="overflow-x:auto">
     <table class="data-table" style="font-size:0.82rem">
@@ -1501,7 +1521,7 @@
           <td><strong>Tiempo resolución síntomas -30%</strong></td>
           <td>~80h mediana placebo (CAPSTONE-1: 80.2h; oseltamivir pivotal: 80-97h) — en GT sin tratamiento previo antiviral podría ser mayor (~96-120h) por acceso tardío y comorbilidades</td>
           <td>HR=1.30 (CAPSTONE-1: 1.36 [IC95% 1.17-1.58]; CAPSTONE-2: 1.30 alto riesgo)</td>
-          <td><strong>600</strong> (480 eventos + 20% dropout) — log-rank: d=4(1.96+0.84)&sup2;/[ln(1.30)]&sup2;=454 eventos</td>
+          <td><strong>600</strong> (454 eventos / 0.95 event rate / 0.80 retention &asymp; 598) — log-rank: d=4(1.96+0.84)&sup2;/[ln(1.30)]&sup2;=454 eventos</td>
           <td style="color:#27ae60;font-weight:700">~95%</td>
           <td>~4-5 (referencia: oseltamivir NNT=~6 para reducir 1 día síntomas)</td>
           <td><span class="tag tag-h1n1">RECOMENDADO</span></td>
@@ -1519,8 +1539,8 @@
           <td>Mortalidad intrahospitalaria -50%</td>
           <td>6% CFR (VICo 2008-12) — caveat: dato de 14 años, era H1N1 pandémica; CFR actual podría ser 3-8% dependiendo de cepa y sitio; oseltamivir no mostró reducción mortalidad significativa en RCTs ambulatorios (solo en observacionales de hospitalizados)</td>
           <td>RR=0.50 (→3%) — efecto muy ambicioso; ningún antiviral ha demostrado 50% reducción mortalidad en RCT</td>
-          <td><strong>2,078</strong></td>
-          <td style="color:#e67e22">~64%</td>
+          <td><strong>1,490</strong> [corregido: N=2&times;(Z&alpha;+Z&beta;)&sup2;(p&sub1;q&sub1;+p&sub2;q&sub2;)/&delta;&sup2; = 2&times;745; prev. 2,078 era error]</td>
+          <td style="color:#e67e22">~63%</td>
           <td>33</td>
           <td>Solo como secundario (exploratorio)</td>
         </tr>
@@ -1528,17 +1548,17 @@
           <td>Mortalidad intrahospitalaria -25%</td>
           <td>6% CFR (caveat: ver arriba)</td>
           <td>RR=0.75 (→4.5%)</td>
-          <td><strong>8,678</strong></td>
-          <td style="color:#c0392b">~15%</td>
+          <td><strong>6,926</strong> [corregido: prev. 8,678 sobreestimaba ~25%]</td>
+          <td style="color:#c0392b">~19%</td>
           <td>67</td>
           <td><span class="tag tag-h3n2">NO VIABLE como primario</span></td>
         </tr>
         <tr>
           <td>Hospitalización -25%</td>
           <td>~1.5% de ILI ambulatorio (oseltamivir redujo hosp. ~59% en meta-análisis Dobson 2015 — pero solo observacional, no RCT)</td>
-          <td>RR=0.75</td>
-          <td><strong>8,678+</strong></td>
-          <td style="color:#c0392b">~15%</td>
+          <td>RR=0.75 (&rarr;1.125%)</td>
+          <td><strong>28,880</strong> [corregido: prev. 8,678 era copy-paste de mortalidad; baseline 1.5% requiere N masivo]</td>
+          <td style="color:#c0392b">~8%</td>
           <td>267</td>
           <td><span class="tag tag-h3n2">NO VIABLE como primario</span></td>
         </tr>
@@ -1548,11 +1568,11 @@
     <div style="margin-top:12px;padding:10px;background:#e8f8f5;border-radius:6px;font-size:0.82rem;border-left:4px solid #27ae60">
       <strong>Diseño recomendado (sujeto a validación por bioestadístico independiente):</strong><br>
       <strong>Primario:</strong> Tiempo desde inicio de tratamiento hasta resolución de síntomas (score FLU-PRO &le;1 o equivalente validado por &ge;24h). N=1,000 &rarr; ~95% poder para HR=1.30 (randomización 1:1, 500 por brazo). Asume mediana placebo ~80-120h según población GT.<br>
-      <strong>Secundarios:</strong> (a) Proporción hospitalizada a 28d (exploratorio); (b) Mortalidad a 28d (exploratorio, poder ~64% con N=1,000 solo si CFR &ge;6%); (c) Negativización viral por RT-PCR (submuestra en &ge;3 sitios centinela con PCR cuantitativa); (d) Tiempo a negativización RIDT.<br>
+      <strong>Secundarios:</strong> (a) Proporción hospitalizada a 28d (exploratorio); (b) Mortalidad a 28d (exploratorio, poder ~63% con N=1,000 asumiendo CFR 6%&rarr;3% [RR=0.50]; N&asymp;1,490 para 80% poder); (c) Negativización viral por RT-PCR (submuestra en &ge;3 sitios centinela con PCR cuantitativa); (d) Tiempo a negativización RIDT.<br>
       <strong>Interino:</strong> Futilidad al 50% (N=500) con Lan-DeMets O'Brien-Fleming, alpha-spending function. <strong>DSMB independiente obligatorio (ICH-E9 / ICH-E6 R2 s5.5.2)</strong>: m&iacute;nimo 3 miembros (bioestadístico, clínico infectólogo, eticista), independientes del sponsor y PI. Triggers de parada: mortalidad diferencial &gt;3%, SAE &gt;10%, dropout &gt;25%, se&ntilde;al de hepatotoxicidad. Plan de monitoreo de seguridad debe ser aprobado antes del primer paciente.<br>
       <strong>Referencia ensayos pivotales:</strong> CAPSTONE-1 baloxavir (N=1,436, HR=1.36 [1.17-1.58] ambulatorio sin riesgo); CAPSTONE-2 baloxavir alto riesgo (N=2,184, HR=1.30); Oseltamivir pivotal Treanor 2000 (N=629, reducción ~30% duración síntomas); Hayden 1999 (N=726). Nota: todos estos ensayos fueron en pa&iacute;ses de alto ingreso con acceso temprano &le;48h &mdash; la extrapolación a GT requiere ajuste por tiempo a consulta mayor.
     </div>
-    <div class="source" style="margin-top:8px">Fórmulas: Test proporciones (mortalidad): N=[Z_&alpha;/2&radic;(2p&#772;q&#772;)+Z_&beta;&radic;(p&#8321;q&#8321;+p&#8322;q&#8322;)]&sup2;/&delta;&sup2;. Log-rank (tiempo): d=4(Z_&alpha;/2+Z_&beta;)&sup2;/[ln(HR)]&sup2;. &alpha;=0.05 dos colas, &beta;=0.20 (80% poder). Dropout: 20% (conservador para GT &mdash; puede ser 25-30% en sitios rurales). Fuente baseline: VICo 2008-12 (CFR 6% &mdash; dato antiguo, verificar), literatura oseltamivir/baloxavir (resolución placebo ~80-97h, NO ~7 d&iacute;as como indicado originalmente). Referencia f&oacute;rmulas: Schoenfeld 1983 (log-rank), Fleiss 1981 (proporciones). <strong>Nota: estos c&aacute;lculos deben ser reproducidos en software validado (nQuery, PASS, o R/gsDesign) antes de incluirse en protocolo.</strong></div>
+    <div class="source" style="margin-top:8px">Fórmulas: Test proporciones (mortalidad): N=[Z_&alpha;/2&radic;(2p&#772;q&#772;)+Z_&beta;&radic;(p&#8321;q&#8321;+p&#8322;q&#8322;)]&sup2;/&delta;&sup2;. Log-rank (tiempo): d=4(Z_&alpha;/2+Z_&beta;)&sup2;/[ln(HR)]&sup2;. &alpha;=0.05 dos colas, &beta;=0.20 (80% poder). Dropout: 20% (conservador para GT &mdash; puede ser 25-30% en sitios rurales). Fuente baseline: VICo 2008-12 (CFR 6% &mdash; dato antiguo, verificar), literatura oseltamivir/baloxavir (resolución placebo ~80-97h, NO ~7 d&iacute;as como indicado originalmente). Referencia f&oacute;rmulas: Schoenfeld 1983 (log-rank), Fleiss 1981 (proporciones). <strong>Nota: estos c&aacute;lculos deben ser reproducidos en software validado (nQuery, PASS, o R/gsDesign) antes de incluirse en protocolo.</strong> <em>Auditor&iacute;a 2026-03-17: corregidos N mortalidad -50% (2,078&rarr;1,490), mortalidad -25% (8,678&rarr;6,926), hospitalizaci&oacute;n -25% (8,678&rarr;28,880 — era copy-paste de mortalidad), evento-count row 1 (480&rarr;454). Poder a N=1,000 verificado. F&oacute;rmula proporciones usada: N=2&times;(Z&alpha;/2+Z&beta;)&sup2;&times;(p1q1+p2q2)/&delta;&sup2; (Fleiss 1981 sin continuidad; con Yates correction los N ser&iacute;an ~5-10% mayores).</em></div>
   </div>
 
   <!-- ===== SECCIÓN: FUNNEL CORREGIDO (Auditoría 4ª) ===== -->
@@ -1573,7 +1593,7 @@
         <tr><td>Buscan atención (52%)</td><td>442,887</td><td>182,000</td><td>WHO GHO 52%</td></tr>
         <tr><td>En facilities del ensayo (20%)</td><td>88,577</td><td>36,400</td><td>Solo MSPAS+IGSS con capacidad Dx</td></tr>
         <tr><td>Confirmados Dx</td><td>70,862 (80%)</td><td style="color:#e67e22">21,840 (60%)</td><td>RIDT sensibilidad real 50-70% (no 80%)</td></tr>
-        <tr><td>Ventana terapéutica</td><td>56,689 (80% ≤72h)</td><td style="color:#c0392b">10,920 (50% ≤48h)</td><td>Requisito real: ≤48h, no ≤72h</td></tr>
+        <tr><td>Ventana terapéutica</td><td>56,689 (80% ≤72h)</td><td style="color:#c0392b">10,920 (50% ≤48h)</td><td>Requisito real: ≤48h, no ≤72h. El 50% es estimación sin dato local publicado; probable rango 30-70% según tipo de sitio (IGSS urbano vs MSPAS rural)</td></tr>
         <tr><td>Dispuestos a participar (75%)</td><td>42,517</td><td>8,190</td><td>75% consent rate</td></tr>
         <tr style="background:#fdf2f2"><td><strong>Post-exclusiones clínicas</strong></td><td><em>no incluido</em></td><td style="color:#c0392b"><strong>~6,962/año</strong></td><td>-15% por embarazo, renal, hepático, &lt;1 año, sin tutor</td></tr>
       </tbody>
@@ -1638,10 +1658,10 @@
 
   <!-- ===== SECCIÓN: ANÁLISIS PROFUNDO IGSS — DISEÑO DE ENSAYO CLÍNICO (2026-03-16) ===== -->
   <div class="chart-card" style="margin-top:20px">
-    <h3>&#128300; Analisis Profundo Red IGSS — Factibilidad de Reclutamiento para Ensayo Clinico Antiviral</h3>
+    <h3>&#128300; Análisis Profundo Red IGSS — Factibilidad de Reclutamiento para Ensayo Clínico Antiviral</h3>
     <div class="alert alert-danger" style="margin-bottom:12px">
       <span class="alert-icon">&#9888;&#65039;</span>
-      <div><strong>NUEVA SECCION (2026-03-16):</strong> Analisis integrado de TODOS los datos IGSS (Oficios EPI 60/2026) — 8 hospitales, 9,180+ pacientes, 2024-2026. Incluye: factibilidad de reclutamiento por sitio, ventanas optimas de enrollment, estrategia PCR vs RIDT, dinamica Flu A/B, anomalia Ceibal, senal de expansion geografica y comparacion IGSS vs MSPAS/FluNet. Datos granulares mensuales integrados por primera vez.</div>
+      <div><strong>NUEVA SECCIÓN (2026-03-16):</strong> Análisis integrado de TODOS los datos IGSS (Oficios EPI 60/2026) — 8 hospitales, 9,180+ pacientes, 2024-2026. Incluye: factibilidad de reclutamiento por sitio, ventanas óptimas de enrollment, estrategia PCR vs RIDT, dinámica Flu A/B, anomalía Ceibal, señal de expansión geografica y comparación IGSS vs MSPAS/FluNet. Datos granulares mensuales integrados por primera vez.</div>
     </div>
   </div>
 
@@ -1650,7 +1670,7 @@
     <h3>A. Factibilidad de Reclutamiento por Sitio IGSS</h3>
     <div class="alert alert-info" style="margin-bottom:12px">
       <span class="alert-icon">&#128202;</span>
-      <div><strong>Metodologia:</strong> Para cada hospital IGSS, se calcula: (1) pacientes testados/mes, (2) positivos/mes por temporada, (3) elegibles para ensayo aplicando filtros secuenciales: positivo influenza &rarr; &le;48h desde inicio sintomas (50%) &rarr; consentimiento (75%) &rarr; sin exclusiones clinicas (85%). <strong>Screening-to-enrollment ratio estimado: 15-25%</strong> (ref: CAPSTONE-1 ~25%).</div>
+      <div><strong>Metodología:</strong> Para cada hospital IGSS, se calcula: (1) pacientes testados/mes, (2) positivos/mes por temporada, (3) elegibles para ensayo aplicando filtros secuenciales: positivo influenza &rarr; &le;48h desde inicio síntomas (50%) &rarr; consentimiento (75%) &rarr; sin exclusiones clínicas (85%). <strong>Screening-to-enrollment ratio estimado: 15-25%</strong> (ref: CAPSTONE-1 ~25%).</div>
     </div>
     <div style="overflow-x:auto">
     <table class="data-table" style="font-size:0.78rem">
@@ -1660,12 +1680,12 @@
           <th>Periodo datos</th>
           <th>Tests totales</th>
           <th>Positivos (tasa)</th>
-          <th>Metodologia Dx</th>
+          <th>Metodología Dx</th>
           <th>Pico: positivos/mes</th>
           <th>Off-peak: positivos/mes</th>
           <th>Elegibles/mes pico*</th>
           <th>Elegibles/mes off-peak*</th>
-          <th>Contribucion estimada a N=1,000</th>
+          <th>Contribución estimada a N=1,000</th>
           <th>Tier</th>
         </tr>
       </thead>
@@ -1754,7 +1774,7 @@
           <td>101</td>
           <td>1 (1.0%)</td>
           <td>PCR (SUSPENDIDO 2025)</td>
-          <td colspan="5" style="color:#c0392b"><em>PCR suspendida en 2025. NO viable para ensayo sin reactivacion de laboratorio.</em></td>
+          <td colspan="5" style="color:#c0392b"><em>PCR suspendida en 2025. NO viable para ensayo sin reactivación de laboratorio.</em></td>
           <td><span class="tag" style="background:#eee">INACTIVO</span></td>
         </tr>
         <tr style="background:#f5f5f5">
@@ -1763,15 +1783,15 @@
           <td>0</td>
           <td>0</td>
           <td>Sin capacidad</td>
-          <td colspan="5" style="color:#c0392b"><em>SIN capacidad diagnostica. Requiere infraestructura completa.</em></td>
+          <td colspan="5" style="color:#c0392b"><em>SIN capacidad diagnóstica. Requiere infraestructura completa.</em></td>
           <td><span class="tag" style="background:#eee">NO VIABLE</span></td>
         </tr>
       </tbody>
     </table>
     </div>
     <div class="source" style="margin-top:8px">
-      <strong>*Calculo elegibles/mes pico:</strong> Positivos/mes x 50% (&le;48h ventana) x 75% (consentimiento) x 85% (sin exclusion clinica) = ~31.9% de positivos. Ejemplo HGE: 60 positivos/mes pico x 0.319 = 19.1 elegibles/mes.
-      <br><strong>Screening-to-enrollment:</strong> De todos los testeados, se espera enrollar ~3-5% (positivos x elegibilidad). HGE: 402 tests/mes pico x 4.7% = 19 enrollados/mes — consistente.
+      <strong>*Cálculo elegibles/mes pico:</strong> Positivos/mes x 50% (&le;48h ventana) x 75% (consentimiento) x 85% (sin exclusión clínica) = ~31.9% de positivos. Ejemplo HGE: 60 positivos/mes pico x 0.319 = 19.1 elegibles/mes.
+      <br><strong>Screening-to-enrollment:</strong> De todos los testeados, se espera enrollar ~3-5% (positivos x elegibilidad). HGE: 402 tests/mes pico x 4.7% = 19 enrollados/mes — consistente. [Nota: el 4.7% usa positivity del mes pico (60/402=14.9%) &times; 0.319, no el promedio anual de 12.7%.]
       <br><strong>Fuente:</strong> Oficios EPI 60/2026, datos individuales por hospital IGSS. Datos de HGE: igss_analysis.json (3,677 pacientes PCR verificados).
     </div>
   </div>
@@ -1792,8 +1812,8 @@
       </div>
       <div class="kpi">
         <div class="label">IGSS solo: meses para N=1,000</div>
-        <div class="value">~24-30</div>
-        <div class="sub">6 meses pico (300) + 6 off-peak (48) = ~350/ano. Requiere 2.5-3 anos SOLO IGSS</div>
+        <div class="value">~30-36</div>
+        <div class="sub">6 meses pico (300) + 6 off-peak (48) = ~348/a&ntilde;o &rarr; ~2.9 a&ntilde;os SOLO IGSS [corregido: prev. decía 24-30]</div>
       </div>
       <div class="kpi success">
         <div class="label">IGSS + MSPAS Tier 1: meses para N=1,000</div>
@@ -1802,13 +1822,13 @@
       </div>
     </div>
     <div style="margin-top:10px;padding:10px;background:#fff8e1;border-radius:6px;font-size:0.82rem">
-      <strong>Conclusion A:</strong> La red IGSS SOLA no puede alcanzar N=1,000 en un plazo razonable (&lt;18 meses). HGE y Antigua son los unicos sitios con volumen significativo. Se REQUIERE combinar con sitios MSPAS (SJD, Roosevelt, VICo Cuilapa, VICo Quetzaltenango) para alcanzar la meta. IGSS aporta ~35% del reclutamiento total. CAMIP (pensionados) tiene positividad muy baja (2.1%) — el costo de screening supera el beneficio a menos que se enfoque en adultos mayores como subgrupo de interes.
+      <strong>Conclusión A:</strong> La red IGSS SOLA no puede alcanzar N=1,000 en un plazo razonable (&lt;18 meses). HGE y Antigua son los unicos sitios con volumen significativo. Se REQUIERE combinar con sitios MSPAS (SJD, Roosevelt, VICo Cuilapa, VICo Quetzaltenango) para alcanzar la meta. IGSS aporta ~35% del reclutamiento total. CAMIP (pensionados) tiene positividad muy baja (2.1%) — el costo de screening supera el beneficio a menos que se enfoque en adultos mayores como subgrupo de interes.
     </div>
   </div>
 
   <!-- B. OPTIMAL ENROLLMENT WINDOWS -->
   <div class="chart-card" style="margin-top:20px">
-    <h3>B. Ventanas Optimas de Enrollment — Analisis Mensual Multi-Hospital</h3>
+    <h3>B. Ventanas Óptimas de Enrollment — Análisis Mensual Multi-Hospital</h3>
     <div style="overflow-x:auto">
     <table class="data-table" style="font-size:0.78rem">
       <thead>
@@ -1818,7 +1838,7 @@
           <th>HGE positive count (avg)</th>
           <th>Antigua positivity 2025</th>
           <th>FluNet SENTINEL avg</th>
-          <th>Clasificacion</th>
+          <th>Clasificación</th>
         </tr>
       </thead>
       <tbody>
@@ -1839,36 +1859,36 @@
     </div>
     <div style="margin-top:12px;padding:12px;background:#e8f8f5;border-radius:6px;font-size:0.82rem;border-left:4px solid #27ae60">
       <strong>Hallazgos clave sobre estacionalidad:</strong><br>
-      <strong>1. Patron bimodal confirmado:</strong> Pico principal Ene-Mar (positividad 13-29% IGSS, 18-25% FluNet) + pico secundario variable (Jul en HGE 2025, Nov-Dic en Antigua 2025). El patron NO es identico entre sitios.<br>
-      <strong>2. Discordancia inter-sitio:</strong> HGE pico Jul 2025 (15% positivity, 60 positivos) vs Antigua pico Dic 2025 (37.7%, 72 positivos) vs FluNet pico Mar historico (25.4%). Esto FAVORECE enrollment continuo: siempre hay algun sitio en temporada activa.<br>
+      <strong>1. Patrón bimodal confirmado:</strong> Pico principal Ene-Mar (positividad 13-29% IGSS, 18-25% FluNet) + pico secundario variable (Jul en HGE 2025, Nov-Dic en Antigua 2025). El patron NO es identico entre sitios.<br>
+      <strong>2. Discordancia inter-sitio:</strong> HGE pico Jul 2025 (15% positivity, 60 positivos) vs Antigua pico Dic 2025 (37.7%, 72 positivos) vs FluNet pico Mar histórico (25.4%). Esto FAVORECE enrollment continuo: siempre hay algún sitio en temporada activa.<br>
       <strong>3. Valle universal:</strong> Agosto es consistentemente el mes mas bajo (7.2% IGSS, 7.5% FluNet). Enrollment en agosto sera minimo en toda la red.<br>
-      <strong>4. Variabilidad interanual extrema:</strong> Enero 2024 = 52.5% (HGE) vs Enero 2025 = 10.9% (HGE). NO se puede garantizar que el proximo enero sea pico.<br>
+      <strong>4. Variabilidad interanual extrema:</strong> Enero 2024 = 52.5% (HGE) vs Enero 2025 = 10.9% (HGE). NO se puede garantizar que el próximo enero sea pico.<br>
       <strong>5. Enrollment year-round vs peak-only:</strong><br>
       &bull; Peak-only (Ene-Mar + Nov-Dic = 5 meses): ~250 pts/ciclo desde IGSS &rarr; necesita 4 ciclos (2 anos peak-only)<br>
-      &bull; Year-round: ~350 pts/ano IGSS &rarr; 2.5-3 anos. Diferencia: 6 meses mas rapido con year-round por capturar picos secundarios<br>
-      &bull; <strong>Recomendacion:</strong> Year-round enrollment con staffing reforzado Ene-Mar y Dic. El costo de mantener sitios activos en off-peak se justifica por la variabilidad inter-sitio.
+      &bull; Year-round: ~350 pts/ano IGSS &rarr; 2.5-3 años. Diferencia: 6 meses mas rapido con year-round por capturar picos secundarios<br>
+      &bull; <strong>Recomendación:</strong> Year-round enrollment con staffing reforzado Ene-Mar y Dic. El costo de mantener sitios activos en off-peak se justifica por la variabilidad inter-sitio.
     </div>
   </div>
 
   <!-- C. PCR vs RAPID TEST IMPLICATIONS -->
   <div class="chart-card" style="margin-top:20px">
-    <h3>C. Implicaciones PCR vs Prueba Rapida (RIDT) para Screening del Ensayo</h3>
+    <h3>C. Implicaciones PCR vs Prueba Rápida (RIDT) para Screening del Ensayo</h3>
     <div style="overflow-x:auto">
     <table class="data-table" style="font-size:0.8rem">
       <thead>
         <tr>
-          <th>Metrica</th>
+          <th>Métrica</th>
           <th>PCR (RT-PCR)</th>
-          <th>RIDT (Prueba rapida antigeno)</th>
+          <th>RIDT (Prueba rápida antígeno)</th>
           <th>Evidencia IGSS</th>
-          <th>Implicacion ensayo</th>
+          <th>Implicación ensayo</th>
         </tr>
       </thead>
       <tbody>
         <tr>
           <td><strong>Sensibilidad</strong></td>
           <td>95-99%</td>
-          <td>50-70% (meta-analisis Chartrand 2012)</td>
+          <td>50-70% (meta-análisis Chartrand 2012)</td>
           <td>Antigua PCR: 5.4% positivity vs RIDT: 17.7% en misma poblacion &rarr; sugiere RIDT sobrestima O PCR subestima por muestra tardia</td>
           <td>RIDT pierde 30-50% de verdaderos positivos</td>
         </tr>
@@ -1909,14 +1929,14 @@
       <strong>Paso 2 — PCR confirmatorio (hora 0-6):</strong> Solo a pacientes RIDT+. Resultado en 4-6h (si PCR in-situ en HGE, Ceibal) o 24-48h (si envio a LNS desde Antigua, CAMIP). Enrollment condicional: administrar primera dosis IMP tras RIDT+ con PCR pendiente; discontinuar si PCR negativo.<br>
       <strong>Impacto en sample size:</strong><br>
       &bull; Falsos negativos RIDT (30-50%): perdemos 30-50% de verdaderos positivos en screening. Mitigation: usar RIDT de alta sensibilidad (Xpert Xpress Flu: sens 98.2%) o multiplex molecular rapido en sitios Tier 1.<br>
-      &bull; Falsos positivos RIDT (~5-10%): Enrollar RIDT+ sin PCR confirm a sesgo de inclusion ~5-10% de no-influenza &rarr; dilucion del efecto del farmaco &rarr; aumento de N requerido ~10%.<br>
+      &bull; Falsos positivos RIDT (~5-10%): Enrollar RIDT+ sin PCR confirm a sesgo de inclusion ~5-10% de no-influenza &rarr; dilucion del efecto del fármaco &rarr; aumento de N requerido ~10%.<br>
       &bull; <strong>Si RIDT sensibilidad = 60%: necesitamos screenar 1,667 pacientes RIDT+ para obtener 1,000 verdaderos positivos confirmados por PCR.</strong> Esto agrega ~$15k-25k al presupuesto diagnostico (667 PCR adicionales en pacientes que resultaran negativos).
     </div>
   </div>
 
   <!-- D. FLU A vs FLU B DYNAMICS -->
   <div class="chart-card" style="margin-top:20px">
-    <h3>D. Dinamica Flu A vs Flu B — Datos IGSS 2024-2026</h3>
+    <h3>D. Dinámica Flu A vs Flu B — Datos IGSS 2024-2026</h3>
     <div style="overflow-x:auto">
     <table class="data-table" style="font-size:0.8rem">
       <thead>
@@ -1942,19 +1962,19 @@
     </table>
     </div>
     <div style="margin-top:12px;padding:12px;background:#f8f9fa;border-radius:6px;font-size:0.82rem">
-      <strong>Analisis:</strong><br>
-      <strong>1. Eliminacion de Flu B (B/Yamagata):</strong> OMS declaro extincion del linaje B/Yamagata en 2024. Los datos IGSS confirman: Flu B paso de 28-68% en 2024 a 0-5% en 2025 en TODOS los hospitales. Solo quedan B/Victoria (raro). Para el ensayo 2026-2027, Flu B sera insignificante (&lt;3% del total).<br>
-      <strong>2. Flu A homogeneidad:</strong> En 2025-2026, H3N2 representa 84-97% de Flu A subtipificada. Esto es una VENTAJA: cohorte virologicamente homogenea &rarr; menor varianza en respuesta al farmaco &rarr; mayor poder estadistico sin necesidad de estratificar por subtipo.<br>
+      <strong>Análisis:</strong><br>
+      <strong>1. Eliminación de Flu B (B/Yamagata):</strong> OMS declaró extinción del linaje B/Yamagata en 2024. Los datos IGSS confirman: Flu B paso de 28-68% en 2024 a 0-5% en 2025 en TODOS los hospitales. Solo quedan B/Victoria (raro). Para el ensayo 2026-2027, Flu B sera insignificante (&lt;3% del total). <strong>Caveat diagnostico:</strong> las pruebas rapidas de antigeno (RIDT) tienen sensibilidad menor para Influenza B que para Influenza A (meta-análisis Chartrand 2012: sens. Flu B ~53% vs Flu A ~62%). La "desaparicion" de Flu B en sitios que usan RIDT (Antigua, CAMIP) podria estar parcialmente amplificada por menor sensibilidad del test. En HGE (PCR, sens. &gt;95% para ambos tipos), Flu B también cayo a 0.6% (2/320), confirmando la tendencia real — pero los datos RIDT deben interpretarse con esta limitacion.<br>
+      <strong>2. Flu A homogeneidad:</strong> En 2025-2026, H3N2 representa 84-97% de Flu A subtipificada. Esto es una VENTAJA: cohorte virologicamente homogenea &rarr; menor varianza en respuesta al fármaco &rarr; mayor poder estadistico sin necesidad de estratificar por subtipo.<br>
       <strong>3. Recomendacion de targeting:</strong><br>
-      &bull; <strong>Opcion A (recomendada): "Any influenza" con analisis pre-especificado por tipo.</strong> Enrollment: Flu A + Flu B (si aparece). Endpoint primario: ITT. Sub-analisis por tipo/subtipo. Maximiza enrollment sin perder poder.<br>
-      &bull; <strong>Opcion B: "Flu A only".</strong> Excluye &lt;5% de la cohorte en 2025-2026. Casi identico a Opcion A en la practica actual. Pero si Flu B resurge (B/Victoria), perder 5-15% de enrollment.<br>
-      &bull; <strong>NO se recomienda estratificar por tipo como factor de randomizacion</strong> dado que Flu B sera &lt;5%. Incluir como covariable en analisis ajustado.
+      &bull; <strong>Opción A (recomendada): "Any influenza" con análisis pre-especificado por tipo.</strong> Enrollment: Flu A + Flu B (si aparece). Endpoint primario: ITT. Sub-análisis por tipo/subtipo. Maximiza enrollment sin perder poder.<br>
+      &bull; <strong>Opción B: "Flu A only".</strong> Excluye &lt;5% de la cohorte en 2025-2026. Casi identico a Opción A en la practica actual. Pero si Flu B resurge (B/Victoria), perder 5-15% de enrollment.<br>
+      &bull; <strong>NO se recomienda estratificar por tipo como factor de randomización</strong> dado que Flu B sera &lt;5%. Incluir como covariable en análisis ajustado.
     </div>
   </div>
 
   <!-- E. THE CEIBAL ANOMALY -->
   <div class="chart-card" style="margin-top:20px">
-    <h3>E. Anomalia Ceibal — Caida del 93% en Volumen de Testing</h3>
+    <h3>E. Anomalía Ceibal — Caida del 93% en Volumen de Testing</h3>
     <div class="kpi-grid" style="grid-template-columns: repeat(4, 1fr)">
       <div class="kpi danger">
         <div class="label">Ceibal 2024: tests</div>
@@ -1982,23 +2002,23 @@
       <strong>1. Cambio de protocolo de testing (MAS PROBABLE):</strong> En 2024 se testaba ampliamente (screening de baja sospecha, ~2% positivity = alta NNT). En 2025, probable cambio a testing dirigido: solo pacientes con alta sospecha clinica &rarr; baja volumen, sube positivity. Esto es consistente con la tendencia IGSS de "racionalizar" PCR (ver: Tiquisate suspendida en 2025).<br>
       <strong>2. Restriccion presupuestaria:</strong> El costo PCR (~$20-50/test) x 2,159 tests = $43,000-108,000/ano. Reducir a 152 tests ahorra $40k-105k. Consistente con suspension de Tiquisate en mismo periodo.<br>
       <strong>3. Cambio de personal/equipamiento:</strong> Salida de personal de laboratorio o falla de equipo PCR no reparada.<br>
-      <strong>Implicacion para ensayo:</strong><br>
+      <strong>Implicación para ensayo:</strong><br>
       &bull; La positivity de 20.4% en Ceibal 2025 demuestra que <strong>targeted testing es 10x mas eficiente</strong>. Si el ensayo implementa screening dirigido (ILI definition + &le;48h window), la positivity del pool de screening sera 15-25%, NO el 2% de testing masivo.<br>
-      &bull; <strong>Lesson learned:</strong> Usar criterios clinicos estrictos (Fiebre &ge;38C + tos o dolor de garganta + &le;48h sintomas) como pre-screen antes de RIDT maximiza yield y minimiza costos diagnosticos.<br>
+      &bull; <strong>Lesson learned:</strong> Usar criterios clínicos estrictos (Fiebre &ge;38C + tos o dolor de garganta + &le;48h sintomas) como pre-screen antes de RIDT maximiza yield y minimiza costos diagnósticos.<br>
       &bull; Ceibal como sitio del ensayo: volumen actual (13/mes) es bajo pero positivity alta. Si se reactiva volumen de screening a 50-100/mes con criterios ILI, podria aportar 10-20 positivos/mes &rarr; 3-6 elegibles/mes.
     </div>
   </div>
 
   <!-- F. GEOGRAPHIC EXPANSION SIGNAL -->
   <div class="chart-card" style="margin-top:20px">
-    <h3>F. Senal de Expansion Geografica — Brote H3N2 Marzo 2026</h3>
+    <h3>F. Señal de Expansión Geográfica — Brote H3N2 Marzo 2026</h3>
     <div class="alert alert-danger" style="margin-bottom:12px">
       <span class="alert-icon">&#9888;&#65039;</span>
-      <div><strong>Convergencia de senales epidemiologicas (Marzo 2026):</strong><br>
+      <div><strong>Convergencia de señales epidemiológicas (Marzo 2026):</strong><br>
         &bull; <strong>Amates, Izabal:</strong> 59% positivity (10/17) en Mar 2026 — brote activo H3N2 en costa atlantica<br>
         &bull; <strong>FluNet SENTINEL SE8/2026:</strong> 55.4% positivity nacional — nivel "Alto" segun MEM<br>
         &bull; <strong>HGE IGSS Dic 2025:</strong> 20.4% positivity (42/206) — duplico el promedio anual<br>
-        &bull; <strong>Antigua Dic 2025:</strong> 37.7% (72/191) — maximo historico del hospital<br>
+        &bull; <strong>Antigua Dic 2025:</strong> 37.7% (72/191) — máximo histórico del hospital<br>
         &bull; <strong>Hospital SJD:</strong> +390% hospitalizaciones ene-feb 2026 vs 2025 (fuente: MSPAS sala situacional)
       </div>
     </div>
@@ -2009,27 +2029,27 @@
       &bull; <strong>El brote valida la factibilidad:</strong> >55% positivity demuestra que Guatemala tiene pool de pacientes masivo. Si H3N2 sigue dominando (como en hemisferio sur 2025), la temporada 2027 sera igualmente intensa.<br>
       &bull; <strong>Urgencia de accion AHORA:</strong> (a) Iniciar tramites regulatorios MSPAS inmediatamente (Abr 2026), (b) Pre-calificar sitios durante el brote actual (observacional), (c) Pilotar RIDT + PCR en 2-3 sitios para calibrar screening-to-enrollment antes del ensayo formal.<br>
       &bull; <strong>Riesgo: inmunidad de rebano post-brote.</strong> Si >30% de la poblacion se infecta en Ene-Mar 2026, la positivity en 2027 podria ser menor. PERO: 0% vacunacion + variabilidad antigenica H3N2 + inmunidad natural corta (~6-12 meses) = la probabilidad de brote recurrente en 2027 es ALTA.<br>
-      &bull; <strong>Amates como "canario en la mina":</strong> El brote en Izabal (costa atlantica, tropical humeda) demuestra expansion geografica mas alla del altiplano central. Si el ensayo incluye sitios perifericos, la cobertura de variantes circulantes es mas representativa.
+      &bull; <strong>Amates como "canario en la mina":</strong> El brote en Izabal (costa atlantica, tropical humeda) demuestra expansión geográfica más allá del altiplano central. Si el ensayo incluye sitios perifericos, la cobertura de variantes circulantes es mas representativa.
     </div>
   </div>
 
   <!-- G. IGSS vs MSPAS COMPARISON -->
   <div class="chart-card" style="margin-top:20px">
-    <h3>G. Comparacion IGSS vs MSPAS/FluNet — Representatividad de la Poblacion del Ensayo</h3>
+    <h3>G. Comparación IGSS vs MSPAS/FluNet — Representatividad de la Población del Ensayo</h3>
     <div style="overflow-x:auto">
     <table class="data-table" style="font-size:0.8rem">
       <thead>
         <tr>
-          <th>Dimension</th>
+          <th>Dimensión</th>
           <th>IGSS</th>
           <th>MSPAS</th>
           <th>FluNet SENTINEL (LNS)</th>
-          <th>Implicacion para ensayo</th>
+          <th>Implicación para ensayo</th>
         </tr>
       </thead>
       <tbody>
         <tr>
-          <td><strong>Poblacion cubierta</strong></td>
+          <td><strong>Población cubierta</strong></td>
           <td>~3.2M afiliados (18% poblacion) — sector formal, empleados</td>
           <td>~5.5-6M (30-35%) — sector informal, rural, indigena</td>
           <td>6 sitios centinela (sampling, no cobertura)</td>
@@ -2054,33 +2074,33 @@
           <td>PCR in-situ (HGE, Ceibal), FilmArray (Z11), RIDT (Antigua, CAMIP)</td>
           <td>PCR solo en LNS (nacional) + VICo (Cuilapa, Quetzaltenango)</td>
           <td>RT-PCR LNS exclusivamente</td>
-          <td>IGSS HGE tiene MEJOR capacidad diagnostica que la mayoria de hospitales MSPAS &rarr; ventaja operacional para el ensayo</td>
+          <td>IGSS HGE tiene MEJOR capacidad diagnóstica que la mayoria de hospitales MSPAS &rarr; ventaja operacional para el ensayo</td>
         </tr>
         <tr>
-          <td><strong>Experiencia investigacion</strong></td>
+          <td><strong>Experiencia investigación</strong></td>
           <td>HGE: sitio centinela OMS. Resto: limitada</td>
           <td>SJD, Roosevelt: amplia. VICo: 15+ anos. Otros: ninguna</td>
           <td>—</td>
-          <td>Solo HGE-IGSS y VICo tienen experiencia real en investigacion epidemiologica</td>
+          <td>Solo HGE-IGSS y VICo tienen experiencia real en investigación epidemiológica</td>
         </tr>
         <tr style="background:rgba(231,76,60,0.06)">
           <td><strong>Acceso a pacientes &le;48h</strong></td>
           <td>Emergencia Adultos: probable &le;48h en ~60-70% (autorefieren). Observacion: ~50% (mas tardio). Maternidad: unico — sintomas incidentales</td>
           <td>Emergencia: ~40-50% &le;48h (mas lejos del hospital). Referidos: >48h</td>
           <td>—</td>
-          <td>IGSS pacientes tienen MEJOR acceso geografico (urbanos) &rarr; mayor proporcion en ventana &le;48h que MSPAS rural</td>
+          <td>IGSS pacientes tienen MEJOR acceso geografico (urbaños) &rarr; mayor proporcion en ventana &le;48h que MSPAS rural</td>
         </tr>
       </tbody>
     </table>
     </div>
     <div style="margin-top:12px;padding:12px;background:#f8f9fa;border-radius:6px;font-size:0.82rem">
-      <strong>Representatividad:</strong> Los pacientes IGSS son representativos del sector formal guatemalteco (clase media, urbana, con empleo), pero NO de la poblacion general. Un ensayo SOLO en IGSS tendria sesgo de generalizacion significativo. <strong>Solucion:</strong> Combinar sitios IGSS (HGE, Antigua) con MSPAS (SJD, Roosevelt, VICo Cuilapa para rural, VICo Quetzaltenango para indigena). Esto cubre: urbano formal (IGSS) + urbano informal (SJD/Roosevelt) + rural ladino (Cuilapa) + altiplano indigena (Quetzaltenango). Las 4 categorias demograficas clave de Guatemala.
+      <strong>Representatividad:</strong> Los pacientes IGSS son representativos del sector formal guatemalteco (clase media, urbana, con empleo), pero NO de la población general. Un ensayo SOLO en IGSS tendria sesgo de generalizacion significativo. <strong>Solucion:</strong> Combinar sitios IGSS (HGE, Antigua) con MSPAS (SJD, Roosevelt, VICo Cuilapa para rural, VICo Quetzaltenango para indigena). Esto cubre: urbano formal (IGSS) + urbano informal (SJD/Roosevelt) + rural ladino (Cuilapa) + altiplano indigena (Quetzaltenango). Las 4 categorias demograficas clave de Guatemala.
     </div>
   </div>
 
   <!-- H. CONCRETE RECOMMENDATIONS -->
   <div class="chart-card" style="margin-top:20px">
-    <h3>H. Recomendaciones Concretas — Plan de Ejecucion del Ensayo</h3>
+    <h3>H. Recomendaciones Concretas — Plan de Ejecución del Ensayo</h3>
 
     <div style="margin-bottom:16px">
     <h4 style="color:var(--primary);margin-bottom:8px">H.1 Sitios Recomendados (Ranking Final Integrado)</h4>
@@ -2104,7 +2124,7 @@
           <td>IGSS</td>
           <td>PCR in-situ</td>
           <td>200-300</td>
-          <td>Mayor volumen PCR IGSS; centinela OMS; data 3,677 pts; positivity 12.7%; Emergencia + Observacion: 36.2% de positivos; experiencia investigacion</td>
+          <td>Mayor volumen PCR IGSS; centinela OMS; data 3,677 pts; positivity 12.7%; Emergencia + Observación: 36.2% de positivos; experiencia investigación</td>
           <td><span class="tag tag-h3n2">1 ESENCIAL</span></td>
         </tr>
         <tr style="background:rgba(231,76,60,0.08)">
@@ -2140,7 +2160,7 @@
           <td>MSPAS/VICo</td>
           <td>RT-PCR in-situ</td>
           <td>150-250</td>
-          <td>RT-PCR existente; 15+ anos de datos VICo; poblacion K'iche'/Mam; 2a ciudad del pais</td>
+          <td>RT-PCR existente; 15+ anos de datos VICo; población K'iche'/Mam; 2a ciudad del pais</td>
           <td><span class="tag tag-h1n1">2 ALTA</span></td>
         </tr>
         <tr style="background:rgba(230,126,34,0.06)">
@@ -2149,7 +2169,7 @@
           <td>MSPAS/VICo</td>
           <td>RT-PCR in-situ</td>
           <td>100-200</td>
-          <td>RT-PCR existente; poblacion rural ladina; datos historicos de referencia (VICo 2008-12 = baseline del ensayo)</td>
+          <td>RT-PCR existente; población rural ladina; datos históricos de referencia (VICo 2008-12 = baseline del ensayo)</td>
           <td><span class="tag tag-h1n1">2 ALTA</span></td>
         </tr>
         <tr>
@@ -2173,7 +2193,7 @@
       </tbody>
     </table>
     </div>
-    <div class="source" style="margin-top:4px">Sitios NO recomendados: CAMIP Z12 (positivity 2.1%, demasiado baja — screening ineficiente), HGE Z11 (volumen 135/2 anos, insuficiente), Tiquisate (PCR suspendida), Patulul (sin capacidad). CAMIP podria agregarse SOLO si el protocolo incluye subgrupo especifico de adultos mayores (pensionados >60 anos).</div>
+    <div class="source" style="margin-top:4px">Sitios NO recomendados: CAMIP Z12 (positivity 2.1%, demasiado baja — screening ineficiente), HGE Z11 (volumen 135/2 anos, insuficiente), Tiquisate (PCR suspendida), Patulul (sin capacidad). CAMIP podria agregarse SOLO si el protocolo incluye subgrupo especifico de adultos mayores (pensionados >60 años).</div>
     </div>
 
     <div style="margin-bottom:16px">
@@ -2202,10 +2222,10 @@
     </table>
     </div>
     <div style="margin-top:8px;padding:10px;background:#e8f8f5;border-radius:6px;font-size:0.82rem;border-left:4px solid #27ae60">
-      <strong>Escenario base:</strong> N=1,000 alcanzado entre <strong>Dic 2027 y Mar 2028</strong> (14-18 meses de enrollment).<br>
+      <strong>Escenario base:</strong> N=1,000 alcanzado entre <strong>Dic 2027 y Mar 2028</strong> (14-18 meses de enrollment). <em>[Caveat: el extremo inferior de la tabla (870 acum. a Mar 2028) NO alcanza 1,000 en 18 meses; 14-18 meses solo aplica con enrollment &ge;midpoint. Peor caso base requiere ~20 meses.]</em><br>
       <strong>Escenario optimista</strong> (alta positividad como 2025-26, 8 sitios a plena capacidad): N=1,000 en <strong>Oct-Nov 2027</strong> (12-13 meses).<br>
       <strong>Escenario pesimista</strong> (baja positividad como 2024 off-peak, dropouts >25%): N=1,000 en <strong>Jun-Sep 2028</strong> (20-23 meses).<br>
-      <strong>Contingencia:</strong> Si enrollment &lt;60% del target al mes 8, considerar: (a) agregar 2-3 sitios MSPAS Tier 2 (Totonipacapan, Coban), (b) flexibilizar ventana a &le;72h (con analisis de sensibilidad pre-especificado), (c) aceptar RIDT+ sin PCR confirm en sitios rurales (analisis por protocolo separado).
+      <strong>Contingencia:</strong> Si enrollment &lt;60% del target al mes 8, considerar: (a) agregar 2-3 sitios MSPAS Tier 2 (Totonicapán, Coban), (b) flexibilizar ventana a &le;72h (con análisis de sensibilidad pre-especificado), (c) aceptar RIDT+ sin PCR confirm en sitios rurales (análisis por protocolo separado).
     </div>
     </div>
 
@@ -2213,10 +2233,10 @@
     <h4 style="color:var(--primary);margin-bottom:8px">H.3 Estrategia de Screening Recomendada</h4>
     <div style="padding:12px;background:#f8f9fa;border-radius:6px;font-size:0.82rem">
       <strong>Protocolo de screening en 3 pasos:</strong><br><br>
-      <strong>Paso 1 — Pre-screening clinico (Minuto 0):</strong> En emergencia/consulta, identificar pacientes con: Fiebre &ge;38&deg;C + &ge;1 sintoma respiratorio (tos, odinofagia, rinorrea) + inicio sintomas &le;48 horas + edad &ge;1 ano. Personal de enfermeria con checklist. Estimado: 30-40% de consultas IRA cumplen.<br>
+      <strong>Paso 1 — Pre-screening clínico (Minuto 0):</strong> En emergencia/consulta, identificar pacientes con: Fiebre &ge;38&deg;C + &ge;1 síntoma respiratorio (tos, odinofagia, rinorrea) + inicio síntomas &le;48 horas + edad &ge;1 ano. Personal de enfermeria con checklist. Estimado: 30-40% de consultas IRA cumplen.<br>
       <strong>Paso 2 — RIDT (Minuto 5-20):</strong> Aplicar prueba rapida de antigeno (idealmente Xpert Xpress Flu si presupuesto lo permite, o Sofia Influenza A+B FIA como alternativa economica). Resultado en 15-30 min. Estimado: 15-25% de pre-screened son RIDT+.<br>
       <strong>Paso 3 — Consentimiento + PCR + Enrollment condicional (Minuto 20-60):</strong> Si RIDT+: (a) iniciar proceso de consentimiento informado, (b) tomar muestra nasofaringea para PCR confirmatorio, (c) administrar primera dosis IMP si PCR in-situ disponible y resultado en &le;6h, o enrollment condicional si PCR sera enviado a LNS. Discontinuar si PCR negativo (estimado: 5-10% de RIDT+ seran falsos positivos).<br><br>
-      <strong>NNS (Number Needed to Screen):</strong> Para enrollar 1 paciente, se necesita pre-screenar ~25-35 consultas IRA. Con 8 sitios y ~200 consultas IRA/dia/sitio en pico, se pueden pre-screenar ~1,600/dia &rarr; ~45-65 enrollados/dia en pico maximo &rarr; consistente con 80-120/mes (no todos los dias son pico, horario staff limitado).
+      <strong>NNS (Number Needed to Screen):</strong> Para enrollar 1 paciente se necesita testar ~25-35 pacientes con criterios ILI (NNS desde testeados = 1/(positivity &times; 0.319 elegibilidad); con positivity 9-13% &rarr; NNS 24-35). <em>[Nota: si el denominador es todas las consultas IRA incluyendo las que no cumplen criterios ILI, NNS sube a ~45-70.]</em> Con 8 sitios y ~200 consultas IRA/dia/sitio en pico, ~35% cumplen ILI &rarr; ~560 testeados/dia &rarr; ~16-22 enrollados/dia te&oacute;ricos &rarr; ~80-120/mes ajustando por d&iacute;as no-pico y limitaciones de staff.
     </div>
     </div>
 
@@ -2224,10 +2244,10 @@
     <h4 style="color:var(--primary);margin-bottom:8px">H.4 Plan Estacional de Enrollment</h4>
     <div style="padding:12px;background:#f8f9fa;border-radius:6px;font-size:0.82rem">
       <strong>Staffing diferenciado por temporada:</strong><br>
-      &bull; <strong>Temporada alta (Ene-Mar, Nov-Dic):</strong> Staff completo (PI + 2 coordinadores + 1 farmaceutico + 1 lab technician por sitio Tier 1). Horario extendido 7am-7pm incluyendo fines de semana. 80% del budget de screening.<br>
+      &bull; <strong>Temporada alta (Ene-Mar, Nov-Dic):</strong> Staff completo (PI + 2 coordinadores + 1 farmacéutico + 1 lab technician por sitio Tier 1). Horario extendido 7am-7pm incluyendo fines de semana. 80% del budget de screening.<br>
       &bull; <strong>Temporada media (Abr-Jul, Oct):</strong> Staff regular (PI + 1 coordinador). Horario laboral estandar. 15% del budget de screening.<br>
       &bull; <strong>Valle (Ago-Sep):</strong> Staff minimo (1 coordinador). Solo screening oportunista. Usar para: actualizacion de datos, auditorias de calidad, entrenamiento GCP refresher, preparacion para siguiente pico. 5% del budget de screening.<br>
-      &bull; <strong>Adaptacion inter-sitio:</strong> HGE pico secundario en Jul &rarr; mantener staff completo Jul en HGE. Antigua pico tardio Dic &rarr; reforzar Antigua en Dic. La discordancia entre sitios es una VENTAJA operacional.
+      &bull; <strong>Adaptación inter-sitio:</strong> HGE pico secundario en Jul &rarr; mantener staff completo Jul en HGE. Antigua pico tardio Dic &rarr; reforzar Antigua en Dic. La discordancia entre sitios es una VENTAJA operacional.
     </div>
     </div>
 
@@ -2240,7 +2260,7 @@
           <th>Riesgo</th>
           <th>Probabilidad</th>
           <th>Impacto</th>
-          <th>Mitigacion</th>
+          <th>Mitigación</th>
         </tr>
       </thead>
       <tbody>
@@ -2248,13 +2268,13 @@
           <td><strong>Temporada baja inesperada</strong> (positivity &lt;10% todo el ano)</td>
           <td>Media (20%)</td>
           <td>Alto — enrollment &lt;50% del target</td>
-          <td>Agregar sitios MSPAS Tier 2; flexibilizar ventana a &le;72h (analisis sensibilidad); enrollment oportunista en brotes (Amates-style)</td>
+          <td>Agregar sitios MSPAS Tier 2; flexibilizar ventana a &le;72h (análisis sensibilidad); enrollment oportunista en brotes (Amates-style)</td>
         </tr>
         <tr>
           <td><strong>Rechazo consentimiento</strong> (&lt;60% tasa aceptacion)</td>
           <td>Media-Alta (30%)</td>
           <td>Alto — reduce pool elegible 20-40%</td>
-          <td>Engagement comunitario PREVIO (lideres, radio local, idiomas Maya); compensacion transporte adecuada (Q50-100); explicacion clara del beneficio (acceso a antiviral que no existe en GT)</td>
+          <td>Engagement comunitario PREVIO (lideres, radio local, idiomas Maya); compensación transporte adecuada (Q50-100); explicación clara del beneficio (acceso a antiviral que no existe en GT)</td>
         </tr>
         <tr style="background:rgba(231,76,60,0.06)">
           <td><strong>Dropout &gt;25%</strong></td>
@@ -2265,14 +2285,14 @@
         <tr>
           <td><strong>Supply chain IMP</strong> (cadena de frio rota)</td>
           <td>Baja-Media (15%)</td>
-          <td>Alto — suspension temporal de enrollment</td>
+          <td>Alto — suspensión temporal de enrollment</td>
           <td>Buffer stock 20% en cada sitio; monitoreo continuo temperatura (data loggers); proveedor local de hielo seco como backup</td>
         </tr>
         <tr style="background:rgba(231,76,60,0.06)">
           <td><strong>Cepa drift/shift</strong> (nueva variante emerge)</td>
           <td>Baja (10%)</td>
-          <td>Medio — puede afectar eficacia si farmaco es cepa-especifico</td>
-          <td>Farmaco de amplio espectro (cap-dependent endonuclease, PA inhibitor); subtipificacion en todas las muestras; analisis por subtipo pre-especificado</td>
+          <td>Medio — puede afectar eficacia si fármaco es cepa-específico</td>
+          <td>Fármaco de amplio espectro (cap-dependent endonuclease, PA inhibitor); subtipificación en todas las muestras; análisis por subtipo pre-especificado</td>
         </tr>
         <tr>
           <td><strong>Competencia con otro ensayo/intervencion</strong></td>
@@ -2303,16 +2323,16 @@
     <h3>Tabla Resumen Ejecutivo — Ensayo Antiviral Influenza Guatemala (Red IGSS + MSPAS)</h3>
     <div style="overflow-x:auto">
     <table class="data-table" style="font-size:0.82rem">
-      <thead><tr><th>Parametro</th><th>Valor/Recomendacion</th></tr></thead>
+      <thead><tr><th>Parámetro</th><th>Valor/Recomendacion</th></tr></thead>
       <tbody>
-        <tr><td><strong>Target enrollment</strong></td><td>N=1,000 (randomizacion 1:1, 500/brazo) + 20% sobre-enrollment = 1,200 screened-eligible</td></tr>
-        <tr><td><strong>Endpoint primario</strong></td><td>Tiempo a resolucion de sintomas (FLU-PRO &le;1 x &ge;24h). Poder: ~95% para HR=1.30</td></tr>
+        <tr><td><strong>Target enrollment</strong></td><td>N=1,000 (randomización 1:1, 500/brazo) + 20% sobre-enrollment = 1,200 screened-eligible</td></tr>
+        <tr><td><strong>Endpoint primario</strong></td><td>Tiempo a resolución de síntomas (FLU-PRO &le;1 x &ge;24h). Poder: ~95% para HR=1.30</td></tr>
         <tr><td><strong>Sitios</strong></td><td>8 sitios: 3 IGSS (HGE, Antigua, Ceibal) + 3 MSPAS Tier 1 (SJD, Roosevelt, HIIR) + 2 VICo (Cuilapa, Quetzaltenango) + Amates oportunista</td></tr>
-        <tr><td><strong>Contribucion IGSS</strong></td><td>~350 pts/ano (35% del total) — HGE: 200-300, Antigua: 150-250, Ceibal: 30-50</td></tr>
-        <tr><td><strong>Contribucion MSPAS+VICo</strong></td><td>~650 pts/ano (65% del total) — SJD: 250-400, Roosevelt: 200-350, VICo: 250-450</td></tr>
-        <tr><td><strong>Timeline enrollment</strong></td><td>Oct 2026 &rarr; Dic 2027-Mar 2028 (14-18 meses). Primer paciente: Oct 2026</td></tr>
-        <tr><td><strong>Screening strategy</strong></td><td>Pre-screen clinico ILI &le;48h &rarr; RIDT &rarr; PCR confirmatorio. NNS = 25-35 consultas por enrollment</td></tr>
-        <tr><td><strong>Target tipo viral</strong></td><td>"Any influenza" con estratificacion A/B en analisis. En practica 2026-27: &ge;95% sera Flu A (H3N2)</td></tr>
+        <tr><td><strong>Contribución IGSS</strong></td><td>~350 pts/ano (35% del total) — HGE: 200-300, Antigua: 150-250, Ceibal: 30-50</td></tr>
+        <tr><td><strong>Contribución MSPAS+VICo</strong></td><td>~650 pts/ano (65% del total) — SJD: 250-400, Roosevelt: 200-350, VICo: 250-450</td></tr>
+        <tr><td><strong>Timeline enrollment</strong></td><td>Oct 2026 &rarr; Dic 2027-Mar 2028 (14-18 meses escenario &ge;midpoint; peor caso base ~20 meses). Primer paciente: Oct 2026</td></tr>
+        <tr><td><strong>Screening strategy</strong></td><td>Pre-screen cl&iacute;nico ILI &le;48h &rarr; RIDT &rarr; PCR confirmatorio. NNS = 25-35 desde pacientes testeados (45-70 desde todas las consultas IRA)</td></tr>
+        <tr><td><strong>Target tipo viral</strong></td><td>"Any influenza" con estratificación A/B en análisis. En practica 2026-27: &ge;95% sera Flu A (H3N2)</td></tr>
         <tr><td><strong>Ventana optima</strong></td><td>Year-round con staffing reforzado Ene-Mar y Nov-Dic. Valle Ago-Sep: mantenimiento minimo</td></tr>
         <tr><td><strong>Presupuesto Dx estimado</strong></td><td>~$125k-200k (RIDT: 5,000 tests x $10 = $50k; PCR confirmatorio: 1,500 tests x $35 = $52.5k; overhead $22.5-97.5k)</td></tr>
         <tr><td><strong>Riesgos principales</strong></td><td>Temporada baja inesperada (20%), rechazo consentimiento (30%), retraso regulatorio (25%)</td></tr>
@@ -2320,7 +2340,7 @@
       </tbody>
     </table>
     </div>
-    <div class="source" style="margin-top:8px"><strong>Fuentes integradas:</strong> IGSS Oficios EPI 60/2026 (8 hospitales, 9,180+ pacientes); igss_analysis.json (HGE 3,677 PCR verificado); WHO FluNet SENTINEL GT 2009-2026; MSPAS SIGSA IRA 2012-2024 (3.13M casos 2024); VICo 2008-2012 (PMC6696630); CAPSTONE-1/2 (baloxavir); Treanor 2000 (oseltamivir). Analisis: 2026-03-16. Todos los numeros de elegibles son proyecciones — requieren validacion con fase piloto de 4 semanas en 2-3 sitios Tier 1.</div>
+    <div class="source" style="margin-top:8px"><strong>Fuentes integradas:</strong> IGSS Oficios EPI 60/2026 (8 hospitales, 9,180+ pacientes); igss_analysis.json (HGE 3,677 PCR verificado); WHO FluNet SENTINEL GT 2009-2026; MSPAS SIGSA IRA 2012-2024 (3.13M casos 2024); VICo 2008-2012 (PMC6696630); CAPSTONE-1/2 (baloxavir); Treanor 2000 (oseltamivir). Análisis: 2026-03-16. Todos los numeros de elegibles son proyecciones — requieren validacion con fase piloto de 4 semanas en 2-3 sitios Tier 1.</div>
   </div>
 
 </div>
@@ -3358,8 +3378,8 @@ new Chart(document.getElementById('chartFig1A_GT'), {
       annotation:{annotations:{
         pico2024:{type:'point',xValue:'Mar',yValue:54,backgroundColor:'rgba(231,76,60,0.8)',borderColor:'#c0392b',radius:6,
           label:{display:true,content:'Mar 2024\n54% (Máximo)',position:'top',font:{size:9}}},
-        pico2026:{type:'point',xValue:'Feb',yValue:39,backgroundColor:'rgba(142,68,173,0.8)',borderColor:'#6c3483',radius:6,
-          label:{display:true,content:'Feb 2026\n39% (en curso)',position:'top',font:{size:9}}}
+        pico2026:{type:'point',xValue:'Feb',yValue:42,backgroundColor:'rgba(142,68,173,0.8)',borderColor:'#6c3483',radius:6,
+          label:{display:true,content:'Feb 2026\n42% (en curso)',position:'top',font:{size:9}}}
       }}
     },
     scales: {
@@ -3859,7 +3879,7 @@ new Chart(document.getElementById('chartMultiVaccine'), {
         },
         {
           label: 'FluNet SENTINEL (%)',
-          data: [19.4,18.2,20.0,15.0,21.4,0.0,0.0,36.0,41.9,25.0,43.3,43.8],
+          data: [38.5,42.9,54.4,28.4,26.5,30.6,16.9,17.3,21.6,21.6,17.1,6.7],
           type: 'line',
           borderColor: '#e74c3c',
           backgroundColor: 'transparent',
@@ -4060,11 +4080,11 @@ new Chart(document.getElementById('chartMultiVaccine'), {
 })();
 
 // ===================== TAB SWITCHING =====================
-function showTab(id) {
+function showTab(id, evt) {
   document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
   document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
   document.getElementById(id).classList.add('active');
-  event.target.classList.add('active');
+  if (evt && evt.currentTarget) evt.currentTarget.classList.add('active');
 }
 </script>
 </body>
