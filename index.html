@@ -412,18 +412,18 @@
     <div class="kpi-grid" style="grid-template-columns: repeat(4, 1fr); margin-bottom:16px">
       <div class="kpi">
         <div class="label">Red IGSS: Tests Totales</div>
-        <div class="value">9,368</div>
-        <div class="sub">2024: 4,185 · 2025: 5,156 · 2026: 27 · 9 hospitales consultados</div>
+        <div class="value">~24,000</div>
+        <div class="sub">17 unidades consultadas · 2024-2025 combinado + 61 tests 2026</div>
       </div>
       <div class="kpi success">
         <div class="label">Hospitales Activos</div>
-        <div class="value" style="color:#27ae60">7 / 9</div>
-        <div class="sub">PCR: 4 (HGE, Z11, Ceibal, Chimaltenango) · Rápida: 3 (Antigua, CAMIP, Amates)</div>
+        <div class="value" style="color:#27ae60">12 / 17</div>
+        <div class="sub">PCR: 9 (HGE Z9, HJJAB, Z5, Z11, Ceibal, Gineco, Mazat, Chimal, Zacapa) · Rápida: 3</div>
       </div>
       <div class="kpi danger">
-        <div class="label">Positividad Red 2025</div>
-        <div class="value" style="color:#e74c3c">10.9%</div>
-        <div class="sub">2024: 6.4% · Flu B desaparece: 53→11 casos</div>
+        <div class="label">Positividad Flu A (PCR)</div>
+        <div class="value" style="color:#e74c3c">8.1%</div>
+        <div class="sub">HGE Z9 (mayor volumen). Flu B: 2.0%. Red varía 2-20% según sitio</div>
       </div>
       <div class="kpi danger">
         <div class="label">Brote H3N2 (mar 2026)</div>
@@ -462,18 +462,26 @@
         <table class="data-table" style="font-size:0.78rem">
           <thead><tr><th>Hospital IGSS</th><th>Departamento</th><th>Tipo Test</th><th>Tests 2024</th><th>Tests 2025</th><th>Tests 2026</th><th>Pos. 2024</th><th>Pos. 2025</th><th>Hallazgo Clave</th><th>Estado</th></tr></thead>
           <tbody>
-            <tr style="background:#d4edda"><td><strong>HGE Guatemala (Z11)</strong></td><td>Guatemala</td><td>PCR</td><td>1,005</td><td>2,672</td><td>—</td><td>14.3%</td><td>12.1%</td><td>Mayor volumen de la red. Flu B desaparece en 2025</td><td>✅ Activo</td></tr>
-            <tr style="background:#d4edda"><td><strong>HGE Zona 11 (FilmArray)</strong></td><td>Guatemala</td><td>PCR molecular</td><td>12</td><td>123</td><td>—</td><td>0%</td><td>4.1%</td><td>Panel respiratorio completo. Solo 5 Flu A+ en 2025</td><td>✅ Activo</td></tr>
-            <tr style="background:#d4edda"><td><strong>Hosp. Antigua "La Capitanía"</strong></td><td>Sacatepéquez</td><td>Rápida + PCR</td><td>290</td><td>1,101</td><td>—</td><td>21.4%</td><td>16.1%</td><td>Ola Flu B sep'24 (33%). Surge Flu A dic'25 (37.7%)</td><td>✅ Activo</td></tr>
-            <tr style="background:#d4edda"><td><strong>CAMIP Pensionados (Z12)</strong></td><td>Guatemala</td><td>Rápida</td><td>618</td><td>1,076</td><td>—</td><td>2.8%</td><td>1.7%</td><td>Población mayor. Positividad muy baja por screening amplio</td><td>✅ Activo</td></tr>
+            <tr style="background:#b9f6ca"><td><strong>HGE Zona 9</strong></td><td>Guatemala</td><td>PCR</td><td colspan="2">11,158 Flu A + 6,538 Flu B (combinado 2024-25)</td><td>—</td><td colspan="2">A: 8.1% · B: 2.0%</td><td>MAYOR volumen de toda la red IGSS. Fuente: 4D Analytics-HGE</td><td>✅ Activo</td></tr>
+            <tr style="background:#d4edda"><td><strong>HJJAB (Juan José Arévalo)</strong></td><td>Guatemala</td><td>PCR</td><td>1,005</td><td>2,672</td><td>—</td><td>14.3%</td><td>12.1%</td><td>Datos individuales por paciente. Flu B desaparece en 2025</td><td>✅ Activo</td></tr>
+            <tr style="background:#d4edda"><td><strong>Periférica Z5</strong></td><td>Guatemala</td><td>PCR Panel</td><td>1,884</td><td>156</td><td>—</td><td>20.4%</td><td>16.0%</td><td>Mayor positividad Flu A de la red. Volumen cayó 92% en 2025</td><td>✅ Activo</td></tr>
+            <tr style="background:#d4edda"><td><strong>Periférica Z11 (FilmArray)</strong></td><td>Guatemala</td><td>PCR molecular</td><td>12</td><td>123</td><td>—</td><td>0%</td><td>4.1%</td><td>Panel respiratorio completo. Solo 5 Flu A+ en 2025</td><td>✅ Activo</td></tr>
             <tr style="background:#d4edda"><td><strong>HGA Ceibal (Accidentes)</strong></td><td>Guatemala</td><td>PCR</td><td>2,159</td><td>152</td><td>—</td><td>2.0%</td><td>20.4%</td><td>Volumen cayó 93% pero positividad subió 10×. Cambio protocolo</td><td>✅ Activo</td></tr>
-            <tr style="background:#d4edda"><td><strong>Hosp. Chimaltenango</strong></td><td>Chimaltenango</td><td>PCR panel multiplex</td><td>0</td><td>32</td><td>—</td><td>—</td><td>15.6%</td><td>Lab abrió 2025. 5/5 Flu A son H3N2. 0 Flu B. 4 parainfluenza</td><td>✅ Nuevo 2025</td></tr>
+            <tr style="background:#d4edda"><td><strong>Ginecobstetricia</strong></td><td>Guatemala</td><td>PCR</td><td>183</td><td>180</td><td>—</td><td>9.8%</td><td>3.3%</td><td>Hospital especializado OB/GYN. Positividad bajó en 2025</td><td>✅ Activo</td></tr>
+            <tr style="background:#d4edda"><td><strong>Hosp. Antigua "La Capitanía"</strong></td><td>Sacatepéquez</td><td>Rápida + PCR</td><td>290</td><td>1,101</td><td>—</td><td>21.4%</td><td>16.1%</td><td>Ola Flu B sep'24 (33%). Surge Flu A dic'25 (37.7%)</td><td>✅ Activo</td></tr>
+            <tr style="background:#d4edda"><td><strong>Mazatenango</strong></td><td>Suchitepéquez</td><td>PCR Panel</td><td>149</td><td>214</td><td>34</td><td>9.4%</td><td>8.4%</td><td><strong>2026: 35.3% positividad</strong> (12/34) — brote activo confirmado</td><td>✅ Activo</td></tr>
+            <tr style="background:#d4edda"><td><strong>Hosp. Chimaltenango</strong></td><td>Chimaltenango</td><td>PCR panel multiplex</td><td>0</td><td>32</td><td>—</td><td>—</td><td>15.6%</td><td>Lab abrió 2025. 5/5 Flu A = H3N2 subtipados. 0 Flu B</td><td>✅ Nuevo 2025</td></tr>
+            <tr style="background:#d4edda"><td><strong>CAMIP Pamplona (Z12)</strong></td><td>Guatemala</td><td>Rápida</td><td>618</td><td>1,076</td><td>—</td><td>2.8%</td><td>1.7%</td><td>Población geriátrica (pensionados). Screening amplio</td><td>✅ Activo</td></tr>
             <tr style="background:#fff3cd"><td>Cons. Amates</td><td>Izabal</td><td>Rápida</td><td>0</td><td>0</td><td>27</td><td>—</td><td>—</td><td>Inició feb 2026. Positiv. 48% (brote activo H3N2)</td><td>⚠️ Nuevo 2026</td></tr>
-            <tr style="background:#fff3cd"><td>Hosp. Tiquisate</td><td>Escuintla</td><td>Rápida</td><td>101</td><td>0</td><td>—</td><td>1.0%</td><td>—</td><td>PCR suspendido 2025. Solo 1 positivo en 101 tests</td><td>⚠️ Suspendido</td></tr>
+            <tr style="background:#fff3cd"><td>Cons. Zacapa</td><td>Zacapa</td><td>PCR (2025)</td><td>0</td><td>23</td><td>—</td><td>—</td><td>0%</td><td>Inició PCR 2025. 23 tests, 0 influenza (otros virus resp.)</td><td>⚠️ Nuevo 2025</td></tr>
+            <tr style="background:#fff3cd"><td>Chicacao</td><td>Suchitepéquez</td><td>Rápida</td><td>20</td><td>24</td><td>—</td><td>N/D</td><td>N/D</td><td>Solo prueba rápida. Muy bajo volumen. Sin desglose resultados</td><td>⚠️ Limitado</td></tr>
+            <tr style="background:#fff3cd"><td>Hosp. Tiquisate</td><td>Escuintla</td><td>Rápida</td><td>101</td><td>0</td><td>—</td><td>1.0%</td><td>—</td><td>Todo diagnóstico suspendido en 2025</td><td>⚠️ Suspendido</td></tr>
+            <tr style="background:#f8d7da"><td>Hosp. Quetzaltenango</td><td>Quetzaltenango</td><td>Rápida solo</td><td>?</td><td>?</td><td>—</td><td>?</td><td>?</td><td>Sin PCR. Solo prueba rápida. No proporcionó datos numéricos</td><td>❌ Sin PCR</td></tr>
+            <tr style="background:#f8d7da"><td>Cons. San Marcos</td><td>San Marcos</td><td>Ninguno</td><td>0</td><td>0</td><td>0</td><td>—</td><td>—</td><td>"No se realizan pruebas de PCR para Influenza"</td><td>❌ Sin capacidad</td></tr>
             <tr style="background:#f8d7da"><td>Hosp. Patulul</td><td>Suchitepéquez</td><td>Ninguno</td><td>0</td><td>0</td><td>0</td><td>—</td><td>—</td><td>Sin capacidad PCR ni prueba rápida instalada</td><td>❌ Sin capacidad</td></tr>
           </tbody>
           <tfoot>
-            <tr style="font-weight:bold;background:#e8f4fd"><td colspan="3">TOTAL RED IGSS</td><td>4,185</td><td>5,156</td><td>27</td><td>6.4%</td><td>10.9%</td><td colspan="2">9 hospitales consultados, 7 activos</td></tr>
+            <tr style="font-weight:bold;background:#e8f4fd"><td colspan="3">TOTAL RED IGSS (17 unidades)</td><td colspan="3">~24,000 tests (2024-2025 combinado) + 61 (2026)</td><td colspan="2">PCR: ~8% · Rápida: ~3-16%</td><td colspan="2">17 consultados, 12 activos, 9 con PCR</td></tr>
           </tfoot>
         </table>
       </div>
@@ -481,12 +489,13 @@
         <span class="alert-icon">⚠️</span>
         <div style="font-size:0.82rem"><strong>Hallazgos clave de la red IGSS:</strong>
           <ul style="margin:4px 0 0 16px;padding:0">
-            <li><strong>Flu B desapareció en 2025:</strong> De 53 positivos en 2024 (significativo en Antigua y HGE), cayó a 11 en toda la red — un cambio de tipo completo hacia Flu A/H3N2. Confirmado por PCR en HGE (2/320 = 0.6%). Caveat: RIDT tiene menor sensibilidad para Flu B (~53%) que para Flu A (~62%), lo que puede amplificar la caída aparente en sitios sin PCR</li>
-            <li><strong>Brote activo mar 2026:</strong> Amates (Izabal) reporta 48% positividad con solo pruebas rápidas — el brote H3N2 se está expandiendo fuera de la capital</li>
-            <li><strong>PCR vs Rápida:</strong> Positividad PCR (4-12%) &lt; Rápida (17-21%) porque los paneles PCR se ordenan por diferencial respiratorio amplio, no solo sospecha de influenza</li>
-            <li><strong>Ceibal:</strong> Caída del 93% en volumen de tests (2,159→152) con aumento de 10× en positividad sugiere cambio de protocolo de screening masivo a testeo dirigido</li>
-            <li><strong>Chimaltenango (nuevo 2025):</strong> Lab abrió en 2025 con panel multiplex. 32 paneles, 5 Flu A+ — <strong>todos H3N2 subtipados</strong>. También detecta parainfluenza (4 positivos). Confirmación molecular del predominio H3N2 fuera de la capital</li>
-            <li><strong>Capacidad total:</strong> ~9,400 tests/año en 7 hospitales activos. Para ensayo clínico, suficiente como pool de screening con alianza IGSS</li>
+            <li><strong>HGE Zona 9 — mayor volumen:</strong> 11,158 tests Flu A + 6,538 Flu B (2024-2025 combinado). Positividad: A 8.1%, B 2.0%. Fuente: sistema 4D Analytics-HGE. Es el hospital IGSS con mayor capacidad diagnóstica del país</li>
+            <li><strong>Periférica Z5 — mayor positividad Flu A:</strong> 19.2% en 2024 (361/1,884). Volumen cayó 92% en 2025 (156 tests) pero positividad se mantuvo alta (16.0%). Patrón similar a Ceibal</li>
+            <li><strong>Flu B desapareció en 2025:</strong> Confirmado en TODA la red expandida. HGE Z9: B solo 2.0%. HJJAB: 2/2,672. Periférica Z5: 0/156. CAMIP: 0/538. Chimaltenango: 0/32. Cambio de tipo completo hacia Flu A/H3N2</li>
+            <li><strong>Brotes activos 2026:</strong> Amates 48% (Izabal) + <strong>Mazatenango 35.3%</strong> (Suchitepéquez, 12/34). El brote H3N2 se expande a departamentos del suroccidente</li>
+            <li><strong>Ginecobstetricia:</strong> 363 PCR tests (2024-25). Positividad bajó de 9.8% a 3.3% — población embarazada con menor exposición</li>
+            <li><strong>Brechas geográficas:</strong> San Marcos, Quetzaltenango (2ª ciudad) y Patulul NO tienen PCR. Zacapa inició 2025 (23 tests, 0 influenza). Chicacao solo rápida (44 tests, sin desglose)</li>
+            <li><strong>Capacidad total actualizada:</strong> ~24,000 tests en 12 unidades activas (9 con PCR). Para ensayo clínico: pool de screening sustancial, especialmente HGE Z9 + HJJAB + Periférica Z5</li>
           </ul>
         </div>
       </div>
